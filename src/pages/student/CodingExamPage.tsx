@@ -35,6 +35,7 @@ export const StudentCodingExamPage = () => {
   const { examId } = useParams();
   const navigate = useNavigate();
   const [code, setCode] = useState('# Write your Python code here\n\ndef solution():\n    pass\n');
+  const [language, setLanguage] = useState('python');
   const [timeRemaining, setTimeRemaining] = useState(5400); // 90 minutes
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
   const [tabValue, setTabValue] = useState(0);
@@ -55,6 +56,7 @@ export const StudentCodingExamPage = () => {
 
   const handleSubmit = () => {
     console.log('Submitting code:', code);
+    console.log('Language:', language);
     navigate(`/student/exam/${examId}/result`);
   };
 
@@ -161,7 +163,8 @@ export const StudentCodingExamPage = () => {
             <CodeEditor
               value={code}
               onChange={(value) => setCode(value || '')}
-              language="python"
+              language={language}
+              onLanguageChange={setLanguage}
               height="calc(100vh - 250px)"
             />
 

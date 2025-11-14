@@ -54,7 +54,7 @@ export const mockExams: Exam[] = [
     type: 'coding',
     access_code: 'PY202',
     duration_minutes: 90,
-    start_at: '2025-11-16T10:00:00',
+    start_at: '2025-11-14T10:00:00',
     end_at: '2025-11-16T19:00:00',
     created_at: '2025-11-02T10:00:00',
   },
