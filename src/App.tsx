@@ -1,34 +1,26 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { Button, Typography, Box } from '@mui/material'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
-
+const App = () => {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <Box className="w-screen min-h-screen flex items-center justify-center bg-white text-gray-900">
+      <Box textAlign="center" className="space-y-6">
+        <Typography variant="h2" component="h1" className="font-bold text-green-600">
+          Welcome to ExamWeb
+        </Typography>
+        <Typography variant="h5" component="p" className="text-gray-600">
+          Your ultimate platform for taking exams online. Prepare, practice, and succeed with our comprehensive exam system.
+        </Typography>
+        <Box className="space-x-4">
+          <Button variant="contained" color="primary" size="large">
+            Start Exam
+          </Button>
+          <Button variant="outlined" color="secondary" size="large">
+            Learn More
+          </Button>
+        </Box>
+      </Box>
+    </Box>
   )
 }
 
