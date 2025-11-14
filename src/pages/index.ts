@@ -1,0 +1,19 @@
+// Student Pages
+export { StudentExamListPage } from './student/ExamListPage';
+export { StudentStandardExamPage } from './student/StandardExamPage';
+export { StudentCodingExamPage } from './student/CodingExamPage';
+export { StudentExamResultPage } from './student/ExamResultPage';
+export { StudentAllResultsPage } from './student/AllResultsPage';
+export { StudentProfilePage } from './student/ProfilePage';
+
+// Admin Pages
+export { AdminDashboardPage } from './admin/DashboardPage';
+export { AdminExamsPage } from './admin/AllExamsPage';
+export { AdminCreateExamPage } from './admin/CreateExamPage';
+export { AdminEditExamPage } from './admin/EditExamPage';
+export { AdminGradingPage } from './admin/GradingPage';
+export { AdminLeaderboardPage } from './admin/LeaderboardPage';
+export { AdminProfilePage } from './admin/ProfilePage';
+
+// Auth Pages
+export { SignInPage } from './SignInPage';

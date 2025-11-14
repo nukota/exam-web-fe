@@ -1,27 +1,149 @@
-import { Button, Typography, Box } from '@mui/material'
-import './App.css'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './shared/providers/AuthProvider';
+import { ProtectedRoute } from './components/common';
+import {
+  SignInPage,
+  // Student Pages
+  StudentExamListPage,
+  StudentStandardExamPage,
+  StudentCodingExamPage,
+  StudentExamResultPage,
+  StudentAllResultsPage,
+  StudentProfilePage,
+  // Admin Pages
+  AdminDashboardPage,
+  AdminExamsPage,
+  AdminCreateExamPage,
+  AdminEditExamPage,
+  AdminGradingPage,
+  AdminLeaderboardPage,
+  AdminProfilePage,
+} from './pages';
+import './App.css';
 
 const App = () => {
   return (
-    <Box className="w-screen min-h-screen flex items-center justify-center bg-white text-gray-900">
-      <Box textAlign="center" className="space-y-6">
-        <Typography variant="h2" component="h1" className="font-bold text-green-600">
-          Welcome to ExamWeb
-        </Typography>
-        <Typography variant="h5" component="p" className="text-gray-600">
-          Your ultimate platform for taking exams online. Prepare, practice, and succeed with our comprehensive exam system.
-        </Typography>
-        <Box className="space-x-4">
-          <Button variant="contained" color="primary" size="large">
-            Start Exam
-          </Button>
-          <Button variant="outlined" color="secondary" size="large">
-            Learn More
-          </Button>
-        </Box>
-      </Box>
-    </Box>
-  )
-}
+    <BrowserRouter>
+      <AuthProvider>
+        <Routes>
+          {/* Auth Route */}
+          <Route path="/signin" element={<SignInPage />} />
 
-export default App
+          {/* Student Routes */}
+          <Route
+            path="/student/exams"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <StudentExamListPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/exam/:examId/standard"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <StudentStandardExamPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/exam/:examId/coding"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <StudentCodingExamPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/exam/:examId/result"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <StudentExamResultPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/results"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <StudentAllResultsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/profile"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <StudentProfilePage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Admin Routes */}
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute allowedRoles={['admin', 'teacher']}>
+                <AdminDashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/exams"
+            element={
+              <ProtectedRoute allowedRoles={['admin', 'teacher']}>
+                <AdminExamsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/exams/create"
+            element={
+              <ProtectedRoute allowedRoles={['admin', 'teacher']}>
+                <AdminCreateExamPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/exams/:examId/edit"
+            element={
+              <ProtectedRoute allowedRoles={['admin', 'teacher']}>
+                <AdminEditExamPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/grading"
+            element={
+              <ProtectedRoute allowedRoles={['admin', 'teacher']}>
+                <AdminGradingPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/exams/:examId/leaderboard"
+            element={
+              <ProtectedRoute allowedRoles={['admin', 'teacher']}>
+                <AdminLeaderboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/profile"
+            element={
+              <ProtectedRoute allowedRoles={['admin', 'teacher']}>
+                <AdminProfilePage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Default Route */}
+          <Route path="/" element={<Navigate to="/signin" replace />} />
+          <Route path="*" element={<Navigate to="/signin" replace />} />
+        </Routes>
+      </AuthProvider>
+    </BrowserRouter>
+  );
+};
+
+export default App;
