@@ -2,7 +2,6 @@ import {
   Box,
   IconButton,
   Avatar,
-  Typography,
   Menu,
   MenuItem,
   Divider,
@@ -13,6 +12,7 @@ import {
   LogoutRounded,
   MenuRounded,
 } from "@mui/icons-material";
+import { Calendar, Bell } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../shared/providers/AuthProvider";
@@ -68,7 +68,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           justifyContent: "space-between",
           alignItems: "center",
           gap: { xs: 1, lg: 2 },
-          height: { xs: 60, sm: 66 },
+          height: { xs: 54, sm: 60 },
           px: 3,
         }}
       >
@@ -84,31 +84,16 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
         {/* Spacer */}
         <Box sx={{ flex: 1 }} />
 
-        {/* Profile Section */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <Box sx={{ textAlign: "right", display: { xs: 'none', sm: 'block' } }}>
-            <Typography
-              variant="body2"
-              sx={{
-                fontWeight: 600,
-                color: "text.primary",
-                fontSize: "0.95rem",
-              }}
-            >
-              {currentUser?.full_name || currentUser?.username}
-            </Typography>
-            <Typography
-              variant="caption"
-              sx={{
-                color: "text.secondary",
-                fontSize: "0.8rem",
-              }}
-            >
-              {currentUser?.email}
-            </Typography>
-          </Box>
+        {/* Icon Buttons */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <IconButton sx={{ color: "text.secondary" }}>
+            <Calendar size={24} />
+          </IconButton>
+          <IconButton sx={{ color: "text.secondary" }}>
+            <Bell size={24} />
+          </IconButton>
           <IconButton onClick={handleClick} size="small">
-            <Avatar sx={{ width: 40, height: 40, bgcolor: "primary.main" }}>
+            <Avatar sx={{ width: 36, height: 36, bgcolor: "primary.main" }}>
               {currentUser?.full_name?.charAt(0) || currentUser?.username?.charAt(0) || 'U'}
             </Avatar>
           </IconButton>

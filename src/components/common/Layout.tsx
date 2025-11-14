@@ -27,11 +27,10 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       {!isMobile && (
         <Box
           sx={{
-            width: 250,
+            width: 240,
             flexShrink: 0,
             borderRight: 1,
             borderColor: 'divider',
-            bgcolor: 'background.paper',
           }}
         >
           <NavBar role={userRole} />
@@ -47,7 +46,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         sx={{
           display: { xs: 'block', md: 'none' },
           '& .MuiDrawer-paper': {
-            width: 250,
+            width: 240,
             boxSizing: 'border-box',
           },
         }}
@@ -63,7 +62,6 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           sx={{
             flexGrow: 1,
             p: 3,
-            background: 'linear-gradient(135deg, #f5f7fa 0%, #e8eef5 50%, #f0f4f8 100%)',
             overflow: 'auto',
           }}
         >
