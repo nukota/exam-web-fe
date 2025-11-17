@@ -126,7 +126,7 @@ export const AdminExamsPage = () => {
             onClick={() => navigate("/admin/exams/create")}
             sx={{
               fontWeight: "bold",
-              backgroundColor: "grey.200",
+              backgroundColor: "grey.400",
               color: "black",
             }}
           >

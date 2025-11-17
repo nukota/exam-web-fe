@@ -1,142 +1,161 @@
-import { useState } from "react";
-import {
-  Box,
-  Typography,
-  Paper,
-  Button,
-  TextField,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  IconButton,
-} from "@mui/material";
-import { Grading } from "@mui/icons-material";
+import { Box, Typography, IconButton } from "@mui/material";
+import { Check, X, ClipboardEdit } from "lucide-react";
 import type { GridColDef } from "@mui/x-data-grid";
-import { Layout, CustomDataGrid, Chip } from "../../components/common";
+import { Layout, CustomDataGrid } from "../../components/common";
+import { useNavigate } from "react-router-dom";
 
-interface EssayAnswer {
-  answer_id: string;
-  student_name: string;
-  exam_title: string;
-  question_text: string;
-  answer_text: string;
-  max_points: number;
-  current_score?: number;
+interface ExamForGrading {
+  exam_id: string;
+  title: string;
+  duration_minutes: number;
+  end_at: string;
+  ended: boolean;
+  total_submissions: number;
+  pending_submissions: number;
 }
 
 // Mock data
-const mockEssayAnswers: EssayAnswer[] = [
+const mockExamsForGrading: ExamForGrading[] = [
   {
-    answer_id: "1",
-    student_name: "Alice Johnson",
-    exam_title: "Introduction to Computer Science",
-    question_text: "Explain the concept of recursion in programming.",
-    answer_text:
-      "Recursion is a programming technique where a function calls itself to solve a problem. It breaks down complex problems into simpler sub-problems. A recursive function must have a base case to stop the recursion and prevent infinite loops. For example, calculating factorial is a classic recursive problem.",
-    max_points: 5,
+    exam_id: "1",
+    title: "Introduction to Computer Science",
+    duration_minutes: 60,
+    end_at: "2025-11-15T18:00:00",
+    ended: true,
+    total_submissions: 25,
+    pending_submissions: 5,
   },
   {
-    answer_id: "2",
-    student_name: "Bob Smith",
-    exam_title: "Data Structures",
-    question_text: "Describe the difference between a stack and a queue.",
-    answer_text:
-      "A stack follows LIFO (Last In First Out) principle while a queue follows FIFO (First In First Out). In a stack, elements are added and removed from the same end. In a queue, elements are added at one end and removed from the other end.",
-    max_points: 3,
+    exam_id: "2",
+    title: "Advanced Data Structures",
+    duration_minutes: 90,
+    end_at: "2025-11-16T20:00:00",
+    ended: true,
+    total_submissions: 18,
+    pending_submissions: 0,
+  },
+  {
+    exam_id: "3",
+    title: "Web Development Final",
+    duration_minutes: 120,
+    end_at: "2025-11-20T22:00:00",
+    ended: false,
+    total_submissions: 10,
+    pending_submissions: 10,
   },
 ];
 
 export const AdminGradingPage = () => {
-  const [answers, setAnswers] = useState(mockEssayAnswers);
-  const [gradingDialogOpen, setGradingDialogOpen] = useState(false);
-  const [currentAnswer, setCurrentAnswer] = useState<any>(null);
-  const [score, setScore] = useState<string>("");
+  const navigate = useNavigate();
 
-  const handleOpenGrading = (answer: any) => {
-    setCurrentAnswer(answer);
-    setScore(answer.current_score?.toString() || "");
-    setGradingDialogOpen(true);
+  const handleGradeExam = (examId: string) => {
+    // TODO: Implement the grading page
+    navigate(`/admin/exams/${examId}/grade`);
   };
 
-  const handleSubmitGrade = () => {
-    const updatedAnswers = answers.map((a) =>
-      a.answer_id === currentAnswer.answer_id
-        ? { ...a, current_score: parseFloat(score) }
-        : a
-    );
-    setAnswers(updatedAnswers);
-    setGradingDialogOpen(false);
-    setCurrentAnswer(null);
-    setScore("");
-  };
-
-  const pendingCount = answers.filter(
-    (a) => a.current_score === undefined
-  ).length;
+  const totalPending = mockExamsForGrading.reduce(
+    (sum, exam) => sum + exam.pending_submissions,
+    0
+  );
 
   const columns: GridColDef[] = [
     {
-      field: "student_name",
-      headerName: "Student",
+      field: "title",
+      headerName: "Exam Title",
       flex: 1,
-      minWidth: 150,
-    },
-    {
-      field: "exam_title",
-      headerName: "Exam",
-      flex: 1,
-      minWidth: 150,
-    },
-    {
-      field: "question_text",
-      headerName: "Question",
-      flex: 2,
       minWidth: 200,
       renderCell: (params) => (
-        <Typography variant="body2" sx={{ maxWidth: 300 }}>
+        <Typography variant="body2" fontWeight="medium">
+          {params.value}
+        </Typography>
+      ),
+    },
+
+    {
+      field: "end_at",
+      headerName: "End Time",
+      flex: 0.75,
+      minWidth: 180,
+      valueFormatter: (value) =>
+        value ? new Date(value).toLocaleString() : "N/A",
+    },
+    {
+      field: "status",
+      headerName: "Ended",
+      width: 110,
+      align: "center",
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Box>
+          {params.value ? (
+            <Check size={20} color="#4caf50" />
+          ) : (
+            <X size={20} color="#f44336" />
+          )}
+        </Box>
+      ),
+    },
+
+    {
+      field: "total_submissions",
+      headerName: "Total Subm",
+      width: 80,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "pending_submissions",
+      headerName: "Pending",
+      width: 80,
+      align: "center",
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Typography
+          variant="body2"
+          sx={{
+            color: "text.secondary",
+          }}
+        >
           {params.value}
         </Typography>
       ),
     },
     {
-      field: "points",
-      headerName: "Points",
-      width: 120,
-      align: "center",
-      headerAlign: "center",
-      renderCell: (params) =>
-        params.row.current_score !== undefined
-          ? `${params.row.current_score} / ${params.row.max_points}`
-          : `- / ${params.row.max_points}`,
-    },
-    {
-      field: "status",
+      field: "grading_status",
       headerName: "Status",
-      width: 120,
+      width: 110,
       align: "center",
       headerAlign: "center",
       renderCell: (params) => (
-        <Chip
-          label={params.row.current_score !== undefined ? "Graded" : "Pending"}
-          color={params.row.current_score !== undefined ? "#4caf50" : "#ff9800"}
-        />
+        <Box>
+          {params.row.pending_submissions === 0 ? (
+            <Check size={20} color="#4caf50" />
+          ) : (
+            <X size={20} color="#f44336" />
+          )}
+        </Box>
       ),
     },
     {
       field: "actions",
       headerName: "Actions",
-      width: 150,
+      width: 120,
       align: "center",
       headerAlign: "center",
       sortable: false,
       renderCell: (params) => (
         <IconButton
           size="small"
-          color="primary"
-          onClick={() => handleOpenGrading(params.row)}
+          onClick={() => handleGradeExam(params.row.exam_id)}
+          disabled={params.row.total_submissions === 0}
+          sx={{
+            color: "text.secondary",
+            "&:hover": {
+              bgcolor: "action.hover",
+            },
+          }}
         >
-          <Grading />
+          <ClipboardEdit size={24} />
         </IconButton>
       ),
     },
@@ -148,95 +167,36 @@ export const AdminGradingPage = () => {
         <Box
           sx={{
             display: "flex",
-            justifyContent: "space-between",
             alignItems: "center",
             mb: 3,
           }}
         >
           <Typography variant="h4" component="h1" fontWeight="bold">
-            Grade Essay Questions
+            Grade Exams
           </Typography>
-          <Chip
-            label={`${pendingCount} Pending`}
-            color={pendingCount > 0 ? "#ff9800" : "#4caf50"}
-          />
+          <Typography
+            variant="body1"
+            sx={{
+              color: "text.secondary",
+              bgcolor: "grey.300",
+              ml: 2,
+              px: 1,
+              py: 0.5,
+              borderRadius: 1,
+              flexShrink: 0,
+            }}
+          >
+            {totalPending} Pending Submissions
+          </Typography>
         </Box>
 
         <CustomDataGrid
-          rows={answers}
+          rows={mockExamsForGrading}
           columns={columns}
-          getRowId={(row) => row.answer_id}
+          getRowId={(row) => row.exam_id}
           pageSize={10}
           pageSizeOptions={[10, 20, 50]}
         />
-
-        {/* Grading Dialog */}
-        <Dialog
-          open={gradingDialogOpen}
-          onClose={() => setGradingDialogOpen(false)}
-          maxWidth="md"
-          fullWidth
-        >
-          <DialogTitle>Grade Essay Answer</DialogTitle>
-          <DialogContent>
-            {currentAnswer && (
-              <>
-                <Typography variant="subtitle2" gutterBottom>
-                  Student: {currentAnswer.student_name}
-                </Typography>
-                <Typography variant="subtitle2" gutterBottom sx={{ mb: 2 }}>
-                  Exam: {currentAnswer.exam_title}
-                </Typography>
-
-                <Paper sx={{ p: 2, mb: 2, bgcolor: "grey.50" }}>
-                  <Typography
-                    variant="subtitle2"
-                    fontWeight="bold"
-                    gutterBottom
-                  >
-                    Question:
-                  </Typography>
-                  <Typography variant="body2">
-                    {currentAnswer.question_text}
-                  </Typography>
-                </Paper>
-
-                <Paper sx={{ p: 2, mb: 3, bgcolor: "grey.50" }}>
-                  <Typography
-                    variant="subtitle2"
-                    fontWeight="bold"
-                    gutterBottom
-                  >
-                    Student Answer:
-                  </Typography>
-                  <Typography variant="body2">
-                    {currentAnswer.answer_text}
-                  </Typography>
-                </Paper>
-
-                <TextField
-                  fullWidth
-                  label="Score"
-                  type="number"
-                  value={score}
-                  onChange={(e) => setScore(e.target.value)}
-                  helperText={`Maximum points: ${currentAnswer.max_points}`}
-                  inputProps={{
-                    min: 0,
-                    max: currentAnswer.max_points,
-                    step: 0.5,
-                  }}
-                />
-              </>
-            )}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setGradingDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleSubmitGrade} variant="contained">
-              Submit Grade
-            </Button>
-          </DialogActions>
-        </Dialog>
       </Box>
     </Layout>
   );
