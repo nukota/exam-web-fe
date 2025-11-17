@@ -3,7 +3,7 @@ export interface Exam {
   teacher_id: string;
   title: string;
   description?: string;
-  type: 'essay' | 'multiple_choice' | 'coding';
+  type: 'standard' | 'coding';
   access_code: string;
   start_at?: string;
   end_at?: string;
@@ -12,21 +12,14 @@ export interface Exam {
 }
 
 export interface CreateExamDto {
+  teacher_id: string;
   title: string;
   description?: string;
-  type: 'essay' | 'multiple_choice' | 'coding';
+  type: 'standard' | 'coding';
   access_code: string;
   start_at?: string;
   end_at?: string;
   duration_minutes?: number;
 }
 
-export interface UpdateExamDto {
-  title?: string;
-  description?: string;
-  type?: 'essay' | 'multiple_choice' | 'coding';
-  access_code?: string;
-  start_at?: string;
-  end_at?: string;
-  duration_minutes?: number;
-}
+export type UpdateExamDto = Partial<CreateExamDto>;

@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './shared/providers/AuthProvider';
-import { ProtectedRoute } from './components/common';
+import { ProtectedRoute } from './components/common/ProtectedRoute';
 import {
   SignInPage,
   // Student Pages

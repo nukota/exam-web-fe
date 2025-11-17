@@ -2,23 +2,99 @@ import {
   Box,
   Typography,
   Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Chip,
   Button,
 } from '@mui/material';
 import { CheckCircle, Cancel, Visibility } from '@mui/icons-material';
-import { Layout } from '../../components/common';
+import { Layout } from '../../components/common/Layout';
+import { CustomDataGrid } from '../../components/common';
 import { calculatePercentage } from '../../shared/utils';
 import { useNavigate } from 'react-router-dom';
 import { mockResults } from '../../shared/mockdata';
+import type { GridColDef } from '@mui/x-data-grid';
 
 export const StudentAllResultsPage = () => {
   const navigate = useNavigate();
+
+  const columns: GridColDef[] = [
+    {
+      field: 'title',
+      headerName: 'Exam Title',
+      flex: 1,
+      minWidth: 200,
+    },
+    {
+      field: 'score',
+      headerName: 'Score',
+      width: 120,
+      align: 'center',
+      headerAlign: 'center',
+      renderCell: (params) => (
+        <Typography fontWeight="bold">
+          {params.value} / {params.row.maxScore}
+        </Typography>
+      ),
+    },
+    {
+      field: 'percentage',
+      headerName: 'Percentage',
+      width: 120,
+      align: 'center',
+      headerAlign: 'center',
+      renderCell: (params) => {
+        const percentage = calculatePercentage(params.row.score, params.row.maxScore);
+        return (
+          <Typography
+            color={params.row.passed ? 'success.main' : 'error.main'}
+            fontWeight="bold"
+          >
+            {percentage}%
+          </Typography>
+        );
+      },
+    },
+    {
+      field: 'passed',
+      headerName: 'Status',
+      width: 150,
+      align: 'center',
+      headerAlign: 'center',
+      renderCell: (params) => (
+        <Chip
+          icon={params.value ? <CheckCircle /> : <Cancel />}
+          label={params.value ? 'Passed' : 'Not Passed'}
+          color={params.value ? 'success' : 'error'}
+          size="small"
+        />
+      ),
+    },
+    {
+      field: 'submitted_at',
+      headerName: 'Submitted At',
+      width: 180,
+      align: 'right',
+      headerAlign: 'right',
+      valueFormatter: (value) => new Date(value).toLocaleString(),
+    },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 120,
+      align: 'center',
+      headerAlign: 'center',
+      sortable: false,
+      renderCell: (params) => (
+        <Button
+          size="small"
+          variant="outlined"
+          startIcon={<Visibility />}
+          onClick={() => navigate(`/student/exam/${params.row.exam_id}/result`)}
+        >
+          View
+        </Button>
+      ),
+    },
+  ];
 
   return (
     <Layout>
@@ -27,74 +103,23 @@ export const StudentAllResultsPage = () => {
           My Exam Results
         </Typography>
 
-        <Paper elevation={2} sx={{ mt: 3 }}>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell><strong>Exam Title</strong></TableCell>
-                  <TableCell align="center"><strong>Score</strong></TableCell>
-                  <TableCell align="center"><strong>Percentage</strong></TableCell>
-                  <TableCell align="center"><strong>Status</strong></TableCell>
-                  <TableCell align="right"><strong>Submitted At</strong></TableCell>
-                  <TableCell align="center"><strong>Actions</strong></TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {mockResults.map((result) => {
-                  const percentage = calculatePercentage(result.score, result.maxScore);
-                  return (
-                    <TableRow key={result.exam_id}>
-                      <TableCell>{result.title}</TableCell>
-                      <TableCell align="center">
-                        <Typography fontWeight="bold">
-                          {result.score} / {result.maxScore}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="center">
-                        <Typography 
-                          color={result.passed ? 'success.main' : 'error.main'}
-                          fontWeight="bold"
-                        >
-                          {percentage}%
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="center">
-                        <Chip
-                          icon={result.passed ? <CheckCircle /> : <Cancel />}
-                          label={result.passed ? 'Passed' : 'Not Passed'}
-                          color={result.passed ? 'success' : 'error'}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell align="right">
-                        {new Date(result.submitted_at).toLocaleString()}
-                      </TableCell>
-                      <TableCell align="center">
-                        <Button
-                          size="small"
-                          variant="outlined"
-                          startIcon={<Visibility />}
-                          onClick={() => navigate(`/student/exam/${result.exam_id}/result`)}
-                        >
-                          View
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Paper>
-
-        {mockResults.length === 0 && (
+        {mockResults.length > 0 ? (
+          <Box sx={{ mt: 3 }}>
+            <CustomDataGrid
+              rows={mockResults}
+              columns={columns}
+              getRowId={(row) => row.exam_id}
+              pageSize={10}
+              pageSizeOptions={[10, 20, 50]}
+            />
+          </Box>
+        ) : (
           <Paper elevation={2} sx={{ p: 4, mt: 3, textAlign: 'center' }}>
             <Typography variant="h6" color="text.secondary">
               No exam results yet
             </Typography>
-            <Button 
-              variant="contained" 
+            <Button
+              variant="contained"
               sx={{ mt: 2 }}
               onClick={() => navigate('/student/exams')}
             >

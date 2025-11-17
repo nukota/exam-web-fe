@@ -2,7 +2,6 @@ import { useState } from 'react';
 import {
   Box,
   Typography,
-  Paper,
   TextField,
   Button,
   Avatar,
@@ -11,6 +10,7 @@ import {
 import { Edit, PhotoCamera } from '@mui/icons-material';
 import { Layout } from '../../components/common';
 import { useAuth } from '../../shared/providers/AuthProvider';
+import Card from '../../components/common/Card';
 
 export const AdminProfilePage = () => {
   const { currentUser } = useAuth();
@@ -33,7 +33,7 @@ export const AdminProfilePage = () => {
           My Profile
         </Typography>
 
-        <Paper elevation={2} sx={{ p: 4, mt: 3 }}>
+        <Card sx={{ p: 4, mt: 3 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
             <Box sx={{ position: 'relative' }}>
               <Avatar
@@ -115,7 +115,7 @@ export const AdminProfilePage = () => {
               </Button>
             </Box>
           )}
-        </Paper>
+        </Card>
       </Box>
     </Layout>
   );

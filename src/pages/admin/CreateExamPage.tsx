@@ -22,7 +22,7 @@ export const AdminCreateExamPage = () => {
   const [exam, setExam] = useState<Partial<CreateExamDto>>({
     title: '',
     description: '',
-    type: 'multiple_choice',
+    type: 'standard',
     access_code: '',
     duration_minutes: 60,
     start_at: '',

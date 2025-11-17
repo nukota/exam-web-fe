@@ -2,20 +2,72 @@ import {
   Box,
   Typography,
   Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Chip,
 } from '@mui/material';
 import { EmojiEvents } from '@mui/icons-material';
-import { Layout } from '../../components/common';
+import { Layout } from '../../components/common/Layout';
+import { CustomDataGrid } from '../../components/common';
 import { mockLeaderboardData } from '../../shared/mockdata';
+import type { GridColDef } from '@mui/x-data-grid';
 
 export const AdminLeaderboardPage = () => {
   // const { examId } = useParams(); // For future use to fetch exam-specific leaderboard
+
+  const columns: GridColDef[] = [
+    {
+      field: 'rank',
+      headerName: 'Rank',
+      width: 100,
+      renderCell: (params) =>
+        params.value <= 3 ? (
+          <Chip
+            label={params.value}
+            color={params.value === 1 ? 'warning' : 'default'}
+            size="small"
+            sx={{ fontWeight: 'bold' }}
+          />
+        ) : (
+          <Typography>{params.value}</Typography>
+        ),
+    },
+    {
+      field: 'name',
+      headerName: 'Student Name',
+      flex: 1,
+      minWidth: 180,
+      renderCell: (params) => (
+        <Typography fontWeight={params.row.rank <= 3 ? 'bold' : 'normal'}>
+          {params.value}
+        </Typography>
+      ),
+    },
+    {
+      field: 'email',
+      headerName: 'Email',
+      flex: 1,
+      minWidth: 200,
+    },
+    {
+      field: 'score',
+      headerName: 'Score',
+      width: 120,
+      align: 'center',
+      headerAlign: 'center',
+      renderCell: (params) => (
+        <Typography fontWeight="bold" color="primary">
+          {params.value}
+        </Typography>
+      ),
+    },
+    {
+      field: 'submitted_at',
+      headerName: 'Submitted At',
+      width: 180,
+      align: 'right',
+      headerAlign: 'right',
+      valueFormatter: (value) => new Date(value).toLocaleString(),
+    },
+  ];
 
   return (
     <Layout>
@@ -34,53 +86,13 @@ export const AdminLeaderboardPage = () => {
           </Typography>
         </Paper>
 
-        <Paper elevation={2}>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell><strong>Rank</strong></TableCell>
-                  <TableCell><strong>Student Name</strong></TableCell>
-                  <TableCell><strong>Email</strong></TableCell>
-                  <TableCell align="center"><strong>Score</strong></TableCell>
-                  <TableCell align="right"><strong>Submitted At</strong></TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {mockLeaderboardData.map((entry) => (
-                  <TableRow key={entry.rank}>
-                    <TableCell>
-                      {entry.rank <= 3 ? (
-                        <Chip
-                          label={entry.rank}
-                          color={entry.rank === 1 ? 'warning' : 'default'}
-                          size="small"
-                          sx={{ fontWeight: 'bold' }}
-                        />
-                      ) : (
-                        <Typography>{entry.rank}</Typography>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Typography fontWeight={entry.rank <= 3 ? 'bold' : 'normal'}>
-                        {entry.name}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>{entry.email}</TableCell>
-                    <TableCell align="center">
-                      <Typography fontWeight="bold" color="primary">
-                        {entry.score}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="right">
-                      {new Date(entry.submitted_at).toLocaleString()}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Paper>
+        <CustomDataGrid
+          rows={mockLeaderboardData}
+          columns={columns}
+          getRowId={(row) => row.rank.toString()}
+          pageSize={10}
+          pageSizeOptions={[10, 20, 50]}
+        />
       </Box>
     </Layout>
   );

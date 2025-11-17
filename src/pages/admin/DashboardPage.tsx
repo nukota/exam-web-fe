@@ -1,9 +1,6 @@
 import {
   Box,
   Typography,
-  Paper,
-  Card,
-  CardContent,
 } from '@mui/material';
 import {
   Assignment,
@@ -12,13 +9,15 @@ import {
   TrendingUp,
 } from '@mui/icons-material';
 import { Layout } from '../../components/common';
+import StatCard from '../../components/admin/items/StatCard';
+import Card from '../../components/common/Card';
 
 export const AdminDashboardPage = () => {
   const stats = [
-    { title: 'Total Exams', value: 15, icon: <Assignment />, color: 'primary.main' },
-    { title: 'Total Students', value: 250, icon: <People />, color: 'success.main' },
-    { title: 'Pending Grading', value: 8, icon: <Grading />, color: 'warning.main' },
-    { title: 'Avg Score', value: '78%', icon: <TrendingUp />, color: 'info.main' },
+    { title: 'Total Exams', value: 15, icon: <Assignment /> },
+    { title: 'Total Students', value: 250, icon: <People /> },
+    { title: 'Pending Grading', value: 8, icon: <Grading /> },
+    { title: 'Avg Score', value: '78%', icon: <TrendingUp /> },
   ];
 
   return (
@@ -31,36 +30,36 @@ export const AdminDashboardPage = () => {
           Welcome back! Here's an overview of your exam platform.
         </Typography>
 
-        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 3, mb: 4 }}>
-          {stats.map((stat, index) => (
-            <Card key={index} elevation={3}>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Box>
-                    <Typography variant="h4" fontWeight="bold" color={stat.color}>
-                      {stat.value}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {stat.title}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ color: stat.color, fontSize: '3rem' }}>
-                    {stat.icon}
-                  </Box>
-                </Box>
-              </CardContent>
-            </Card>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: '1fr',
+              sm: '1fr 1fr',
+              md: 'repeat(4, 1fr)',
+            },
+            gap: 3,
+            mb: 4,
+          }}
+        >
+          {stats.map((stat) => (
+            <StatCard
+              key={stat.title}
+              title={stat.title}
+              value={stat.value}
+              icon={stat.icon}
+            />
           ))}
         </Box>
 
-        <Paper elevation={2} sx={{ p: 3 }}>
+        <Card>
           <Typography variant="h6" gutterBottom fontWeight="bold">
             Recent Activity
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Recent exam submissions and student activities will appear here.
           </Typography>
-        </Paper>
+        </Card>
       </Box>
     </Layout>
   );

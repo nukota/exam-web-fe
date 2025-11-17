@@ -3,12 +3,6 @@ import {
   Box,
   Typography,
   Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Button,
   TextField,
   Dialog,
@@ -18,7 +12,8 @@ import {
   Chip,
 } from '@mui/material';
 import { Grading } from '@mui/icons-material';
-import { Layout } from '../../components/common';
+import type { GridColDef } from '@mui/x-data-grid';
+import { Layout, CustomDataGrid } from '../../components/common';
 
 interface EssayAnswer {
   answer_id: string;
@@ -78,6 +73,75 @@ export const AdminGradingPage = () => {
 
   const pendingCount = answers.filter((a) => a.current_score === undefined).length;
 
+  const columns: GridColDef[] = [
+    {
+      field: 'student_name',
+      headerName: 'Student',
+      flex: 1,
+      minWidth: 150,
+    },
+    {
+      field: 'exam_title',
+      headerName: 'Exam',
+      flex: 1,
+      minWidth: 150,
+    },
+    {
+      field: 'question_text',
+      headerName: 'Question',
+      flex: 2,
+      minWidth: 200,
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ maxWidth: 300 }}>
+          {params.value}
+        </Typography>
+      ),
+    },
+    {
+      field: 'points',
+      headerName: 'Points',
+      width: 120,
+      align: 'center',
+      headerAlign: 'center',
+      renderCell: (params) =>
+        params.row.current_score !== undefined
+          ? `${params.row.current_score} / ${params.row.max_points}`
+          : `- / ${params.row.max_points}`,
+    },
+    {
+      field: 'status',
+      headerName: 'Status',
+      width: 120,
+      align: 'center',
+      headerAlign: 'center',
+      renderCell: (params) => (
+        <Chip
+          label={params.row.current_score !== undefined ? 'Graded' : 'Pending'}
+          color={params.row.current_score !== undefined ? 'success' : 'warning'}
+          size="small"
+        />
+      ),
+    },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 150,
+      align: 'center',
+      headerAlign: 'center',
+      sortable: false,
+      renderCell: (params) => (
+        <Button
+          size="small"
+          variant="outlined"
+          startIcon={<Grading />}
+          onClick={() => handleOpenGrading(params.row)}
+        >
+          {params.row.current_score !== undefined ? 'Re-grade' : 'Grade'}
+        </Button>
+      ),
+    },
+  ];
+
   return (
     <Layout>
       <Box>
@@ -92,59 +156,13 @@ export const AdminGradingPage = () => {
           />
         </Box>
 
-        <Paper elevation={2}>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell><strong>Student</strong></TableCell>
-                  <TableCell><strong>Exam</strong></TableCell>
-                  <TableCell><strong>Question</strong></TableCell>
-                  <TableCell align="center"><strong>Points</strong></TableCell>
-                  <TableCell align="center"><strong>Status</strong></TableCell>
-                  <TableCell align="center"><strong>Actions</strong></TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {answers.map((answer) => (
-                  <TableRow key={answer.answer_id}>
-                    <TableCell>{answer.student_name}</TableCell>
-                    <TableCell>
-                      <Typography variant="body2">{answer.exam_title}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" sx={{ maxWidth: 300 }}>
-                        {answer.question_text}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="center">
-                      {answer.current_score !== undefined
-                        ? `${answer.current_score} / ${answer.max_points}`
-                        : `- / ${answer.max_points}`}
-                    </TableCell>
-                    <TableCell align="center">
-                      <Chip
-                        label={answer.current_score !== undefined ? 'Graded' : 'Pending'}
-                        color={answer.current_score !== undefined ? 'success' : 'warning'}
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell align="center">
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        startIcon={<Grading />}
-                        onClick={() => handleOpenGrading(answer)}
-                      >
-                        {answer.current_score !== undefined ? 'Re-grade' : 'Grade'}
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Paper>
+        <CustomDataGrid
+          rows={answers}
+          columns={columns}
+          getRowId={(row) => row.answer_id}
+          pageSize={10}
+          pageSizeOptions={[10, 20, 50]}
+        />
 
         {/* Grading Dialog */}
         <Dialog

@@ -14,7 +14,8 @@ import {
   Tab,
 } from '@mui/material';
 import { Timer, Send, PlayArrow } from '@mui/icons-material';
-import { Layout, CodeEditor } from '../../components/common';
+import { Layout } from '../../components/common';
+import { CodeEditor } from '../../components/student/CodeEditor';
 
 interface TabPanelProps {
   children?: React.ReactNode;

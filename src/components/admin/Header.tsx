@@ -106,15 +106,14 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           onClose={handleClose}
           transformOrigin={{ horizontal: "right", vertical: "top" }}
           anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-          slotProps={{
-            paper: {
-              elevation: 3,
+          PaperProps={{
               sx: {
-                mt: 1.5,
-                minWidth: 200,
+                boxShadow: "0px 8px 20px 0px rgba(60, 60, 60, 0.10)",
+                border: "1px solid #e0e0e0",
+                borderRadius: 3,
+                mt: -1,
               },
-            },
-          }}
+            }}
         >
           <MenuItem onClick={handleProfile}>
             <ListItemIcon>
