@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Box,
   Typography,
@@ -8,25 +8,25 @@ import {
   Avatar,
   IconButton,
   Stack,
-} from '@mui/material';
-import { Edit, PhotoCamera } from '@mui/icons-material';
-import { Layout } from '../../components/common';
-import { useAuth } from '../../shared/providers/AuthProvider';
+} from "@mui/material";
+import { Edit, PhotoCamera } from "@mui/icons-material";
+import { Layout } from "../../components/common";
+import { useAuth } from "../../shared/providers/AuthProvider";
 
 export const StudentProfilePage = () => {
   const { currentUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState({
-    full_name: currentUser?.full_name || '',
-    email: currentUser?.email || '',
-    dob: currentUser?.dob || '',
-    class_name: currentUser?.class_name || '',
-    school_name: currentUser?.school_name || '',
+    full_name: currentUser?.full_name || "",
+    email: currentUser?.email || "",
+    dob: currentUser?.dob || "",
+    class_name: currentUser?.class_name || "",
+    school_name: currentUser?.school_name || "",
   });
 
   const handleSave = () => {
     // In a real app, save to backend
-    console.log('Saving profile:', profile);
+    console.log("Saving profile:", profile);
     setIsEditing(false);
   };
 
@@ -38,25 +38,26 @@ export const StudentProfilePage = () => {
         </Typography>
 
         <Paper elevation={2} sx={{ p: 4, mt: 3 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
-            <Box sx={{ position: 'relative' }}>
+          <Box sx={{ display: "flex", alignItems: "center", mb: 4 }}>
+            <Box sx={{ position: "relative" }}>
               <Avatar
                 sx={{
                   width: 120,
                   height: 120,
-                  fontSize: '3rem',
-                  bgcolor: 'primary.main',
+                  fontSize: "3rem",
+                  bgcolor: "primary.main",
                 }}
               >
-                {profile.full_name?.charAt(0) || currentUser?.username?.charAt(0)}
+                {profile.full_name?.charAt(0) ||
+                  currentUser?.username?.charAt(0)}
               </Avatar>
               {isEditing && (
                 <IconButton
                   sx={{
-                    position: 'absolute',
+                    position: "absolute",
                     bottom: 0,
                     right: 0,
-                    bgcolor: 'background.paper',
+                    bgcolor: "background.paper",
                   }}
                 >
                   <PhotoCamera />
@@ -86,29 +87,35 @@ export const StudentProfilePage = () => {
           </Box>
 
           <Stack spacing={3}>
-            <Box sx={{ display: 'flex', gap: 2 }}>
+            <Box sx={{ display: "flex", gap: 2 }}>
               <TextField
                 fullWidth
                 label="Full Name"
                 value={profile.full_name}
-                onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
+                onChange={(e) =>
+                  setProfile({ ...profile, full_name: e.target.value })
+                }
                 disabled={!isEditing}
               />
               <TextField
                 fullWidth
                 label="Email"
                 value={profile.email}
-                onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                onChange={(e) =>
+                  setProfile({ ...profile, email: e.target.value })
+                }
                 disabled={!isEditing}
               />
             </Box>
-            <Box sx={{ display: 'flex', gap: 2 }}>
+            <Box sx={{ display: "flex", gap: 2 }}>
               <TextField
                 fullWidth
                 label="Date of Birth"
                 type="date"
                 value={profile.dob}
-                onChange={(e) => setProfile({ ...profile, dob: e.target.value })}
+                onChange={(e) =>
+                  setProfile({ ...profile, dob: e.target.value })
+                }
                 disabled={!isEditing}
                 InputLabelProps={{ shrink: true }}
               />
@@ -116,7 +123,9 @@ export const StudentProfilePage = () => {
                 fullWidth
                 label="Class"
                 value={profile.class_name}
-                onChange={(e) => setProfile({ ...profile, class_name: e.target.value })}
+                onChange={(e) =>
+                  setProfile({ ...profile, class_name: e.target.value })
+                }
                 disabled={!isEditing}
               />
             </Box>
@@ -124,13 +133,22 @@ export const StudentProfilePage = () => {
               fullWidth
               label="School Name"
               value={profile.school_name}
-              onChange={(e) => setProfile({ ...profile, school_name: e.target.value })}
+              onChange={(e) =>
+                setProfile({ ...profile, school_name: e.target.value })
+              }
               disabled={!isEditing}
             />
           </Stack>
 
           {isEditing && (
-            <Box sx={{ mt: 3, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+            <Box
+              sx={{
+                mt: 3,
+                display: "flex",
+                gap: 2,
+                justifyContent: "flex-end",
+              }}
+            >
               <Button variant="outlined" onClick={() => setIsEditing(false)}>
                 Cancel
               </Button>

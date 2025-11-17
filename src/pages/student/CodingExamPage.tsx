@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -12,10 +12,10 @@ import {
   DialogActions,
   Tabs,
   Tab,
-} from '@mui/material';
-import { Timer, Send, PlayArrow } from '@mui/icons-material';
-import { Layout } from '../../components/common';
-import { CodeEditor } from '../../components/student/CodeEditor';
+} from "@mui/material";
+import { Timer, Send, PlayArrow } from "@mui/icons-material";
+import { Layout } from "../../components/common";
+import { CodeEditor } from "../../components/student/CodeEditor";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -35,8 +35,10 @@ function TabPanel(props: TabPanelProps) {
 export const StudentCodingExamPage = () => {
   const { examId } = useParams();
   const navigate = useNavigate();
-  const [code, setCode] = useState('# Write your Python code here\n\ndef solution():\n    pass\n');
-  const [language, setLanguage] = useState('python');
+  const [code, setCode] = useState(
+    "# Write your Python code here\n\ndef solution():\n    pass\n"
+  );
+  const [language, setLanguage] = useState("python");
   const [timeRemaining, setTimeRemaining] = useState(5400); // 90 minutes
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
   const [tabValue, setTabValue] = useState(0);
@@ -56,21 +58,23 @@ export const StudentCodingExamPage = () => {
   }, []);
 
   const handleSubmit = () => {
-    console.log('Submitting code:', code);
-    console.log('Language:', language);
+    console.log("Submitting code:", code);
+    console.log("Language:", language);
     navigate(`/student/exam/${examId}/result`);
   };
 
   const handleRunCode = () => {
     // Placeholder for code execution
-    alert('Code execution feature will be implemented in the future');
+    alert("Code execution feature will be implemented in the future");
   };
 
   const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    return `${hours.toString().padStart(2, "0")}:${minutes
+      .toString()
+      .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
   return (
@@ -78,22 +82,31 @@ export const StudentCodingExamPage = () => {
       <Box>
         {/* Header */}
         <Paper elevation={2} sx={{ p: 2, mb: 3 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
             <Typography variant="h5" fontWeight="bold">
               Python Programming Challenge
             </Typography>
             <Chip
               icon={<Timer />}
               label={formatTime(timeRemaining)}
-              color={timeRemaining < 300 ? 'error' : 'primary'}
+              color={timeRemaining < 300 ? "error" : "primary"}
             />
           </Box>
         </Paper>
 
-        <Box sx={{ display: 'flex', gap: 3 }}>
+        <Box sx={{ display: "flex", gap: 3 }}>
           {/* Problem Description */}
           <Paper elevation={2} sx={{ flex: 1, p: 3 }}>
-            <Tabs value={tabValue} onChange={(_, newValue) => setTabValue(newValue)}>
+            <Tabs
+              value={tabValue}
+              onChange={(_, newValue) => setTabValue(newValue)}
+            >
               <Tab label="Problem" />
               <Tab label="Test Cases" />
             </Tabs>
@@ -103,13 +116,16 @@ export const StudentCodingExamPage = () => {
                 Problem Statement
               </Typography>
               <Typography variant="body1" paragraph>
-                Write a function that finds the longest palindromic substring in a given string.
+                Write a function that finds the longest palindromic substring in
+                a given string.
               </Typography>
 
               <Typography variant="subtitle1" gutterBottom sx={{ mt: 3 }}>
                 Example:
               </Typography>
-              <Paper sx={{ p: 2, bgcolor: 'grey.100', fontFamily: 'monospace' }}>
+              <Paper
+                sx={{ p: 2, bgcolor: "grey.100", fontFamily: "monospace" }}
+              >
                 <Typography variant="body2">Input: "babad"</Typography>
                 <Typography variant="body2">Output: "bab" or "aba"</Typography>
               </Paper>
@@ -133,28 +149,31 @@ export const StudentCodingExamPage = () => {
                 Test Cases
               </Typography>
 
-              <Paper sx={{ p: 2, mb: 2, bgcolor: 'grey.50' }}>
+              <Paper sx={{ p: 2, mb: 2, bgcolor: "grey.50" }}>
                 <Typography variant="subtitle2" gutterBottom>
                   Test Case 1:
                 </Typography>
-                <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                  Input: "babad"<br />
+                <Typography variant="body2" sx={{ fontFamily: "monospace" }}>
+                  Input: "babad"
+                  <br />
                   Expected Output: "bab" or "aba"
                 </Typography>
               </Paper>
 
-              <Paper sx={{ p: 2, mb: 2, bgcolor: 'grey.50' }}>
+              <Paper sx={{ p: 2, mb: 2, bgcolor: "grey.50" }}>
                 <Typography variant="subtitle2" gutterBottom>
                   Test Case 2:
                 </Typography>
-                <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                  Input: "cbbd"<br />
+                <Typography variant="body2" sx={{ fontFamily: "monospace" }}>
+                  Input: "cbbd"
+                  <br />
                   Expected Output: "bb"
                 </Typography>
               </Paper>
 
               <Typography variant="caption" color="text.secondary">
-                Note: Some test cases may be hidden and will only be revealed after submission.
+                Note: Some test cases may be hidden and will only be revealed
+                after submission.
               </Typography>
             </TabPanel>
           </Paper>
@@ -163,13 +182,13 @@ export const StudentCodingExamPage = () => {
           <Box sx={{ flex: 1 }}>
             <CodeEditor
               value={code}
-              onChange={(value) => setCode(value || '')}
+              onChange={(value) => setCode(value || "")}
               language={language}
               onLanguageChange={setLanguage}
               height="calc(100vh - 250px)"
             />
 
-            <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+            <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
               <Button
                 variant="outlined"
                 startIcon={<PlayArrow />}
@@ -182,7 +201,7 @@ export const StudentCodingExamPage = () => {
                 color="success"
                 startIcon={<Send />}
                 onClick={() => setSubmitDialogOpen(true)}
-                sx={{ ml: 'auto' }}
+                sx={{ ml: "auto" }}
               >
                 Submit
               </Button>
@@ -191,11 +210,15 @@ export const StudentCodingExamPage = () => {
         </Box>
 
         {/* Submit Confirmation Dialog */}
-        <Dialog open={submitDialogOpen} onClose={() => setSubmitDialogOpen(false)}>
+        <Dialog
+          open={submitDialogOpen}
+          onClose={() => setSubmitDialogOpen(false)}
+        >
           <DialogTitle>Submit Code?</DialogTitle>
           <DialogContent>
             <Typography>
-              Are you sure you want to submit your code? Once submitted, you cannot make changes.
+              Are you sure you want to submit your code? Once submitted, you
+              cannot make changes.
             </Typography>
           </DialogContent>
           <DialogActions>

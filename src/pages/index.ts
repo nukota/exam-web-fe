@@ -13,6 +13,7 @@ export { AdminCreateExamPage } from './admin/CreateExamPage';
 export { AdminEditExamPage } from './admin/EditExamPage';
 export { AdminGradingPage } from './admin/GradingPage';
 export { AdminLeaderboardPage } from './admin/LeaderboardPage';
+export { AdminStudentsPage } from './admin/StudentsPage';
 export { AdminProfilePage } from './admin/ProfilePage';
 
 // Auth Pages

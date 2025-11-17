@@ -17,6 +17,7 @@ import {
   AdminEditExamPage,
   AdminGradingPage,
   AdminLeaderboardPage,
+  AdminStudentsPage,
   AdminProfilePage,
 } from './pages';
 import './App.css';
@@ -121,6 +122,14 @@ const App = () => {
             }
           />
           <Route
+            path="/admin/students"
+            element={
+              <ProtectedRoute allowedRoles={['admin', 'teacher']}>
+                <AdminStudentsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/admin/exams/:examId/leaderboard"
             element={
               <ProtectedRoute allowedRoles={['admin', 'teacher']}>
@@ -136,7 +145,6 @@ const App = () => {
               </ProtectedRoute>
             }
           />
-
           {/* Default Route */}
           <Route path="/" element={<Navigate to="/signin" replace />} />
           <Route path="*" element={<Navigate to="/signin" replace />} />

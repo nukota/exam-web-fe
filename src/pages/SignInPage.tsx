@@ -1,8 +1,8 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Box, Paper, Typography, Button, Container } from '@mui/material';
-import { Google as GoogleIcon } from '@mui/icons-material';
-import { useAuth } from '../shared/providers/AuthProvider';
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Box, Typography, Button, Container } from "@mui/material";
+import { Google as GoogleIcon } from "@mui/icons-material";
+import { useAuth } from "../shared/providers/AuthProvider";
 
 export const SignInPage = () => {
   const { signInWithGoogle, currentUser } = useAuth();
@@ -11,10 +11,10 @@ export const SignInPage = () => {
   useEffect(() => {
     if (currentUser) {
       // Redirect based on user role
-      if (currentUser.role === 'admin' || currentUser.role === 'teacher') {
-        navigate('/admin/dashboard');
+      if (currentUser.role === "admin" || currentUser.role === "teacher") {
+        navigate("/admin/dashboard");
       } else {
-        navigate('/student/exams');
+        navigate("/student/exams");
       }
     }
   }, [currentUser, navigate]);
@@ -23,63 +23,102 @@ export const SignInPage = () => {
     try {
       await signInWithGoogle();
     } catch (error) {
-      console.error('Sign in failed:', error);
+      console.error("Sign in failed:", error);
     }
   };
 
   return (
     <Box
       sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        // background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "#eee",
       }}
     >
-      <Container maxWidth="sm">
-        <Paper
-          elevation={10}
+      <style>
+        {`
+          .loop-container {
+            overflow: hidden;
+            height: 80px;
+            width: 100%;
+          }
+
+          .loop-text {
+            display: inline-block;
+            white-space: nowrap;
+            animation: slide 3s ease-in-out infinite;
+          }
+
+          @keyframes slide {
+            0% {
+              transform: translateX(-20px);
+              opacity: 0;
+            }
+            25% {
+              transform: translateX(0);
+              opacity: 1;
+            }
+            75% {
+              transform: translateX(0);
+              opacity: 1;
+            }
+            100% {
+              transform: translateX(20px);
+              opacity: 0;
+            }
+          }
+        `}
+      </style>
+      <Container
+        sx={{ background: "white", borderRadius: 4, width: "fit-content" }}
+      >
+        <Box
           sx={{
             p: 4,
             borderRadius: 2,
-            textAlign: 'center',
+            textAlign: "center",
           }}
         >
-          <Typography variant="h3" component="h1" gutterBottom fontWeight="bold" color="primary">
-            ExamWeb
-          </Typography>
-          <Typography variant="h6" color="text.secondary" gutterBottom sx={{ mb: 4 }}>
-            Your ultimate platform for online exams
-          </Typography>
-          
-          <Box sx={{ my: 4 }}>
-            <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-              Sign in to access your exams and results
-            </Typography>
-            <Button
-              variant="contained"
-              size="large"
-              startIcon={<GoogleIcon />}
-              onClick={handleSignIn}
+          <div className="loop-container">
+            <Typography
+              gutterBottom
+              fontWeight="bold"
+              color="black"
+              className="loop-text"
               sx={{
-                py: 1.5,
-                px: 4,
-                fontSize: '1.1rem',
-                textTransform: 'none',
+                px: 2,
+                fontFamily: "REM",
+                letterSpacing: 4,
+                fontSize: "3.5rem",
+                fontWeight: "500",
               }}
             >
-              Sign in with Google
-            </Button>
-          </Box>
-
-          <Box sx={{ mt: 4, p: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
-            <Typography variant="body2" color="text.secondary">
-              <strong>Note:</strong> Use an email containing "admin" to sign in as an admin.
-              Otherwise, you'll be signed in as a student.
+              ExamWeb
             </Typography>
-          </Box>
-        </Paper>
+          </div>
+          <Typography
+            variant="body1"
+            color="text.secondary"
+            gutterBottom
+            sx={{ mb: 3 }}
+          >
+            Your ultimate platform for online exams
+          </Typography>
+          <Button
+            variant="contained"
+            size="large"
+            startIcon={<GoogleIcon />}
+            onClick={handleSignIn}
+            sx={{
+              fontWeight: "bold",
+              my: 2,
+            }}
+          >
+            Sign in with Google
+          </Button>
+        </Box>
       </Container>
     </Box>
   );

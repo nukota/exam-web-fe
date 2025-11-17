@@ -1,35 +1,29 @@
-import { useNavigate } from 'react-router-dom';
-import {
-  Box,
-  Typography,
-  Button,
-  Chip,
-  IconButton,
-} from '@mui/material';
-import { Edit, Delete, Visibility, Add } from '@mui/icons-material';
-import { Layout } from '../../components/common/Layout';
-import { CustomDataGrid } from '../../components/common';
-import { mockExams } from '../../shared/mockdata';
-import type { GridColDef } from '@mui/x-data-grid';
+import { useNavigate } from "react-router-dom";
+import { Box, Typography, Button, IconButton } from "@mui/material";
+import { Edit, Delete, Article, Add } from "@mui/icons-material";
+import { Layout } from "../../components/common";
+import { CustomDataGrid } from "../../components/common";
+import { mockExams } from "../../shared/mockdata";
+import type { GridColDef } from "@mui/x-data-grid";
 
 export const AdminExamsPage = () => {
   const navigate = useNavigate();
 
   const handleDelete = (examId: string) => {
-    if (window.confirm('Are you sure you want to delete this exam?')) {
-      console.log('Deleting exam:', examId);
+    if (window.confirm("Are you sure you want to delete this exam?")) {
+      console.log("Deleting exam:", examId);
       // Implement delete logic
     }
   };
 
   const columns: GridColDef[] = [
     {
-      field: 'title',
-      headerName: 'Title',
+      field: "title",
+      headerName: "Title",
       flex: 1,
       minWidth: 200,
       renderCell: (params) => (
-        <Box>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 0 }}>
           <Typography variant="body1" fontWeight="medium">
             {params.row.title}
           </Typography>
@@ -40,62 +34,69 @@ export const AdminExamsPage = () => {
       ),
     },
     {
-      field: 'type',
-      headerName: 'Type',
+      field: "type",
+      headerName: "Type",
       width: 120,
       renderCell: (params) => (
-        <Chip
-          label={params.value === 'coding' ? 'Coding' : 'Standard'}
-          color={params.value === 'coding' ? 'secondary' : 'primary'}
-          size="small"
-        />
+        <Typography variant="body2">
+          {params.value === "coding" ? "Coding" : "Standard"}
+        </Typography>
       ),
     },
     {
-      field: 'access_code',
-      headerName: 'Access Code',
+      field: "access_code",
+      headerName: "Access Code",
       width: 130,
       renderCell: (params) => (
-        <Chip label={params.value} variant="outlined" size="small" />
+        <Typography variant="body2">{params.value}</Typography>
       ),
     },
     {
-      field: 'duration_minutes',
-      headerName: 'Duration',
+      field: "duration_minutes",
+      headerName: "Duration",
       width: 100,
       valueFormatter: (value) => `${value} min`,
     },
     {
-      field: 'start_at',
-      headerName: 'Start Time',
+      field: "start_at",
+      headerName: "Start Time",
       width: 180,
       valueFormatter: (value) =>
-        value ? new Date(value).toLocaleString() : 'N/A',
+        value ? new Date(value).toLocaleString() : "N/A",
     },
     {
-      field: 'actions',
-      headerName: 'Actions',
+      field: "end_at",
+      headerName: "End Time",
+      width: 180,
+      valueFormatter: (value) =>
+        value ? new Date(value).toLocaleString() : "N/A",
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
       width: 150,
       sortable: false,
       renderCell: (params) => (
         <Box>
           <IconButton
             size="small"
-            color="info"
-            onClick={() => navigate(`/admin/exams/${params.row.exam_id}/leaderboard`)}
+            color="inherit"
+            onClick={() =>
+              navigate(`/admin/exams/${params.row.exam_id}/leaderboard`)
+            }
           >
-            <Visibility />
+            <Article />
           </IconButton>
           <IconButton
             size="small"
-            color="primary"
+            color="inherit"
             onClick={() => navigate(`/admin/exams/${params.row.exam_id}/edit`)}
           >
             <Edit />
           </IconButton>
           <IconButton
             size="small"
-            color="error"
+            color="inherit"
             onClick={() => handleDelete(params.row.exam_id)}
           >
             <Delete />
@@ -108,14 +109,26 @@ export const AdminExamsPage = () => {
   return (
     <Layout>
       <Box>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 3,
+          }}
+        >
           <Typography variant="h4" component="h1" fontWeight="bold">
             All Exams
           </Typography>
           <Button
             variant="contained"
             startIcon={<Add />}
-            onClick={() => navigate('/admin/exams/create')}
+            onClick={() => navigate("/admin/exams/create")}
+            sx={{
+              fontWeight: "bold",
+              backgroundColor: "grey.200",
+              color: "black",
+            }}
           >
             Create New Exam
           </Button>

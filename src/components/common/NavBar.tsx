@@ -11,6 +11,7 @@ import {
   LayoutDashboard,
   FileText,
   CheckSquare,
+  Users,
   Trophy,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -39,9 +40,9 @@ const adminNavItems: NavItem[] = [
     path: "/admin/grading",
   },
   {
-    text: "Leaderboard",
-    icon: <Trophy size={18} />,
-    path: "/admin/leaderboard",
+    text: "Students",
+    icon: <Users size={18} />,
+    path: "/admin/students",
   },
 ];
 
@@ -76,8 +77,37 @@ export const NavBar: React.FC<NavBarProps> = ({ role }) => {
         height: "100%",
         display: "flex",
         flexDirection: "column",
+        position: "relative",
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundImage: "url(/school.png)",
+          backgroundPosition: "bottom left 75%",
+          backgroundRepeat: "no-repeat",
+          backgroundSize: "400px 400px",
+          backgroundAttachment: "local",
+          opacity: 0.1,
+          zIndex: -1,
+          pointerEvents: "none",
+        },
       }}
     >
+      <Box
+        sx={{
+          position: "absolute",
+          top: { xs: 54, sm: 60 },
+          left: 0,
+          right: 0,
+          height: "200px",
+          background:
+            "linear-gradient(to bottom, rgba(227, 193, 0, 0.2) 0%, transparent 100%)",
+          zIndex: -1,
+        }}
+      />
       {/* Logo Section */}
       <Box
         sx={{
@@ -92,10 +122,10 @@ export const NavBar: React.FC<NavBarProps> = ({ role }) => {
       >
         <Typography
           sx={{
-        fontSize: 20,
-        fontWeight: 800,
-        color: "black",
-        letterSpacing: '0.075em',
+            fontSize: 20,
+            fontWeight: 600,
+            letterSpacing: "0.05em",
+            fontFamily: "REM",
           }}
         >
           ExamWeb
@@ -179,31 +209,6 @@ export const NavBar: React.FC<NavBarProps> = ({ role }) => {
           </ListItem>
         ))}
       </List>
-
-      {/* Footer */}
-      <Box
-        sx={{
-          p: 1.5,
-          m: 1.5,
-          mt: 0,
-          borderRadius: 1,
-          backgroundColor: "rgba(0, 0, 0, 0.02)",
-          border: "1px solid rgba(0, 0, 0, 0.06)",
-        }}
-      >
-        <Typography
-          variant="caption"
-          sx={{
-            color: "text.secondary",
-            fontWeight: 500,
-            display: "block",
-            textAlign: "center",
-            lineHeight: 1.4,
-          }}
-        >
-          ExamWeb © 2025
-        </Typography>
-      </Box>
     </Box>
   );
 };

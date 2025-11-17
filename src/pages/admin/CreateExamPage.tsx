@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -12,31 +12,31 @@ import {
   MenuItem,
   Divider,
   IconButton,
-} from '@mui/material';
-import { Add, Delete } from '@mui/icons-material';
-import { Layout } from '../../components/common';
-import type { CreateExamDto, CreateQuestionDto } from '../../shared/dtos';
+} from "@mui/material";
+import { Add, Delete } from "@mui/icons-material";
+import { Layout } from "../../components/common";
+import type { CreateExamDto, CreateQuestionDto } from "../../shared/dtos";
 
 export const AdminCreateExamPage = () => {
   const navigate = useNavigate();
   const [exam, setExam] = useState<Partial<CreateExamDto>>({
-    title: '',
-    description: '',
-    type: 'standard',
-    access_code: '',
+    title: "",
+    description: "",
+    type: "standard",
+    access_code: "",
     duration_minutes: 60,
-    start_at: '',
-    end_at: '',
+    start_at: "",
+    end_at: "",
   });
 
   const [questions, setQuestions] = useState<Partial<CreateQuestionDto>[]>([
     {
-      question_text: '',
-      question_type: 'single_choice',
+      question_text: "",
+      question_type: "single_choice",
       points: 1,
       choices: [
-        { choice_text: '', is_correct: false },
-        { choice_text: '', is_correct: false },
+        { choice_text: "", is_correct: false },
+        { choice_text: "", is_correct: false },
       ],
     },
   ]);
@@ -45,12 +45,12 @@ export const AdminCreateExamPage = () => {
     setQuestions([
       ...questions,
       {
-        question_text: '',
-        question_type: 'single_choice',
+        question_text: "",
+        question_type: "single_choice",
         points: 1,
         choices: [
-          { choice_text: '', is_correct: false },
-          { choice_text: '', is_correct: false },
+          { choice_text: "", is_correct: false },
+          { choice_text: "", is_correct: false },
         ],
       },
     ]);
@@ -71,15 +71,18 @@ export const AdminCreateExamPage = () => {
     if (!newQuestions[questionIndex].choices) {
       newQuestions[questionIndex].choices = [];
     }
-    newQuestions[questionIndex].choices!.push({ choice_text: '', is_correct: false });
+    newQuestions[questionIndex].choices!.push({
+      choice_text: "",
+      is_correct: false,
+    });
     setQuestions(newQuestions);
   };
 
   const handleRemoveChoice = (questionIndex: number, choiceIndex: number) => {
     const newQuestions = [...questions];
-    newQuestions[questionIndex].choices = newQuestions[questionIndex].choices!.filter(
-      (_, i) => i !== choiceIndex
-    );
+    newQuestions[questionIndex].choices = newQuestions[
+      questionIndex
+    ].choices!.filter((_, i) => i !== choiceIndex);
     setQuestions(newQuestions);
   };
 
@@ -102,9 +105,9 @@ export const AdminCreateExamPage = () => {
       ...exam,
       questions,
     };
-    console.log('Creating exam:', examData);
+    console.log("Creating exam:", examData);
     // In a real app, submit to backend
-    navigate('/admin/exams');
+    navigate("/admin/exams");
   };
 
   return (
@@ -119,7 +122,7 @@ export const AdminCreateExamPage = () => {
           <Typography variant="h6" gutterBottom>
             Exam Details
           </Typography>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             <TextField
               fullWidth
               label="Exam Title"
@@ -133,17 +136,23 @@ export const AdminCreateExamPage = () => {
               multiline
               rows={3}
               value={exam.description}
-              onChange={(e) => setExam({ ...exam, description: e.target.value })}
+              onChange={(e) =>
+                setExam({ ...exam, description: e.target.value })
+              }
             />
-            <Box sx={{ display: 'flex', gap: 2 }}>
+            <Box sx={{ display: "flex", gap: 2 }}>
               <FormControl fullWidth>
                 <InputLabel>Exam Type</InputLabel>
                 <Select
                   value={exam.type}
                   label="Exam Type"
-                  onChange={(e) => setExam({ ...exam, type: e.target.value as any })}
+                  onChange={(e) =>
+                    setExam({ ...exam, type: e.target.value as any })
+                  }
                 >
-                  <MenuItem value="multiple_choice">Standard (Multiple Choice)</MenuItem>
+                  <MenuItem value="multiple_choice">
+                    Standard (Multiple Choice)
+                  </MenuItem>
                   <MenuItem value="essay">Essay</MenuItem>
                   <MenuItem value="coding">Coding</MenuItem>
                 </Select>
@@ -152,18 +161,23 @@ export const AdminCreateExamPage = () => {
                 fullWidth
                 label="Access Code"
                 value={exam.access_code}
-                onChange={(e) => setExam({ ...exam, access_code: e.target.value })}
+                onChange={(e) =>
+                  setExam({ ...exam, access_code: e.target.value })
+                }
                 required
               />
             </Box>
-            <Box sx={{ display: 'flex', gap: 2 }}>
+            <Box sx={{ display: "flex", gap: 2 }}>
               <TextField
                 fullWidth
                 label="Duration (minutes)"
                 type="number"
                 value={exam.duration_minutes}
                 onChange={(e) =>
-                  setExam({ ...exam, duration_minutes: parseInt(e.target.value) })
+                  setExam({
+                    ...exam,
+                    duration_minutes: parseInt(e.target.value),
+                  })
                 }
               />
               <TextField
@@ -187,18 +201,35 @@ export const AdminCreateExamPage = () => {
         </Paper>
 
         {/* Questions */}
-        {exam.type !== 'coding' && (
+        {exam.type !== "coding" && (
           <>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 2,
+              }}
+            >
               <Typography variant="h6">Questions</Typography>
-              <Button variant="outlined" startIcon={<Add />} onClick={handleAddQuestion}>
+              <Button
+                variant="outlined"
+                startIcon={<Add />}
+                onClick={handleAddQuestion}
+              >
                 Add Question
               </Button>
             </Box>
 
             {questions.map((question, qIndex) => (
               <Paper key={qIndex} elevation={2} sx={{ p: 3, mb: 2 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    mb: 2,
+                  }}
+                >
                   <Typography variant="subtitle1" fontWeight="bold">
                     Question {qIndex + 1}
                   </Typography>
@@ -213,7 +244,7 @@ export const AdminCreateExamPage = () => {
                   )}
                 </Box>
 
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                   <TextField
                     fullWidth
                     label="Question Text"
@@ -221,21 +252,31 @@ export const AdminCreateExamPage = () => {
                     rows={2}
                     value={question.question_text}
                     onChange={(e) =>
-                      handleQuestionChange(qIndex, 'question_text', e.target.value)
+                      handleQuestionChange(
+                        qIndex,
+                        "question_text",
+                        e.target.value
+                      )
                     }
                   />
-                  <Box sx={{ display: 'flex', gap: 2 }}>
+                  <Box sx={{ display: "flex", gap: 2 }}>
                     <FormControl fullWidth>
                       <InputLabel>Question Type</InputLabel>
                       <Select
                         value={question.question_type}
                         label="Question Type"
                         onChange={(e) =>
-                          handleQuestionChange(qIndex, 'question_type', e.target.value)
+                          handleQuestionChange(
+                            qIndex,
+                            "question_type",
+                            e.target.value
+                          )
                         }
                       >
                         <MenuItem value="single_choice">Single Choice</MenuItem>
-                        <MenuItem value="multiple_choice">Multiple Choice</MenuItem>
+                        <MenuItem value="multiple_choice">
+                          Multiple Choice
+                        </MenuItem>
                         <MenuItem value="short_answer">Short Answer</MenuItem>
                         <MenuItem value="essay">Essay</MenuItem>
                       </Select>
@@ -245,18 +286,28 @@ export const AdminCreateExamPage = () => {
                       type="number"
                       value={question.points}
                       onChange={(e) =>
-                        handleQuestionChange(qIndex, 'points', parseFloat(e.target.value))
+                        handleQuestionChange(
+                          qIndex,
+                          "points",
+                          parseFloat(e.target.value)
+                        )
                       }
                       sx={{ width: 150 }}
                     />
                   </Box>
 
-                  {(question.question_type === 'single_choice' ||
-                    question.question_type === 'multiple_choice') && (
+                  {(question.question_type === "single_choice" ||
+                    question.question_type === "multiple_choice") && (
                     <>
                       <Divider />
                       <Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            mb: 1,
+                          }}
+                        >
                           <Typography variant="subtitle2">Choices</Typography>
                           <Button
                             size="small"
@@ -267,27 +318,35 @@ export const AdminCreateExamPage = () => {
                           </Button>
                         </Box>
                         {question.choices?.map((choice, cIndex) => (
-                          <Box key={cIndex} sx={{ display: 'flex', gap: 1, mb: 1 }}>
+                          <Box
+                            key={cIndex}
+                            sx={{ display: "flex", gap: 1, mb: 1 }}
+                          >
                             <TextField
                               fullWidth
                               size="small"
                               label={`Choice ${cIndex + 1}`}
                               value={choice.choice_text}
                               onChange={(e) =>
-                                handleChoiceChange(qIndex, cIndex, 'choice_text', e.target.value)
+                                handleChoiceChange(
+                                  qIndex,
+                                  cIndex,
+                                  "choice_text",
+                                  e.target.value
+                                )
                               }
                             />
                             <FormControl size="small" sx={{ minWidth: 120 }}>
                               <InputLabel>Correct?</InputLabel>
                               <Select
-                                value={choice.is_correct ? 'yes' : 'no'}
+                                value={choice.is_correct ? "yes" : "no"}
                                 label="Correct?"
                                 onChange={(e) =>
                                   handleChoiceChange(
                                     qIndex,
                                     cIndex,
-                                    'is_correct',
-                                    e.target.value === 'yes'
+                                    "is_correct",
+                                    e.target.value === "yes"
                                   )
                                 }
                               >
@@ -299,7 +358,9 @@ export const AdminCreateExamPage = () => {
                               <IconButton
                                 size="small"
                                 color="error"
-                                onClick={() => handleRemoveChoice(qIndex, cIndex)}
+                                onClick={() =>
+                                  handleRemoveChoice(qIndex, cIndex)
+                                }
                               >
                                 <Delete />
                               </IconButton>
@@ -310,13 +371,15 @@ export const AdminCreateExamPage = () => {
                     </>
                   )}
 
-                  {question.question_type === 'short_answer' && (
+                  {question.question_type === "short_answer" && (
                     <TextField
                       fullWidth
                       label="Correct Answer"
                       placeholder="Enter the expected answer"
                       onChange={(e) =>
-                        handleQuestionChange(qIndex, 'correct_answer', [e.target.value])
+                        handleQuestionChange(qIndex, "correct_answer", [
+                          e.target.value,
+                        ])
                       }
                     />
                   )}
@@ -326,20 +389,21 @@ export const AdminCreateExamPage = () => {
           </>
         )}
 
-        {exam.type === 'coding' && (
+        {exam.type === "coding" && (
           <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
             <Typography variant="h6" gutterBottom>
               Coding Problem
             </Typography>
             <Typography variant="body2" color="text.secondary" paragraph>
-              You can add coding problem details and test cases after creating the exam.
+              You can add coding problem details and test cases after creating
+              the exam.
             </Typography>
           </Paper>
         )}
 
         {/* Actions */}
-        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-          <Button variant="outlined" onClick={() => navigate('/admin/exams')}>
+        <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end" }}>
+          <Button variant="outlined" onClick={() => navigate("/admin/exams")}>
             Cancel
           </Button>
           <Button variant="contained" onClick={handleSubmit}>

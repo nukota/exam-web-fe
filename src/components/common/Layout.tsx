@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { Box, Drawer, useMediaQuery, useTheme } from '@mui/material';
-import { Header } from '../admin/Header';
-import { NavBar } from '../admin/NavBar';
-import { useAuth } from '../../shared/providers/AuthProvider';
-import type { ReactNode } from 'react';
+import { useState } from "react";
+import { Box, Drawer, useMediaQuery, useTheme } from "@mui/material";
+import { Header } from "./Header";
+import { NavBar } from "./NavBar";
+import { useAuth } from "../../shared/providers/AuthProvider";
+import type { ReactNode } from "react";
 
 interface LayoutProps {
   children: ReactNode;
@@ -13,16 +13,19 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { currentUser } = useAuth();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
-  const userRole = (currentUser?.role === 'admin' || currentUser?.role === 'teacher') ? 'admin' : 'student';
+  const userRole =
+    currentUser?.role === "admin" || currentUser?.role === "teacher"
+      ? "admin"
+      : "student";
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+    <Box sx={{ display: "flex", height: "100vh" }}>
       {/* Permanent drawer for desktop */}
       {!isMobile && (
         <Box
@@ -30,7 +33,12 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             width: 240,
             flexShrink: 0,
             borderRight: 1,
-            borderColor: 'divider',
+            borderColor: "divider",
+            position: "sticky",
+            top: 0,
+            height: "100vh",
+            overflowY: "auto",
+            overflowX: "hidden",
           }}
         >
           <NavBar role={userRole} />
@@ -44,10 +52,10 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         onClose={handleDrawerToggle}
         ModalProps={{ keepMounted: true }}
         sx={{
-          display: { xs: 'block', md: 'none' },
-          '& .MuiDrawer-paper': {
+          display: { xs: "block", md: "none" },
+          "& .MuiDrawer-paper": {
             width: 240,
-            boxSizing: 'border-box',
+            boxSizing: "border-box",
           },
         }}
       >
@@ -55,14 +63,30 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       </Drawer>
 
       {/* Main content */}
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-        <Header onMenuClick={handleDrawerToggle} />
+      <Box
+        sx={{
+          flexGrow: 1,
+          display: "flex",
+          flexDirection: "column",
+          backgroundColor: "#eee",
+          overflow: "auto",
+        }}
+      >
+        <Box
+          sx={{
+            position: "sticky",
+            top: 0,
+            zIndex: 1000,
+            backgroundColor: "#eee",
+          }}
+        >
+          <Header onMenuClick={handleDrawerToggle} />
+        </Box>
         <Box
           component="main"
           sx={{
             flexGrow: 1,
             p: 3,
-            overflow: 'auto',
           }}
         >
           {children}
