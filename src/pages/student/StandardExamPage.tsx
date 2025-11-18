@@ -1,37 +1,36 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
-  Paper,
   Button,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  Checkbox,
-  FormGroup,
-  TextField,
-  LinearProgress,
-  Chip,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
 } from "@mui/material";
-import { Timer, Flag, Send } from "@mui/icons-material";
-import { Layout } from "../../components/common";
+import { Timer, Send } from "@mui/icons-material";
 import { mockQuestionsExam1 } from "../../shared/mockdata";
+import { Question } from "../../components/student/items/Question";
 
 export const StudentStandardExamPage = () => {
   const { examId } = useParams();
   const navigate = useNavigate();
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
-  const [timeRemaining, setTimeRemaining] = useState(3600); // 60 minutes in seconds
   const [flaggedQuestions, setFlaggedQuestions] = useState<Set<string>>(
     new Set()
   );
+  const [timeRemaining, setTimeRemaining] = useState(300); // 60 minutes in seconds
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
+  const questionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  const shakeAnimation = `
+    @keyframes shake {
+      0%, 100% { transform: rotate(0deg) translateY(0); }
+      10%, 30%, 50%, 70%, 90% { transform: rotate(-10deg) translateY(-3px); }
+      20%, 40%, 60%, 80% { transform: rotate(10deg) translateY(3px); }
+    }
+  `;
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -47,20 +46,20 @@ export const StudentStandardExamPage = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const currentQuestion = mockQuestionsExam1[currentQuestionIndex];
-
   const handleAnswerChange = (questionId: string, value: any) => {
     setAnswers({ ...answers, [questionId]: value });
   };
 
   const handleToggleFlag = (questionId: string) => {
-    const newFlagged = new Set(flaggedQuestions);
-    if (newFlagged.has(questionId)) {
-      newFlagged.delete(questionId);
-    } else {
-      newFlagged.add(questionId);
-    }
-    setFlaggedQuestions(newFlagged);
+    setFlaggedQuestions((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(questionId)) {
+        newSet.delete(questionId);
+      } else {
+        newSet.add(questionId);
+      }
+      return newSet;
+    });
   };
 
   const handleSubmit = () => {
@@ -78,206 +77,271 @@ export const StudentStandardExamPage = () => {
       .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const progress =
-    ((currentQuestionIndex + 1) / mockQuestionsExam1.length) * 100;
+  const scrollToQuestion = (questionId: string) => {
+    questionRefs.current[questionId]?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
+
+  const totalPoints = mockQuestionsExam1.reduce((sum, q) => sum + q.points, 0);
+  const answeredCount = Object.keys(answers).length;
 
   return (
-    <Layout>
-      <Box>
-        {/* Header */}
-        <Paper elevation={2} sx={{ p: 2, mb: 3 }}>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              mb: 2,
-            }}
-          >
-            <Typography variant="h5" fontWeight="bold">
-              Introduction to Computer Science
-            </Typography>
-            <Chip
-              icon={<Timer />}
-              label={formatTime(timeRemaining)}
-              color={timeRemaining < 300 ? "error" : "primary"}
-            />
-          </Box>
-          <LinearProgress variant="determinate" value={progress} />
-          <Typography variant="caption" sx={{ mt: 1, display: "block" }}>
-            Question {currentQuestionIndex + 1} of {mockQuestionsExam1.length}
+    <Box sx={{ display: "flex", height: "100vh", bgcolor: "white" }}>
+      {/* Left Section - Exam Info */}
+      <Box
+        sx={{
+          width: 400,
+          p: 3,
+          px: { xs: 1, lg: 5 },
+          display: "flex",
+          flexDirection: "column",
+          gap: 0,
+          overflowY: "auto",
+        }}
+      >
+        {/* Exam Title and Timer */}
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
+            Introduction to Computer Science
           </Typography>
-        </Paper>
-
-        {/* Question */}
-        <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
           <Box
             sx={{
+              p: 1.5,
+              // border: "1px solid",
+              // borderColor: "divider",
+              bgcolor: "grey.100",
+              borderRadius: 2,
               display: "flex",
-              justifyContent: "space-between",
-              alignItems: "start",
-              mb: 3,
+              alignItems: "center",
+              gap: 1,
             }}
           >
-            <Box sx={{ flex: 1 }}>
-              <Typography variant="h6" gutterBottom>
-                Question {currentQuestionIndex + 1}
-              </Typography>
-              <Typography variant="body1" sx={{ mb: 2 }}>
-                {currentQuestion.question_text}
-              </Typography>
-              <Chip label={`${currentQuestion.points} points`} size="small" />
-            </Box>
-            <Button
-              startIcon={<Flag />}
-              onClick={() => handleToggleFlag(currentQuestion.question_id)}
-              color={
-                flaggedQuestions.has(currentQuestion.question_id)
-                  ? "warning"
-                  : "inherit"
-              }
-            >
-              {flaggedQuestions.has(currentQuestion.question_id)
-                ? "Flagged"
-                : "Flag"}{" "}
-            </Button>
-          </Box>
-
-          {/* Answer Input Based on Question Type */}
-          {currentQuestion.question_type === "single_choice" && (
-            <RadioGroup
-              value={answers[currentQuestion.question_id] || ""}
-              onChange={(e) =>
-                handleAnswerChange(currentQuestion.question_id, e.target.value)
-              }
-            >
-              {currentQuestion.choices?.map((choice) => (
-                <FormControlLabel
-                  key={choice.choice_id}
-                  value={choice.choice_id}
-                  control={<Radio />}
-                  label={choice.choice_text}
-                />
-              ))}
-            </RadioGroup>
-          )}
-
-          {currentQuestion.question_type === "multiple_choice" && (
-            <FormGroup>
-              {currentQuestion.choices?.map((choice) => (
-                <FormControlLabel
-                  key={choice.choice_id}
-                  control={
-                    <Checkbox
-                      checked={(
-                        answers[currentQuestion.question_id] || []
-                      ).includes(choice.choice_id)}
-                      onChange={(e) => {
-                        const current =
-                          answers[currentQuestion.question_id] || [];
-                        const newValue = e.target.checked
-                          ? [...current, choice.choice_id]
-                          : current.filter(
-                              (id: string) => id !== choice.choice_id
-                            );
-                        handleAnswerChange(
-                          currentQuestion.question_id,
-                          newValue
-                        );
-                      }}
-                    />
-                  }
-                  label={choice.choice_text}
-                />
-              ))}
-            </FormGroup>
-          )}
-
-          {currentQuestion.question_type === "short_answer" && (
-            <TextField
-              fullWidth
-              variant="outlined"
-              placeholder="Type your answer here"
-              value={answers[currentQuestion.question_id] || ""}
-              onChange={(e) =>
-                handleAnswerChange(currentQuestion.question_id, e.target.value)
-              }
+            <style>{shakeAnimation}</style>
+            <Timer
+              fontSize="small"
+              sx={{
+                animation: timeRemaining <= 30 ? "shake 0.5s infinite" : "none",
+              }}
             />
-          )}
-
-          {currentQuestion.question_type === "essay" && (
-            <TextField
-              fullWidth
-              multiline
-              rows={8}
-              variant="outlined"
-              placeholder="Write your essay here..."
-              value={answers[currentQuestion.question_id] || ""}
-              onChange={(e) =>
-                handleAnswerChange(currentQuestion.question_id, e.target.value)
-              }
-            />
-          )}
-        </Paper>
-
-        {/* Navigation */}
-        <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
-          <Button
-            variant="outlined"
-            disabled={currentQuestionIndex === 0}
-            onClick={() => setCurrentQuestionIndex(currentQuestionIndex - 1)}
-          >
-            Previous
-          </Button>
-          <Box sx={{ display: "flex", gap: 2 }}>
-            {currentQuestionIndex < mockQuestionsExam1.length - 1 ? (
-              <Button
-                variant="contained"
-                onClick={() =>
-                  setCurrentQuestionIndex(currentQuestionIndex + 1)
-                }
-              >
-                Next
-              </Button>
-            ) : (
-              <Button
-                variant="contained"
-                color="success"
-                startIcon={<Send />}
-                onClick={() => setSubmitDialogOpen(true)}
-              >
-                Submit Exam
-              </Button>
-            )}
+            <Typography variant="body1" fontWeight="bold" color="black">
+              {formatTime(timeRemaining)}
+            </Typography>
           </Box>
         </Box>
 
-        {/* Submit Confirmation Dialog */}
-        <Dialog
-          open={submitDialogOpen}
-          onClose={() => setSubmitDialogOpen(false)}
+        {/* Progress and Monitoring Status */}
+        <Box
+          sx={{
+            p: 2,
+            mb: 2,
+            // border: "1px solid",
+            // borderColor: "divider",
+            bgcolor: "grey.100",
+            borderRadius: 2,
+          }}
         >
-          <DialogTitle>Submit Exam?</DialogTitle>
-          <DialogContent>
-            <Typography>
-              Are you sure you want to submit your exam? You have answered{" "}
-              {Object.keys(answers).length} out of {mockQuestionsExam1.length}{" "}
-              questions.
+          <Typography
+            variant="h6"
+            fontWeight="bold"
+            gutterBottom
+            sx={{ textAlign: "left" }}
+          >
+            Progress
+          </Typography>
+          <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+            <Typography variant="body2" color="text.secondary">
+              Answered:
             </Typography>
-            {flaggedQuestions.size > 0 && (
-              <Typography color="warning.main" sx={{ mt: 2 }}>
-                You have {flaggedQuestions.size} flagged question(s) for review.
-              </Typography>
-            )}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setSubmitDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleSubmit} variant="contained" color="success">
-              Submit
-            </Button>
-          </DialogActions>
-        </Dialog>
+            <Typography variant="body2" fontWeight="bold">
+              {answeredCount} / {mockQuestionsExam1.length}
+            </Typography>
+          </Box>
+          <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+            <Typography variant="body2" color="text.secondary">
+              Total Points:
+            </Typography>
+            <Typography variant="body2" fontWeight="bold">
+              {totalPoints}
+            </Typography>
+          </Box>
+        </Box>
+
+        {/* Monitoring Status */}
+        <Box
+          sx={{
+            p: 2,
+            mb: 2,
+            bgcolor: "grey.100",
+            borderRadius: 2,
+          }}
+        >
+          <Typography
+            variant="h6"
+            fontWeight="bold"
+            gutterBottom
+            sx={{ textAlign: "left" }}
+          >
+            Monitoring Status
+          </Typography>
+          <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+            <Typography variant="body2" color="text.secondary">
+              Tab Switches:
+            </Typography>
+            <Typography variant="body2" fontWeight="bold">
+              0
+            </Typography>
+          </Box>
+          <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+            <Typography variant="body2" color="text.secondary">
+              Face Detection:
+            </Typography>
+            <Typography variant="body2" fontWeight="bold">
+              Active
+            </Typography>
+          </Box>
+          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+            <Typography variant="body2" color="text.secondary">
+              Window Focus:
+            </Typography>
+            <Typography variant="body2" fontWeight="bold">
+              Yes
+            </Typography>
+          </Box>
+        </Box>
+
+        {/* Question Grid Map */}
+        <Box>
+          <Typography
+            variant="body2"
+            fontWeight="bold"
+            gutterBottom
+            sx={{ textAlign: "left" }}
+          >
+            Question Map
+          </Typography>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "repeat(8, 1fr)",
+              gap: 0.5,
+            }}
+          >
+            {mockQuestionsExam1.map((question, index) => {
+              const isAnswered = answers[question.question_id] !== undefined;
+              const isFlagged = flaggedQuestions.has(question.question_id);
+              return (
+                <Box
+                  key={question.question_id}
+                  onClick={() => scrollToQuestion(question.question_id)}
+                  sx={{
+                    position: "relative",
+                    width: "100%",
+                    aspectRatio: "1",
+                    overflow: "hidden",
+                    cursor: "pointer",
+                    bgcolor: isAnswered ? "grey.300" : "grey.100",
+                    borderRadius: "4px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    "&:hover": {
+                      bgcolor: "grey.300",
+                    },
+                  }}
+                >
+                  <Typography variant="body2" fontWeight="bold">
+                    {index + 1}
+                  </Typography>
+                  {isFlagged && (
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        top: 0,
+                        right: 0,
+                        width: 0,
+                        height: 0,
+                        borderTop: "10px solid",
+                        borderTopColor: "primary.main",
+                        borderLeft: "10px solid transparent",
+                      }}
+                    />
+                  )}
+                </Box>
+              );
+            })}
+          </Box>
+        </Box>
+
+        {/* Submit Button */}
+        <Button
+          variant="contained"
+          startIcon={<Send />}
+          onClick={() => setSubmitDialogOpen(true)}
+          sx={{
+            mt: "auto",
+            width: 180,
+            ml: "auto",
+            py: 1,
+            fontWeight: "bold",
+            backgroundColor: "grey.400",
+            color: "black",
+          }}
+        >
+          Submit Exam
+        </Button>
       </Box>
-    </Layout>
+
+      {/* Right Section - All Questions */}
+      <Box
+        sx={{
+          flex: 1,
+          overflowY: "auto",
+          display: "flex",
+          flexDirection: "column",
+          gap: 4,
+          p: 3,
+          maxWidth: { xs: "100%", lg: "60%", xl: "50%" },
+          pr: { xs: 1 },
+        }}
+      >
+        <Box sx={{ mb: 2 }} />
+        {mockQuestionsExam1.map((question, index) => (
+          <Question
+            key={question.question_id}
+            question={question}
+            index={index}
+            answer={answers[question.question_id]}
+            isFlagged={flaggedQuestions.has(question.question_id)}
+            onAnswerChange={handleAnswerChange}
+            onToggleFlag={handleToggleFlag}
+            questionRef={(el: HTMLDivElement | null) => {
+              questionRefs.current[question.question_id] = el;
+            }}
+          />
+        ))}
+      </Box>
+
+      {/* Submit Confirmation Dialog */}
+      <Dialog
+        open={submitDialogOpen}
+        onClose={() => setSubmitDialogOpen(false)}
+      >
+        <DialogTitle>Submit Exam?</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to submit your exam? You have answered{" "}
+            {answeredCount} out of {mockQuestionsExam1.length} questions.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setSubmitDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleSubmit} variant="contained" color="success">
+            Submit
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 };

@@ -1,24 +1,13 @@
-import {
-  Box,
-  Typography,
-  Paper,
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Chip,
-  Divider,
-} from "@mui/material";
-import { CheckCircle, Cancel, EmojiEvents } from "@mui/icons-material";
-import { Layout } from "../../components/common";
+import { Box, Typography, Button, CircularProgress } from "@mui/material";
+import { Layout, Card } from "../../components/common";
 import { useNavigate } from "react-router-dom";
 import type { Submission } from "../../shared/dtos";
+import { Leaderboard } from "../../components/student/Leaderboard";
+import { QuestionBreakdown } from "../../components/student/items/QuestionBreakdown";
 
 // Mock data
 const mockResult = {
+  exam_title: "Introduction to Computer Science",
   submission: {
     submission_id: "1",
     exam_id: "1",
@@ -98,157 +87,158 @@ export const StudentExamResultPage = () => {
   return (
     <Layout>
       <Box>
-        <Paper elevation={3} sx={{ p: 4, mb: 3, textAlign: "center" }}>
-          <Typography variant="h4" gutterBottom fontWeight="bold">
-            Exam Results
-          </Typography>
-
-          <Box sx={{ my: 3 }}>
-            <Typography
-              variant="h2"
-              color={passed ? "success.main" : "error.main"}
-              fontWeight="bold"
-            >
-              {mockResult.submission.total_score} / {mockResult.maxScore}
-            </Typography>
-            <Typography variant="h6" color="text.secondary">
-              {percentage.toFixed(1)}%
-            </Typography>
-          </Box>
-
-          <Chip
-            icon={passed ? <CheckCircle /> : <Cancel />}
-            label={passed ? "Passed" : "Not Passed"}
-            color={passed ? "success" : "error"}
-            sx={{ fontSize: "1.1rem", py: 2.5, px: 1 }}
-          />
-
-          <Box
-            sx={{ mt: 3, display: "flex", justifyContent: "center", gap: 2 }}
+        {/* Top Section - Results and Leaderboard */}
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", lg: "1fr 1.5fr" },
+            gap: 3,
+            mb: 3,
+          }}
+        >
+          {/* Results Card */}
+          <Card
+            sx={{
+              p: 4,
+              textAlign: "center",
+              background: passed
+                ? "linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%)"
+                : "linear-gradient(135deg, #fef2f2 0%, #ffffff 100%)",
+              position: "relative",
+              overflow: "hidden",
+              "&::before": {
+                content: '""',
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                height: "4px",
+                background: passed
+                  ? "linear-gradient(90deg, #4caf50, #66bb6a)"
+                  : "linear-gradient(90deg, #f44336, #ef5350)",
+              },
+            }}
           >
-            <Box sx={{ textAlign: "center" }}>
-              <Typography variant="h6" color="primary">
-                {mockResult.rank}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Your Rank
-              </Typography>
+            <Typography
+              variant="h5"
+              gutterBottom
+              fontWeight="bold"
+              sx={{ mt: 1 }}
+            >
+              Exam Results
+            </Typography>
+            <Typography
+              variant="subtitle1"
+              color="text.secondary"
+              gutterBottom
+              sx={{ mb: 2 }}
+            >
+              {mockResult.exam_title}
+            </Typography>
+
+            <Box sx={{ my: 4, position: "relative", display: "inline-block" }}>
+              <Box sx={{ position: "relative", display: "inline-flex" }}>
+                <CircularProgress
+                  variant="determinate"
+                  value={100}
+                  size={160}
+                  thickness={3}
+                  sx={{
+                    color: "grey.200",
+                    position: "absolute",
+                  }}
+                />
+                <CircularProgress
+                  variant="determinate"
+                  value={percentage}
+                  size={160}
+                  thickness={3}
+                  sx={{
+                    color: passed ? "success.main" : "error.main",
+                    position: "relative",
+                  }}
+                />
+                <Box
+                  sx={{
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0,
+                    position: "absolute",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Typography
+                    variant="h4"
+                    color={passed ? "success.main" : "error.main"}
+                    fontWeight="bold"
+                  >
+                    {mockResult.submission.total_score}/{mockResult.maxScore}
+                  </Typography>
+                </Box>
+              </Box>
             </Box>
-            <Divider orientation="vertical" flexItem />
-            <Box sx={{ textAlign: "center" }}>
-              <Typography variant="h6" color="primary">
-                {mockResult.totalParticipants}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Total Students
-              </Typography>
+
+            <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
+              <Button
+                variant="outlined"
+                onClick={() => navigate("/student/exams")}
+                sx={{
+                  minWidth: 140,
+                  fontWeight: "bold",
+                  backgroundColor: "grey.400",
+                  color: "black",
+                  borderColor: "grey.400",
+                  "&:hover": {
+                    backgroundColor: "grey.500",
+                    borderColor: "grey.500",
+                  },
+                }}
+              >
+                Back to Exams
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={() => navigate("/student/results")}
+                sx={{
+                  minWidth: 140,
+                  fontWeight: "bold",
+                  backgroundColor: "grey.400",
+                  color: "black",
+                  borderColor: "grey.400",
+                  "&:hover": {
+                    backgroundColor: "grey.500",
+                    borderColor: "grey.500",
+                  },
+                }}
+              >
+                View All Results
+              </Button>
             </Box>
-          </Box>
-        </Paper>
+          </Card>
+
+          {/* Leaderboard Card */}
+          <Leaderboard
+            entries={mockLeaderboard}
+            currentUserRank={mockResult.rank}
+            totalParticipants={mockResult.totalParticipants}
+          />
+        </Box>
 
         {/* Question Breakdown */}
-        <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
-          <Typography variant="h6" gutterBottom fontWeight="bold">
+        <Card sx={{ p: 3 }}>
+          <Typography
+            variant="h5"
+            gutterBottom
+            fontWeight="bold"
+            sx={{ mb: 3, textAlign: "left" }}
+          >
             Question Breakdown
           </Typography>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Question</TableCell>
-                  <TableCell align="center">Score</TableCell>
-                  <TableCell align="center">Status</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {mockResult.questionResults.map((result, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{result.question}</TableCell>
-                    <TableCell align="center">
-                      {result.earned} / {result.max}
-                    </TableCell>
-                    <TableCell align="center">
-                      {result.correct ? (
-                        <CheckCircle color="success" />
-                      ) : (
-                        <Cancel color="error" />
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Paper>
-
-        {/* Leaderboard */}
-        <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
-          <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-            <EmojiEvents color="warning" sx={{ mr: 1 }} />
-            <Typography variant="h6" fontWeight="bold">
-              Leaderboard
-            </Typography>
-          </Box>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Rank</TableCell>
-                  <TableCell>Name</TableCell>
-                  <TableCell align="center">Score</TableCell>
-                  <TableCell align="right">Submitted At</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {mockLeaderboard.map((entry) => (
-                  <TableRow
-                    key={entry.rank}
-                    sx={{
-                      bgcolor: entry.isCurrentUser
-                        ? "primary.light"
-                        : "inherit",
-                      fontWeight: entry.isCurrentUser ? "bold" : "normal",
-                    }}
-                  >
-                    <TableCell>
-                      {entry.rank <= 3 ? (
-                        <Chip
-                          label={entry.rank}
-                          color={entry.rank === 1 ? "warning" : "default"}
-                          size="small"
-                        />
-                      ) : (
-                        entry.rank
-                      )}
-                    </TableCell>
-                    <TableCell>{entry.name}</TableCell>
-                    <TableCell align="center">
-                      <strong>{entry.score}</strong>
-                    </TableCell>
-                    <TableCell align="right">
-                      {new Date(entry.submitted_at).toLocaleString()}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Paper>
-
-        <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
-          <Button
-            variant="outlined"
-            onClick={() => navigate("/student/exams")}
-          >
-            Back to Exams
-          </Button>
-          <Button
-            variant="contained"
-            onClick={() => navigate("/student/results")}
-          >
-            View All Results
-          </Button>
-        </Box>
+          <QuestionBreakdown results={mockResult.questionResults} />
+        </Card>
       </Box>
     </Layout>
   );

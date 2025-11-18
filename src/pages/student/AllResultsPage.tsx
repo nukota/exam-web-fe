@@ -1,5 +1,5 @@
-import { Box, Typography, Paper, Chip, Button } from "@mui/material";
-import { CheckCircle, Cancel, Visibility } from "@mui/icons-material";
+import { Box, Typography, Paper, Button, IconButton } from "@mui/material";
+import { Check, X, Eye } from "lucide-react";
 import { Layout } from "../../components/common/Layout";
 import { CustomDataGrid } from "../../components/common";
 import { calculatePercentage } from "../../shared/utils";
@@ -16,6 +16,11 @@ export const StudentAllResultsPage = () => {
       headerName: "Exam Title",
       flex: 1,
       minWidth: 200,
+      renderCell: (params) => (
+        <Typography variant="body2" fontWeight="medium">
+          {params.value}
+        </Typography>
+      ),
     },
     {
       field: "score",
@@ -24,7 +29,7 @@ export const StudentAllResultsPage = () => {
       align: "center",
       headerAlign: "center",
       renderCell: (params) => (
-        <Typography fontWeight="bold">
+        <Typography variant="body2" fontWeight="medium">
           {params.value} / {params.row.maxScore}
         </Typography>
       ),
@@ -32,7 +37,7 @@ export const StudentAllResultsPage = () => {
     {
       field: "percentage",
       headerName: "Percentage",
-      width: 120,
+      width: 100,
       align: "center",
       headerAlign: "center",
       renderCell: (params) => {
@@ -42,8 +47,9 @@ export const StudentAllResultsPage = () => {
         );
         return (
           <Typography
+            variant="body2"
             color={params.row.passed ? "success.main" : "error.main"}
-            fontWeight="bold"
+            fontWeight="medium"
           >
             {percentage}%
           </Typography>
@@ -53,25 +59,26 @@ export const StudentAllResultsPage = () => {
     {
       field: "passed",
       headerName: "Status",
-      width: 150,
+      width: 110,
       align: "center",
       headerAlign: "center",
       renderCell: (params) => (
-        <Chip
-          icon={params.value ? <CheckCircle /> : <Cancel />}
-          label={params.value ? "Passed" : "Not Passed"}
-          color={params.value ? "success" : "error"}
-          size="small"
-        />
+        <Box>
+          {params.value ? (
+            <Check size={20} color="#4caf50" />
+          ) : (
+            <X size={20} color="#f44336" />
+          )}
+        </Box>
       ),
     },
     {
       field: "submitted_at",
       headerName: "Submitted At",
-      width: 180,
-      align: "right",
-      headerAlign: "right",
-      valueFormatter: (value) => new Date(value).toLocaleString(),
+      flex: 0.75,
+      minWidth: 180,
+      valueFormatter: (value) =>
+        value ? new Date(value).toLocaleString() : "N/A",
     },
     {
       field: "actions",
@@ -81,35 +88,62 @@ export const StudentAllResultsPage = () => {
       headerAlign: "center",
       sortable: false,
       renderCell: (params) => (
-        <Button
+        <IconButton
           size="small"
-          variant="outlined"
-          startIcon={<Visibility />}
           onClick={() => navigate(`/student/exam/${params.row.exam_id}/result`)}
+          sx={{
+            color: "text.secondary",
+            "&:hover": {
+              bgcolor: "action.hover",
+            },
+          }}
         >
-          View
-        </Button>
+          <Eye size={24} />
+        </IconButton>
       ),
     },
   ];
 
+  const totalExams = mockResults.length;
+  const passedExams = mockResults.filter((result) => result.passed).length;
+
   return (
     <Layout>
       <Box>
-        <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom>
-          My Exam Results
-        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            mb: 3,
+          }}
+        >
+          <Typography variant="h4" component="h1" fontWeight="bold">
+            My Exam Results
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              color: "text.secondary",
+              bgcolor: "grey.300",
+              ml: 2,
+              px: 1,
+              py: 0.5,
+              borderRadius: 1,
+              flexShrink: 0,
+            }}
+          >
+            {passedExams} / {totalExams} Passed
+          </Typography>
+        </Box>
 
         {mockResults.length > 0 ? (
-          <Box sx={{ mt: 3 }}>
-            <CustomDataGrid
-              rows={mockResults}
-              columns={columns}
-              getRowId={(row) => row.exam_id}
-              pageSize={10}
-              pageSizeOptions={[10, 20, 50]}
-            />
-          </Box>
+          <CustomDataGrid
+            rows={mockResults}
+            columns={columns}
+            getRowId={(row) => row.exam_id}
+            pageSize={10}
+            pageSizeOptions={[10, 20, 50]}
+          />
         ) : (
           <Paper elevation={2} sx={{ p: 4, mt: 3, textAlign: "center" }}>
             <Typography variant="h6" color="text.secondary">

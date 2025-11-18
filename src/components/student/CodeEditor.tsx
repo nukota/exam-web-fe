@@ -1,5 +1,13 @@
-import Editor from '@monaco-editor/react';
-import { Box, Paper, Typography, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import Editor from "@monaco-editor/react";
+import {
+  Box,
+  Typography,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+} from "@mui/material";
+import Card from "../common/Card";
 
 interface CodeEditorProps {
   value: string;
@@ -11,24 +19,33 @@ interface CodeEditorProps {
 }
 
 const SUPPORTED_LANGUAGES = [
-  { value: 'cpp', label: 'C++' },
-  { value: 'python', label: 'Python' },
-  { value: 'javascript', label: 'JavaScript' },
-  { value: 'java', label: 'Java' },
+  { value: "cpp", label: "C++" },
+  { value: "python", label: "Python" },
+  { value: "javascript", label: "JavaScript" },
+  { value: "java", label: "Java" },
 ];
 
 export const CodeEditor: React.FC<CodeEditorProps> = ({
   value,
   onChange,
-  language = 'python',
+  language = "python",
   onLanguageChange,
   readOnly = false,
-  height = '400px',
+  height = "400px",
 }) => {
   return (
-    <Paper elevation={2} sx={{ p: 2 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Typography variant="subtitle2">
+    <Card
+      sx={{ p: 2, display: "flex", flexDirection: "column", height: "100%" }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2,
+        }}
+      >
+        <Typography variant="subtitle2" fontWeight="bold">
           Code Editor
         </Typography>
         {onLanguageChange && (
@@ -49,7 +66,14 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
           </FormControl>
         )}
       </Box>
-      <Box sx={{ border: '1px solid #ddd', borderRadius: 1 }}>
+      <Box
+        sx={{
+          border: "1px solid #ddd",
+          borderRadius: 1,
+          flex: 1,
+          overflow: "hidden",
+        }}
+      >
         <Editor
           height={height}
           language={language}
@@ -60,12 +84,12 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
             readOnly,
             minimap: { enabled: false },
             fontSize: 14,
-            lineNumbers: 'on',
+            lineNumbers: "on",
             scrollBeyondLastLine: false,
             automaticLayout: true,
           }}
         />
       </Box>
-    </Paper>
+    </Card>
   );
 };

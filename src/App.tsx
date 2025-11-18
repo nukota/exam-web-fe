@@ -1,6 +1,6 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './shared/providers/AuthProvider';
-import { ProtectedRoute } from './components/common/ProtectedRoute';
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "./shared/providers/AuthProvider";
+import { ProtectedRoute } from "./components/common/ProtectedRoute";
 import {
   SignInPage,
   // Student Pages
@@ -19,8 +19,8 @@ import {
   AdminLeaderboardPage,
   AdminStudentsPage,
   AdminProfilePage,
-} from './pages';
-import './App.css';
+} from "./pages";
+import "./App.css";
 
 const App = () => {
   return (
@@ -34,23 +34,23 @@ const App = () => {
           <Route
             path="/student/exams"
             element={
-              <ProtectedRoute allowedRoles={['student']}>
+              <ProtectedRoute allowedRoles={["student"]}>
                 <StudentExamListPage />
               </ProtectedRoute>
             }
           />
           <Route
-            path="/student/exam/:examId/standard"
+            path="/student/exam/:examId"
             element={
-              <ProtectedRoute allowedRoles={['student']}>
+              <ProtectedRoute allowedRoles={["student"]}>
                 <StudentStandardExamPage />
               </ProtectedRoute>
             }
           />
           <Route
-            path="/student/exam/:examId/coding"
+            path="/student/exam/coding/:examId"
             element={
-              <ProtectedRoute allowedRoles={['student']}>
+              <ProtectedRoute allowedRoles={["student"]}>
                 <StudentCodingExamPage />
               </ProtectedRoute>
             }
@@ -58,7 +58,7 @@ const App = () => {
           <Route
             path="/student/exam/:examId/result"
             element={
-              <ProtectedRoute allowedRoles={['student']}>
+              <ProtectedRoute allowedRoles={["student"]}>
                 <StudentExamResultPage />
               </ProtectedRoute>
             }
@@ -66,7 +66,7 @@ const App = () => {
           <Route
             path="/student/results"
             element={
-              <ProtectedRoute allowedRoles={['student']}>
+              <ProtectedRoute allowedRoles={["student"]}>
                 <StudentAllResultsPage />
               </ProtectedRoute>
             }
@@ -74,7 +74,7 @@ const App = () => {
           <Route
             path="/student/profile"
             element={
-              <ProtectedRoute allowedRoles={['student']}>
+              <ProtectedRoute allowedRoles={["student"]}>
                 <StudentProfilePage />
               </ProtectedRoute>
             }
@@ -84,7 +84,7 @@ const App = () => {
           <Route
             path="/admin/dashboard"
             element={
-              <ProtectedRoute allowedRoles={['admin', 'teacher']}>
+              <ProtectedRoute allowedRoles={["admin", "teacher"]}>
                 <AdminDashboardPage />
               </ProtectedRoute>
             }
@@ -92,7 +92,7 @@ const App = () => {
           <Route
             path="/admin/exams"
             element={
-              <ProtectedRoute allowedRoles={['admin', 'teacher']}>
+              <ProtectedRoute allowedRoles={["admin", "teacher"]}>
                 <AdminExamsPage />
               </ProtectedRoute>
             }
@@ -100,7 +100,7 @@ const App = () => {
           <Route
             path="/admin/exams/create"
             element={
-              <ProtectedRoute allowedRoles={['admin', 'teacher']}>
+              <ProtectedRoute allowedRoles={["admin", "teacher"]}>
                 <AdminCreateExamPage />
               </ProtectedRoute>
             }
@@ -108,7 +108,7 @@ const App = () => {
           <Route
             path="/admin/exams/:examId/edit"
             element={
-              <ProtectedRoute allowedRoles={['admin', 'teacher']}>
+              <ProtectedRoute allowedRoles={["admin", "teacher"]}>
                 <AdminEditExamPage />
               </ProtectedRoute>
             }
@@ -116,7 +116,7 @@ const App = () => {
           <Route
             path="/admin/grading"
             element={
-              <ProtectedRoute allowedRoles={['admin', 'teacher']}>
+              <ProtectedRoute allowedRoles={["admin", "teacher"]}>
                 <AdminGradingPage />
               </ProtectedRoute>
             }
@@ -124,7 +124,7 @@ const App = () => {
           <Route
             path="/admin/students"
             element={
-              <ProtectedRoute allowedRoles={['admin', 'teacher']}>
+              <ProtectedRoute allowedRoles={["admin", "teacher"]}>
                 <AdminStudentsPage />
               </ProtectedRoute>
             }
@@ -132,7 +132,7 @@ const App = () => {
           <Route
             path="/admin/exams/:examId/leaderboard"
             element={
-              <ProtectedRoute allowedRoles={['admin', 'teacher']}>
+              <ProtectedRoute allowedRoles={["admin", "teacher"]}>
                 <AdminLeaderboardPage />
               </ProtectedRoute>
             }
@@ -140,7 +140,7 @@ const App = () => {
           <Route
             path="/admin/profile"
             element={
-              <ProtectedRoute allowedRoles={['admin', 'teacher']}>
+              <ProtectedRoute allowedRoles={["admin", "teacher"]}>
                 <AdminProfilePage />
               </ProtectedRoute>
             }

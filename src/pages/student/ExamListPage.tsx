@@ -15,16 +15,20 @@ import { mockExams } from "../../shared/mockdata";
 
 export const StudentExamListPage = () => {
   const [accessCode, setAccessCode] = useState("");
-  const [selectedType, setSelectedType] = useState("standard");
+  const [selectedType, setSelectedType] = useState("all");
   const navigate = useNavigate();
 
   const handleStartExam = (examId: string, examType: string) => {
     if (examType === "coding") {
-      navigate(`/student/exam/${examId}/coding`);
+      navigate(`/student/exam/coding/${examId}`);
     } else {
-      navigate(`/student/exam/${examId}/standard`);
+      navigate(`/student/exam/${examId}`);
     }
   };
+
+  const filteredExams = mockExams.filter(
+    (exam) => selectedType === "all" || exam.type === selectedType
+  );
 
   const handleJoinWithCode = () => {
     const exam = mockExams.find(
@@ -34,7 +38,8 @@ export const StudentExamListPage = () => {
       handleStartExam(exam.exam_id, exam.type);
     } else {
       // Assume accessCode is exam_id, use selectedType
-      handleStartExam(accessCode, selectedType);
+      // handleStartExam(accessCode);
+      handleStartExam("1", "standard");
     }
     setAccessCode("");
   };
@@ -51,7 +56,12 @@ export const StudentExamListPage = () => {
             flexWrap: "wrap",
           }}
         >
-          <Typography variant="h4" component="h1" fontWeight="bold">
+          <Typography
+            variant="h4"
+            component="h1"
+            fontWeight="bold"
+            sx={{ flexGrow: 1, alignItems: "flex-start", display: "flex" }}
+          >
             Available Exams
           </Typography>
           <TextField
@@ -67,6 +77,7 @@ export const StudentExamListPage = () => {
             size="small"
             displayEmpty
           >
+            <MenuItem value="all">All Exams</MenuItem>
             <MenuItem value="standard">Standard</MenuItem>
             <MenuItem value="coding">Coding</MenuItem>
           </Select>
@@ -82,7 +93,7 @@ export const StudentExamListPage = () => {
             gap: 3,
           }}
         >
-          {mockExams.map((exam) => (
+          {filteredExams.map((exam) => (
             <ExamItem
               key={exam.exam_id}
               exam={exam}
