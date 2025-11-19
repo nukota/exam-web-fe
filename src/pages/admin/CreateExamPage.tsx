@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
-  Paper,
   TextField,
   Button,
   FormControl,
@@ -15,6 +14,7 @@ import {
 } from "@mui/material";
 import { Add, Delete } from "@mui/icons-material";
 import { Layout } from "../../components/common";
+import Card from "../../components/common/Card";
 import type { CreateExamDto, CreateQuestionDto } from "../../shared/dtos";
 
 export const AdminCreateExamPage = () => {
@@ -113,12 +113,18 @@ export const AdminCreateExamPage = () => {
   return (
     <Layout>
       <Box>
-        <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom>
+        <Typography
+          variant="h4"
+          component="h1"
+          fontWeight="bold"
+          gutterBottom
+          sx={{ mb: 3 }}
+        >
           Create New Exam
         </Typography>
 
         {/* Exam Details */}
-        <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
+        <Card sx={{ p: 3, mb: 3 }}>
           <Typography variant="h6" gutterBottom>
             Exam Details
           </Typography>
@@ -198,7 +204,7 @@ export const AdminCreateExamPage = () => {
               />
             </Box>
           </Box>
-        </Paper>
+        </Card>
 
         {/* Questions */}
         {exam.type !== "coding" && (
@@ -211,18 +217,21 @@ export const AdminCreateExamPage = () => {
                 mb: 2,
               }}
             >
-              <Typography variant="h6">Questions</Typography>
+              <Typography variant="h6" fontWeight="bold">
+                Questions
+              </Typography>
               <Button
                 variant="outlined"
                 startIcon={<Add />}
                 onClick={handleAddQuestion}
+                sx={{ fontWeight: "bold" }}
               >
                 Add Question
               </Button>
             </Box>
 
             {questions.map((question, qIndex) => (
-              <Paper key={qIndex} elevation={2} sx={{ p: 3, mb: 2 }}>
+              <Card key={qIndex} sx={{ p: 3, mb: 2, bgcolor: "grey.50" }}>
                 <Box
                   sx={{
                     display: "flex",
@@ -244,7 +253,9 @@ export const AdminCreateExamPage = () => {
                   )}
                 </Box>
 
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                <Box
+                  sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}
+                >
                   <TextField
                     fullWidth
                     label="Question Text"
@@ -258,6 +269,11 @@ export const AdminCreateExamPage = () => {
                         e.target.value
                       )
                     }
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        bgcolor: "white",
+                      },
+                    }}
                   />
                   <Box sx={{ display: "flex", gap: 2 }}>
                     <FormControl fullWidth>
@@ -272,6 +288,9 @@ export const AdminCreateExamPage = () => {
                             e.target.value
                           )
                         }
+                        sx={{
+                          bgcolor: "white",
+                        }}
                       >
                         <MenuItem value="single_choice">Single Choice</MenuItem>
                         <MenuItem value="multiple_choice">
@@ -292,7 +311,12 @@ export const AdminCreateExamPage = () => {
                           parseFloat(e.target.value)
                         )
                       }
-                      sx={{ width: 150 }}
+                      sx={{
+                        width: 150,
+                        "& .MuiOutlinedInput-root": {
+                          bgcolor: "white",
+                        },
+                      }}
                     />
                   </Box>
 
@@ -308,11 +332,14 @@ export const AdminCreateExamPage = () => {
                             mb: 1,
                           }}
                         >
-                          <Typography variant="subtitle2">Choices</Typography>
+                          <Typography variant="subtitle2" fontWeight="bold">
+                            Choices
+                          </Typography>
                           <Button
                             size="small"
                             startIcon={<Add />}
                             onClick={() => handleAddChoice(qIndex)}
+                            sx={{ fontWeight: "bold" }}
                           >
                             Add Choice
                           </Button>
@@ -335,6 +362,11 @@ export const AdminCreateExamPage = () => {
                                   e.target.value
                                 )
                               }
+                              sx={{
+                                "& .MuiOutlinedInput-root": {
+                                  bgcolor: "white",
+                                },
+                              }}
                             />
                             <FormControl size="small" sx={{ minWidth: 120 }}>
                               <InputLabel>Correct?</InputLabel>
@@ -349,6 +381,9 @@ export const AdminCreateExamPage = () => {
                                     e.target.value === "yes"
                                   )
                                 }
+                                sx={{
+                                  bgcolor: "white",
+                                }}
                               >
                                 <MenuItem value="yes">Yes</MenuItem>
                                 <MenuItem value="no">No</MenuItem>
@@ -381,32 +416,59 @@ export const AdminCreateExamPage = () => {
                           e.target.value,
                         ])
                       }
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          bgcolor: "white",
+                        },
+                      }}
                     />
                   )}
                 </Box>
-              </Paper>
+              </Card>
             ))}
           </>
         )}
 
         {exam.type === "coding" && (
-          <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
-            <Typography variant="h6" gutterBottom>
+          <Card sx={{ p: 3, mb: 3, bgcolor: "grey.50" }}>
+            <Typography variant="h6" fontWeight="bold" gutterBottom>
               Coding Problem
             </Typography>
             <Typography variant="body2" color="text.secondary" paragraph>
               You can add coding problem details and test cases after creating
               the exam.
             </Typography>
-          </Paper>
+          </Card>
         )}
 
         {/* Actions */}
-        <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end" }}>
-          <Button variant="outlined" onClick={() => navigate("/admin/exams")}>
+        <Box
+          sx={{ display: "flex", gap: 2, justifyContent: "flex-end", mt: 2 }}
+        >
+          <Button
+            variant="outlined"
+            onClick={() => navigate("/admin/exams")}
+            sx={{
+              px: 3,
+              py: 1,
+              fontWeight: "bold",
+            }}
+          >
             Cancel
           </Button>
-          <Button variant="contained" onClick={handleSubmit}>
+          <Button
+            variant="contained"
+            onClick={handleSubmit}
+            sx={{
+              px: 3,
+              py: 1,
+              fontWeight: "bold",
+              bgcolor: "grey.800",
+              "&:hover": {
+                bgcolor: "grey.900",
+              },
+            }}
+          >
             Create Exam
           </Button>
         </Box>

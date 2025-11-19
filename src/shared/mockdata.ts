@@ -98,13 +98,13 @@ export const mockQuestionsExam1: Question[] = [
         choice_id: "q1c1",
         question_id: "q1",
         choice_text: "O(n)",
-        is_correct: false,
+        is_correct: true,
       },
       {
         choice_id: "q1c2",
         question_id: "q1",
         choice_text: "O(log n)",
-        is_correct: true,
+        is_correct: false,
       },
       {
         choice_id: "q1c3",
@@ -443,3 +443,104 @@ export const mockResults = [
     passed: false,
   },
 ];
+
+// Mock Submission Detail with Answers
+export const mockSubmissionDetail = {
+  submission_id: "sub1",
+  exam_id: "1",
+  exam_title: "Introduction to Computer Science",
+  student_name: "Alice Johnson",
+  student_email: "alice@example.com",
+  submitted_at: "2025-11-14T10:30:00",
+  cheated: true,
+  flagged_questions: ["q4", "q5", "q10"],
+  answers: [
+    {
+      answer_id: "a1",
+      submission_id: "sub1",
+      question_id: "q1",
+      selected_choices: ["q1c2"],
+      score: 2,
+    },
+    {
+      answer_id: "a2",
+      submission_id: "sub1",
+      question_id: "q2",
+      selected_choices: ["q2c1", "q2c2", "q2c4"],
+      score: 3,
+    },
+    {
+      answer_id: "a3",
+      submission_id: "sub1",
+      question_id: "q3",
+      answer_text: "Central Processing Unit",
+      score: 1,
+    },
+    {
+      answer_id: "a4",
+      submission_id: "sub1",
+      question_id: "q4",
+      answer_text:
+        "Recursion is a programming technique where a function calls itself to solve a problem by breaking it down into smaller, similar subproblems. A recursive function typically has two parts: a base case that stops the recursion, and a recursive case that calls the function itself with modified parameters.\n\nExample:\nfunction factorial(n) {\n  if (n === 0 || n === 1) return 1; // base case\n  return n * factorial(n - 1); // recursive case\n}\n\nThis function calculates the factorial of a number by recursively multiplying n by the factorial of (n-1) until it reaches the base case.",
+      score: 4.5,
+    },
+    {
+      answer_id: "a5",
+      submission_id: "sub1",
+      question_id: "q5",
+      selected_choices: ["q5c2"],
+      score: 2,
+    },
+    {
+      answer_id: "a6",
+      submission_id: "sub1",
+      question_id: "q6",
+      selected_choices: ["q6c1", "q6c4"],
+      score: 2,
+    },
+    {
+      answer_id: "a7",
+      submission_id: "sub1",
+      question_id: "q7",
+      answer_text: "HyperText Transfer Protocol",
+      score: 1,
+    },
+    {
+      answer_id: "a8",
+      submission_id: "sub1",
+      question_id: "q8",
+      selected_choices: ["q8c1", "q8c2", "q8c4"],
+      score: 3,
+    },
+    {
+      answer_id: "a9",
+      submission_id: "sub1",
+      question_id: "q9",
+      answer_text: "const cannot be reassigned after initialization",
+      score: 2,
+    },
+    {
+      answer_id: "a10",
+      submission_id: "sub1",
+      question_id: "q10",
+      answer_text:
+        "SQL databases are relational databases that use structured schemas with tables and predefined relationships. They are ideal for applications that require ACID compliance and complex queries. Examples include MySQL and PostgreSQL. Use SQL when data is highly structured and relationships are important.\n\nNoSQL databases are non-relational and can handle unstructured or semi-structured data. They offer flexibility in schema design and horizontal scalability. Examples include MongoDB and Cassandra. Use NoSQL for large-scale applications with rapidly changing data structures or when you need high performance for simple queries.",
+      score: 4,
+    },
+    {
+      answer_id: "a11",
+      submission_id: "sub1",
+      question_id: "q11",
+      selected_choices: ["q11c2"],
+      score: 2,
+    },
+    {
+      answer_id: "a12",
+      submission_id: "sub1",
+      question_id: "q12",
+      answer_text:
+        "Big O notation describes the upper bound of an algorithm's time or space complexity in terms of input size. It helps us understand how an algorithm scales and compare different approaches. For example, O(n) means linear time, O(n²) means quadratic time, and O(log n) means logarithmic time. It's important because it allows developers to predict performance and choose the most efficient algorithm for their specific use case.",
+      score: 4,
+    },
+  ],
+};

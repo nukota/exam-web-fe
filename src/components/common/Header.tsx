@@ -38,17 +38,18 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const handleSignOut = async () => {
     try {
       await signOut();
-      navigate('/signin');
+      navigate("/signin");
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error("Error signing out:", error);
     }
   };
 
   const handleProfile = () => {
     handleClose();
-    const profilePath = currentUser?.role === 'admin' || currentUser?.role === 'teacher'
-      ? '/admin/profile'
-      : '/student/profile';
+    const profilePath =
+      currentUser?.role === "admin" || currentUser?.role === "teacher"
+        ? "/admin/profile"
+        : "/student/profile";
     navigate(profilePath);
   };
 
@@ -68,7 +69,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           justifyContent: "space-between",
           alignItems: "center",
           gap: { xs: 1, lg: 2 },
-          height: { xs: 54, sm: 60 },
+          height: 60,
           px: 3,
         }}
       >
@@ -76,7 +77,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
         <IconButton
           color="default"
           onClick={onMenuClick}
-          sx={{ display: { xs: 'block', md: 'none' }, p: 1.25 }}
+          sx={{ display: { xs: "block", md: "none" }, p: 1.25 }}
         >
           <MenuRounded sx={{ fontSize: 28 }} />
         </IconButton>
@@ -94,7 +95,9 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           </IconButton>
           <IconButton onClick={handleClick} size="small">
             <Avatar sx={{ width: 36, height: 36, bgcolor: "primary.main" }}>
-              {currentUser?.full_name?.charAt(0) || currentUser?.username?.charAt(0) || 'U'}
+              {currentUser?.full_name?.charAt(0) ||
+                currentUser?.username?.charAt(0) ||
+                "U"}
             </Avatar>
           </IconButton>
         </Box>
@@ -107,13 +110,13 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           transformOrigin={{ horizontal: "right", vertical: "top" }}
           anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
           PaperProps={{
-              sx: {
-                boxShadow: "0px 8px 20px 0px rgba(60, 60, 60, 0.10)",
-                border: "1px solid #e0e0e0",
-                borderRadius: 3,
-                mt: -1,
-              },
-            }}
+            sx: {
+              boxShadow: "0px 8px 20px 0px rgba(60, 60, 60, 0.10)",
+              border: "1px solid #e0e0e0",
+              borderRadius: 3,
+              mt: -1,
+            },
+          }}
         >
           <MenuItem onClick={handleProfile}>
             <ListItemIcon>

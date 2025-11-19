@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
-  Paper,
   TextField,
   Button,
   FormControl,
@@ -12,6 +11,7 @@ import {
   MenuItem,
 } from "@mui/material";
 import { Layout } from "../../components/common";
+import Card from "../../components/common/Card";
 import type { UpdateExamDto } from "../../shared/dtos";
 import { mockExam } from "../../shared/mockdata";
 
@@ -42,18 +42,29 @@ export const AdminEditExamPage = () => {
   return (
     <Layout>
       <Box>
-        <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom>
+        <Typography
+          variant="h4"
+          component="h1"
+          fontWeight="bold"
+          gutterBottom
+          sx={{ mb: 3 }}
+        >
           Edit Exam
         </Typography>
 
-        <Paper elevation={2} sx={{ p: 3 }}>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        <Card sx={{ p: 3 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
             <TextField
               fullWidth
               label="Exam Title"
               value={exam.title || ""}
               onChange={(e) => setExam({ ...exam, title: e.target.value })}
               required
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  bgcolor: "grey.50",
+                },
+              }}
             />
             <TextField
               fullWidth
@@ -64,6 +75,11 @@ export const AdminEditExamPage = () => {
               onChange={(e) =>
                 setExam({ ...exam, description: e.target.value })
               }
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  bgcolor: "grey.50",
+                },
+              }}
             />
             <Box sx={{ display: "flex", gap: 2 }}>
               <FormControl fullWidth>
@@ -74,6 +90,9 @@ export const AdminEditExamPage = () => {
                   onChange={(e) =>
                     setExam({ ...exam, type: e.target.value as any })
                   }
+                  sx={{
+                    bgcolor: "grey.50",
+                  }}
                 >
                   <MenuItem value="multiple_choice">
                     Standard (Multiple Choice)
@@ -90,6 +109,11 @@ export const AdminEditExamPage = () => {
                   setExam({ ...exam, access_code: e.target.value })
                 }
                 required
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    bgcolor: "grey.50",
+                  },
+                }}
               />
             </Box>
             <Box sx={{ display: "flex", gap: 2 }}>
@@ -104,6 +128,11 @@ export const AdminEditExamPage = () => {
                     duration_minutes: parseInt(e.target.value),
                   })
                 }
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    bgcolor: "grey.50",
+                  },
+                }}
               />
               <TextField
                 fullWidth
@@ -112,6 +141,11 @@ export const AdminEditExamPage = () => {
                 value={exam.start_at || ""}
                 onChange={(e) => setExam({ ...exam, start_at: e.target.value })}
                 InputLabelProps={{ shrink: true }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    bgcolor: "grey.50",
+                  },
+                }}
               />
               <TextField
                 fullWidth
@@ -120,21 +154,46 @@ export const AdminEditExamPage = () => {
                 value={exam.end_at || ""}
                 onChange={(e) => setExam({ ...exam, end_at: e.target.value })}
                 InputLabelProps={{ shrink: true }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    bgcolor: "grey.50",
+                  },
+                }}
               />
             </Box>
           </Box>
 
           <Box
-            sx={{ display: "flex", gap: 2, justifyContent: "flex-end", mt: 3 }}
+            sx={{ display: "flex", gap: 2, justifyContent: "flex-end", mt: 4 }}
           >
-            <Button variant="outlined" onClick={() => navigate("/admin/exams")}>
+            <Button
+              variant="outlined"
+              onClick={() => navigate("/admin/exams")}
+              sx={{
+                px: 3,
+                py: 1,
+                fontWeight: "bold",
+              }}
+            >
               Cancel
             </Button>
-            <Button variant="contained" onClick={handleSubmit}>
+            <Button
+              variant="contained"
+              onClick={handleSubmit}
+              sx={{
+                px: 3,
+                py: 1,
+                fontWeight: "bold",
+                bgcolor: "grey.800",
+                "&:hover": {
+                  bgcolor: "grey.900",
+                },
+              }}
+            >
               Save Changes
             </Button>
           </Box>
-        </Paper>
+        </Card>
       </Box>
     </Layout>
   );

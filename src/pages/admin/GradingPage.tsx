@@ -49,8 +49,7 @@ export const AdminGradingPage = () => {
   const navigate = useNavigate();
 
   const handleGradeExam = (examId: string) => {
-    // TODO: Implement the grading page
-    navigate(`/admin/exams/${examId}/grade`);
+    navigate(`/admin/grading/${examId}`);
   };
 
   const totalPending = mockExamsForGrading.reduce(
