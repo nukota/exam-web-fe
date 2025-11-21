@@ -1,4 +1,11 @@
-import type { User, Exam, Question, Submission } from "./dtos";
+import type {
+  User,
+  Question,
+  Submission,
+  AllExamsPageDTO,
+  GradingPageDTO,
+  ExamAttemptsPageDTO,
+} from "./dtos";
 
 // Mock Users
 export const mockUsers: User[] = [
@@ -33,7 +40,7 @@ export const mockUsers: User[] = [
 ];
 
 // Mock Exams
-export const mockExams: Exam[] = [
+export const mockExams: AllExamsPageDTO = [
   {
     exam_id: "1",
     teacher_id: "teacher1",
@@ -45,6 +52,8 @@ export const mockExams: Exam[] = [
     start_at: "2025-11-15T09:00:00",
     end_at: "2025-11-15T18:00:00",
     created_at: "2025-11-01T10:00:00",
+    question_amount: 12,
+    status: "ended",
   },
   {
     exam_id: "2",
@@ -57,6 +66,8 @@ export const mockExams: Exam[] = [
     start_at: "2025-11-14T10:00:00",
     end_at: "2025-11-24T19:00:00",
     created_at: "2025-11-02T10:00:00",
+    question_amount: 0,
+    status: "started",
   },
   {
     exam_id: "3",
@@ -69,20 +80,10 @@ export const mockExams: Exam[] = [
     start_at: "2025-11-17T09:00:00",
     end_at: "2025-11-21T17:00:00",
     created_at: "2025-11-03T10:00:00",
+    question_amount: 0,
+    status: "started",
   },
 ];
-
-export const mockExam: Exam = {
-  exam_id: "1",
-  teacher_id: "teacher1",
-  title: "Introduction to Computer Science",
-  description: "Basic concepts of programming and algorithms",
-  type: "standard",
-  access_code: "CS101",
-  duration_minutes: 60,
-  start_at: "2025-11-15T09:00:00",
-  end_at: "2025-11-15T18:00:00",
-};
 
 // Mock Questions for Exam 1
 export const mockQuestionsExam1: Question[] = [
@@ -418,6 +419,7 @@ export const mockResults = [
   {
     exam_id: "1",
     title: "Introduction to Computer Science",
+    description: "Basic concepts of programming and algorithms",
     submitted_at: "2025-11-14T10:30:00",
     score: 8,
     maxScore: 11,
@@ -427,6 +429,7 @@ export const mockResults = [
   {
     exam_id: "2",
     title: "Python Programming Challenge",
+    description: "Hands-on coding problems in Python",
     submitted_at: "2025-11-10T14:20:00",
     score: 7,
     maxScore: 10,
@@ -436,10 +439,11 @@ export const mockResults = [
   {
     exam_id: "3",
     title: "Data Structures Basics",
+    description: "Fundamental data structures and their operations",
     submitted_at: "2025-11-05T09:15:00",
     score: 5,
     maxScore: 10,
-    status: "graded",
+    status: "submitted",
     passed: false,
   },
 ];
@@ -575,3 +579,100 @@ cd232dc`,
 232`,
   },
 ];
+
+// Mock Exams for Grading Page
+export const mockExamsForGrading: GradingPageDTO = [
+  {
+    exam_id: "1",
+    title: "Introduction to Computer Science",
+    description: "Basic concepts of programming and algorithms",
+    end_at: "2025-11-15T18:00:00",
+    total_submissions: 25,
+    pending_submissions: 5,
+    teacher_name: "Dr. Sarah Admin",
+    teacher_email: "admin@example.com",
+  },
+  {
+    exam_id: "2",
+    title: "Advanced Data Structures",
+    description: "Arrays, Linked Lists, Stacks, Queues, Trees, and Graphs",
+    end_at: "2025-11-16T20:00:00",
+    total_submissions: 18,
+    pending_submissions: 0,
+    teacher_name: "Dr. Sarah Admin",
+    teacher_email: "admin@example.com",
+  },
+  {
+    exam_id: "3",
+    title: "Web Development Final",
+    description: "HTML, CSS, JavaScript, and Modern Frameworks",
+    end_at: "2025-11-20T22:00:00",
+    total_submissions: 10,
+    pending_submissions: 10,
+    teacher_name: "Dr. Sarah Admin",
+    teacher_email: "admin@example.com",
+  },
+];
+
+// Mock Exam Attempts Page
+export const mockExamAttemptsPage: ExamAttemptsPageDTO = {
+  exam_id: "1",
+  exam_title: "Introduction to Computer Science",
+  max_score: 33,
+  attempts: [
+    {
+      attempt_id: "sub1",
+      student_name: "Alice Johnson",
+      student_email: "alice@example.com",
+      submitted_at: "2025-11-14T10:30:00",
+      score: 30.5,
+      status: "graded",
+      cheated: false,
+    },
+    {
+      attempt_id: "sub2",
+      student_name: "Bob Smith",
+      student_email: "bob@example.com",
+      submitted_at: "2025-11-14T10:45:00",
+      score: 28,
+      status: "graded",
+      cheated: false,
+    },
+    {
+      attempt_id: "sub3",
+      student_name: "Carol White",
+      student_email: "carol@example.com",
+      submitted_at: "2025-11-14T11:00:00",
+      score: 25,
+      status: "graded",
+      cheated: true,
+    },
+    {
+      attempt_id: "sub4",
+      student_name: "David Brown",
+      student_email: "david@example.com",
+      submitted_at: "2025-11-14T11:15:00",
+      score: 0,
+      status: "overdue",
+      cheated: false,
+    },
+    {
+      attempt_id: "sub5",
+      student_name: "Eve Davis",
+      student_email: "eve@example.com",
+      submitted_at: "2025-11-14T11:30:00",
+      score: 0,
+      status: "submitted",
+      cheated: false,
+    },
+    {
+      attempt_id: "sub6",
+      student_name: "Frank Miller",
+      student_email: "frank@example.com",
+      submitted_at: "2025-11-14T11:45:00",
+      score: 0,
+      status: "cancelled",
+      cheated: false,
+    },
+  ],
+};

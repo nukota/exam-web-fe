@@ -14,7 +14,7 @@ import Card from "../../components/common/Card";
 import { EditableQuestion } from "../../components/admin/items/EditableQuestion";
 import { useFeedback } from "../../shared/providers/FeedbackProvider";
 import type { UpdateExamDto, CreateQuestionDto } from "../../shared/dtos";
-import { mockExam } from "../../shared/mockdata";
+import { mockExams } from "../../shared/mockdata";
 
 export const AdminEditExamPage = () => {
   const { examId } = useParams();
@@ -27,17 +27,18 @@ export const AdminEditExamPage = () => {
 
   useEffect(() => {
     // In a real app, fetch exam by ID
+    const examData: any = mockExams[0];
     setExam({
-      title: mockExam.title,
-      description: mockExam.description,
-      type: mockExam.type,
-      access_code: mockExam.access_code,
-      duration_minutes: mockExam.duration_minutes,
-      start_at: mockExam.start_at?.substring(0, 16),
-      end_at: mockExam.end_at?.substring(0, 16),
+      title: examData.title,
+      description: examData.description,
+      type: examData.type,
+      access_code: examData.access_code,
+      duration_minutes: examData.duration_minutes,
+      start_at: examData.start_at?.substring(0, 16),
+      end_at: examData.end_at?.substring(0, 16),
     });
     // Set hasEndTime based on whether end_at exists
-    setHasEndTime(!!mockExam.end_at);
+    setHasEndTime(!!examData.end_at);
     // Load existing questions if any - add initial question
     setQuestions([
       {

@@ -61,7 +61,18 @@ export const AdminLeaderboardPage = () => {
       width: 180,
       align: "right",
       headerAlign: "right",
-      valueFormatter: (value) => new Date(value).toLocaleString(),
+      valueFormatter: (value) => {
+        if (!value) return "N/A";
+        const date = new Date(value);
+        return date.toLocaleString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: true,
+        });
+      },
     },
   ];
 

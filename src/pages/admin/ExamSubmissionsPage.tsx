@@ -1,89 +1,40 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { Box, Typography, IconButton } from "@mui/material";
-import { ArrowLeft, Eye, AlertTriangle } from "lucide-react";
+import { Box, Typography, IconButton, Button } from "@mui/material";
+import { ArrowLeft, Eye, AlertTriangle, SquarePen, Trash } from "lucide-react";
 import type { GridColDef } from "@mui/x-data-grid";
 import { Layout, CustomDataGrid } from "../../components/common";
 import Card from "../../components/common/Card";
-
-interface SubmissionRow {
-  submission_id: string;
-  student_name: string;
-  student_email: string;
-  submitted_at: string;
-  score: number;
-  max_score: number;
-  status: "submitted" | "graded";
-  cheated: boolean;
-}
-
-// Mock data
-const mockSubmissions: SubmissionRow[] = [
-  {
-    submission_id: "sub1",
-    student_name: "Alice Johnson",
-    student_email: "alice@example.com",
-    submitted_at: "2025-11-14T10:30:00",
-    score: 30.5,
-    max_score: 33,
-    status: "graded",
-    cheated: false,
-  },
-  {
-    submission_id: "sub2",
-    student_name: "Bob Smith",
-    student_email: "bob@example.com",
-    submitted_at: "2025-11-14T10:45:00",
-    score: 28,
-    max_score: 33,
-    status: "graded",
-    cheated: false,
-  },
-  {
-    submission_id: "sub3",
-    student_name: "Carol White",
-    student_email: "carol@example.com",
-    submitted_at: "2025-11-14T11:00:00",
-    score: 25,
-    max_score: 33,
-    status: "graded",
-    cheated: true,
-  },
-  {
-    submission_id: "sub4",
-    student_name: "David Brown",
-    student_email: "david@example.com",
-    submitted_at: "2025-11-14T11:15:00",
-    score: 0,
-    max_score: 33,
-    status: "submitted",
-    cheated: false,
-  },
-  {
-    submission_id: "sub5",
-    student_name: "Eve Davis",
-    student_email: "eve@example.com",
-    submitted_at: "2025-11-14T11:30:00",
-    score: 0,
-    max_score: 33,
-    status: "submitted",
-    cheated: false,
-  },
-];
+import { mockExamAttemptsPage } from "../../shared/mockdata";
+import { Flag } from "lucide-react";
 
 export const AdminExamSubmissionsPage = () => {
   const { examId: _ } = useParams();
   const navigate = useNavigate();
 
-  const gradedCount = mockSubmissions.filter(
-    (s) => s.status === "graded"
-  ).length;
-  const pendingCount = mockSubmissions.filter(
-    (s) => s.status === "submitted"
-  ).length;
-  const flaggedCount = mockSubmissions.filter((s) => s.cheated).length;
+  const { exam_title, max_score, attempts } = mockExamAttemptsPage;
 
-  const handleViewSubmission = (submissionId: string) => {
-    navigate(`/admin/submissions/${submissionId}`);
+  const gradedCount = attempts.filter((s) => s.status === "graded").length;
+  const pendingCount = attempts.filter((s) => s.status === "submitted").length;
+  const flaggedCount = attempts.filter((s) => s.cheated).length;
+
+  const handleViewAttempt = (attemptId: string) => {
+    navigate(`/admin/submissions/${attemptId}`);
+  };
+
+  const handleGradeAttempt = (attemptId: string) => {
+    navigate(`/admin/submissions/${attemptId}/grade`);
+  };
+
+  const handleCancelAttempt = (attemptId: string) => {
+    // TODO: Call backend API to cancel/invalidate the attempt
+    console.log("Cancelling attempt:", attemptId);
+    // In a real app, this would make an API call and refresh the data
+  };
+
+  const handleDeleteAttempt = (attemptId: string) => {
+    // TODO: Call backend API to delete the attempt
+    console.log("Deleting attempt:", attemptId);
+    // In a real app, this would make an API call and refresh the data
   };
 
   const columns: GridColDef[] = [
@@ -94,7 +45,7 @@ export const AdminExamSubmissionsPage = () => {
       minWidth: 200,
       renderCell: (params) => (
         <Box>
-          <Typography variant="body2" fontWeight="bold">
+          <Typography variant="body1" fontWeight="bold">
             {params.row.student_name}
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -106,18 +57,30 @@ export const AdminExamSubmissionsPage = () => {
     {
       field: "submitted_at",
       headerName: "Submitted At",
-      width: 180,
-      valueFormatter: (value) => new Date(value).toLocaleString(),
+      flex: 0.5,
+      minWidth: 180,
+      valueFormatter: (value) => {
+        if (!value) return "N/A";
+        const date = new Date(value);
+        return date.toLocaleString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: true,
+        });
+      },
     },
     {
       field: "score",
       headerName: "Score",
       width: 120,
-      align: "center",
-      headerAlign: "center",
       renderCell: (params) => (
-        <Typography variant="body2" fontWeight="bold">
-          {params.value} / {params.row.max_score}
+        <Typography variant="body2">
+          {params.row.status === "graded"
+            ? `${params.value} / ${max_score}`
+            : "-"}
         </Typography>
       ),
     },
@@ -128,7 +91,7 @@ export const AdminExamSubmissionsPage = () => {
       align: "center",
       headerAlign: "center",
       renderCell: (params) => {
-        const percentage = (params.row.score / params.row.max_score) * 100;
+        const percentage = (params.row.score / max_score) * 100;
         const color =
           percentage >= 70
             ? "success.main"
@@ -136,8 +99,8 @@ export const AdminExamSubmissionsPage = () => {
             ? "warning.main"
             : "error.main";
         return (
-          <Typography variant="body2" fontWeight="bold" color={color}>
-            {percentage.toFixed(1)}%
+          <Typography variant="body2" color={color}>
+            {params.row.status === "graded" ? `${percentage.toFixed(1)}%` : "-"}
           </Typography>
         );
       },
@@ -148,46 +111,74 @@ export const AdminExamSubmissionsPage = () => {
       width: 120,
       align: "center",
       headerAlign: "center",
-      renderCell: (params) => (
-        <Typography
-          variant="body2"
-          fontWeight="bold"
-          color={params.value === "graded" ? "success.main" : "text.primary"}
-        >
-          {params.value}
-        </Typography>
-      ),
     },
     {
       field: "cheated",
-      headerName: "Flag",
-      width: 80,
+      headerName: "Flagged as Cheating",
+      width: 180,
       align: "center",
       headerAlign: "center",
       renderCell: (params) =>
-        params.value ? <AlertTriangle size={20} color="#f44336" /> : null,
+        params.value ? (
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Flag size={20} color="#f44336" />
+            <Button
+              size="small"
+              variant="text"
+              color="error"
+              onClick={() => handleCancelAttempt(params.row.attempt_id)}
+              sx={{ textTransform: "none", fontSize: "0.875rem" }}
+            >
+              Cancel result
+            </Button>
+          </Box>
+        ) : null,
     },
     {
       field: "actions",
       headerName: "Actions",
-      width: 100,
+      width: 120,
       align: "center",
       headerAlign: "center",
       sortable: false,
-      renderCell: (params) => (
-        <IconButton
-          size="small"
-          onClick={() => handleViewSubmission(params.row.submission_id)}
-          sx={{
-            color: "text.secondary",
-            "&:hover": {
-              bgcolor: "action.hover",
-            },
-          }}
-        >
-          <Eye size={20} />
-        </IconButton>
-      ),
+      renderCell: (params) => {
+        const status = params.row.status;
+        return (
+          <Box
+            sx={{
+              display: "flex",
+              gap: 1,
+            }}
+          >
+            {status === "submitted" ? (
+              <IconButton
+                size="small"
+                color="default"
+                onClick={() => handleGradeAttempt(params.row.attempt_id)}
+              >
+                <SquarePen size={20} />
+              </IconButton>
+            ) : status === "graded" ? (
+              <IconButton
+                size="small"
+                color="default"
+                onClick={() => handleViewAttempt(params.row.attempt_id)}
+              >
+                <Eye size={20} />
+              </IconButton>
+            ) : (
+              <Box sx={{ width: 30 }} />
+            )}
+            <IconButton
+              size="small"
+              color="default"
+              onClick={() => handleDeleteAttempt(params.row.attempt_id)}
+            >
+              <Trash size={20} />
+            </IconButton>
+          </Box>
+        );
+      },
     },
   ];
 
@@ -205,18 +196,18 @@ export const AdminExamSubmissionsPage = () => {
                 <ArrowLeft size={24} color="black" />
               </IconButton>
               <Typography sx={{ fontWeight: "bold", fontSize: "1.75rem" }}>
-                Exam Submissions
+                Exam Attempts
               </Typography>
             </Box>
             <Typography color="text.secondary" sx={{ pl: 6, fontSize: "1rem" }}>
-              Introduction to Computer Science
+              {exam_title}
             </Typography>
           </Box>
 
           {/* Stats */}
           <Box sx={{ pl: 6, gap: 8, display: "flex", flexWrap: "wrap" }}>
             <Typography variant="body1" color="text.secondary">
-              Total Submissions: <strong>{mockSubmissions.length}</strong>
+              Total Attempts: <strong>{attempts.length}</strong>
             </Typography>
             <Typography variant="body1" color="text.secondary">
               Graded: <strong>{gradedCount}</strong>
@@ -242,8 +233,7 @@ export const AdminExamSubmissionsPage = () => {
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <AlertTriangle size={20} color="#999" />
             <Typography variant="body1" color="#999">
-              All submissions must be graded before releasing results to
-              students.
+              All attempts must be graded before releasing results to students.
             </Typography>
           </Box>
         </Box>
@@ -251,9 +241,9 @@ export const AdminExamSubmissionsPage = () => {
         {/* Submissions Table */}
         <Card sx={{ p: 0, overflow: "hidden" }}>
           <CustomDataGrid
-            rows={mockSubmissions}
+            rows={attempts}
             columns={columns}
-            getRowId={(row) => row.submission_id}
+            getRowId={(row) => row.attempt_id}
             pageSize={10}
             pageSizeOptions={[10, 20, 50]}
           />

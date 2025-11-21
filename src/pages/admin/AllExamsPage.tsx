@@ -1,12 +1,21 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Typography, Button, IconButton } from "@mui/material";
-import { Edit, Delete, Article, Add } from "@mui/icons-material";
+import { Add } from "@mui/icons-material";
+import {
+  SquareTerminal,
+  BookOpen,
+  Copy,
+  BarChart3,
+  Edit,
+  Trash2,
+} from "lucide-react";
 import { Layout } from "../../components/common";
 import { CustomDataGrid } from "../../components/common";
 import { CreateExamDialog } from "../../components/admin/CreateExamDialog";
 import { mockExams } from "../../shared/mockdata";
 import { useFeedback } from "../../shared/providers/FeedbackProvider";
+import { formatExamDateRange } from "../../shared/utils/utils";
 import type { GridColDef } from "@mui/x-data-grid";
 
 export const AdminExamsPage = () => {
@@ -35,6 +44,21 @@ export const AdminExamsPage = () => {
     navigate(`/admin/exams/${newExamId}/edit`);
   };
 
+  const handleCopyAccessCode = async (accessCode: string) => {
+    try {
+      await navigator.clipboard.writeText(accessCode);
+      showSnackbar({
+        message: "Access code copied to clipboard",
+        severity: "success",
+      });
+    } catch (err) {
+      showSnackbar({
+        message: "Failed to copy access code",
+        severity: "error",
+      });
+    }
+  };
+
   const columns: GridColDef[] = [
     {
       field: "title",
@@ -55,20 +79,31 @@ export const AdminExamsPage = () => {
     {
       field: "type",
       headerName: "Type",
-      width: 120,
+      width: 100,
       renderCell: (params) => (
-        <Typography variant="body2">
-          {params.value === "coding" ? "Coding" : "Standard"}
-        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {params.value === "coding" ? (
+            <SquareTerminal size={22} />
+          ) : (
+            <BookOpen size={22} />
+          )}
+        </Box>
       ),
     },
+
     {
-      field: "access_code",
-      headerName: "Access Code",
-      width: 130,
-      renderCell: (params) => (
-        <Typography variant="body2">{params.value}</Typography>
-      ),
+      field: "question_amount",
+      headerName: "Questions",
+      width: 100,
+      valueFormatter: (value) => {
+        value;
+      },
     },
     {
       field: "duration_minutes",
@@ -77,48 +112,62 @@ export const AdminExamsPage = () => {
       valueFormatter: (value) => `${value} min`,
     },
     {
-      field: "start_at",
-      headerName: "Start Time",
-      width: 180,
-      valueFormatter: (value) =>
-        value ? new Date(value).toLocaleString() : "N/A",
+      field: "date",
+      headerName: "Date",
+      flex: 0.5,
+      minWidth: 180,
+      renderCell: (params) => (
+        <Typography variant="body2">
+          {formatExamDateRange(params.row.start_at, params.row.end_at)}
+        </Typography>
+      ),
     },
     {
-      field: "end_at",
-      headerName: "End Time",
-      width: 180,
-      valueFormatter: (value) =>
-        value ? new Date(value).toLocaleString() : "N/A",
+      field: "status",
+      headerName: "Status",
+      width: 120,
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ textTransform: "capitalize" }}>
+          {params.value}
+        </Typography>
+      ),
     },
     {
       field: "actions",
       headerName: "Actions",
-      width: 150,
+      width: 200,
       sortable: false,
       renderCell: (params) => (
-        <Box>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <IconButton
             size="small"
-            color="inherit"
+            onClick={() => handleCopyAccessCode(params.row.access_code)}
+            title="Copy Access Code"
+          >
+            <Copy size={20} />
+          </IconButton>
+          <IconButton
+            size="small"
             onClick={() =>
               navigate(`/admin/exams/${params.row.exam_id}/leaderboard`)
             }
+            title="View Leaderboard"
           >
-            <Article />
+            <BarChart3 size={20} />
           </IconButton>
           <IconButton
             size="small"
-            color="inherit"
             onClick={() => navigate(`/admin/exams/${params.row.exam_id}/edit`)}
+            title="Edit Exam"
           >
-            <Edit />
+            <Edit size={20} />
           </IconButton>
           <IconButton
             size="small"
-            color="inherit"
             onClick={() => handleDelete(params.row.exam_id)}
+            title="Delete Exam"
           >
-            <Delete />
+            <Trash2 size={20} />
           </IconButton>
         </Box>
       ),

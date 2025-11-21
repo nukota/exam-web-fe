@@ -73,9 +73,7 @@ const ExamItem: React.FC<ExamItemProps> = ({
           >
             {exam.title}
           </Typography>
-          <Box
-            sx={{ display: "flex", alignItems: "center", gap: 1, mt: 0.5 }}
-          >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 0.5 }}>
             <Typography
               variant="caption"
               sx={{
@@ -169,7 +167,18 @@ const ExamItem: React.FC<ExamItemProps> = ({
                 whiteSpace: "nowrap",
               }}
             >
-              {new Date(exam.start_at).toLocaleString()}
+              {(() => {
+                if (!exam.start_at) return "N/A";
+                const date = new Date(exam.start_at);
+                return date.toLocaleString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                  hour: "numeric",
+                  minute: "2-digit",
+                  hour12: true,
+                });
+              })()}
             </Typography>
           </Box>
         )}
@@ -195,7 +204,18 @@ const ExamItem: React.FC<ExamItemProps> = ({
                 whiteSpace: "nowrap",
               }}
             >
-              {new Date(exam.end_at).toLocaleString()}
+              {(() => {
+                if (!exam.end_at) return "N/A";
+                const date = new Date(exam.end_at);
+                return date.toLocaleString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                  hour: "numeric",
+                  minute: "2-digit",
+                  hour12: true,
+                });
+              })()}
             </Typography>
           </Box>
         )}

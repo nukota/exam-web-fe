@@ -1,5 +1,5 @@
-import React from "react";
-import { Box, Typography } from "@mui/material";
+import React, { useState } from "react";
+import { Box, Typography, TextField } from "@mui/material";
 import { CheckCircle, X, Check, Flag } from "lucide-react";
 import type {
   Question as QuestionType,
@@ -13,6 +13,8 @@ interface QuestionProps {
   index: number;
   isFlagged?: boolean;
   questionRef?: (el: HTMLDivElement | null) => void;
+  grading?: boolean;
+  onScoreChange?: (questionId: string, score: number) => void;
 }
 
 export const QuestionItem: React.FC<QuestionProps> = ({
@@ -21,7 +23,22 @@ export const QuestionItem: React.FC<QuestionProps> = ({
   index,
   isFlagged = false,
   questionRef,
+  grading = false,
+  onScoreChange,
 }) => {
+  const [score, setScore] = useState<number>(answer.score || 0);
+
+  const handleScoreChange = (value: string) => {
+    const numValue = parseFloat(value);
+    if (!isNaN(numValue) && numValue >= 0 && numValue <= question.points) {
+      // Round to nearest 0.25
+      const roundedValue = Math.round(numValue * 4) / 4;
+      setScore(roundedValue);
+      if (onScoreChange) {
+        onScoreChange(question.question_id, roundedValue);
+      }
+    }
+  };
   const renderChoices = () => {
     if (
       question.question_type === "single_choice" ||
@@ -123,6 +140,7 @@ export const QuestionItem: React.FC<QuestionProps> = ({
           <Box
             sx={{
               p: 2,
+              mb: 2,
               bgcolor: "grey.100",
               borderRadius: 1,
               border: "1px solid",
@@ -197,20 +215,48 @@ export const QuestionItem: React.FC<QuestionProps> = ({
         : renderAnswer()}
 
       {/* Grading Section */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "flex-end",
-          mb: 4,
-        }}
-      >
-        <Typography variant="body2" color="text.secondary">
-          {answer.score || 0} / {question.points} points
-        </Typography>
-        {answer.score === question.points && (
-          <CheckCircle size={20} color="#4caf50" />
-        )}
-      </Box>
+      {grading && question.question_type === "essay" ? (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
+            gap: 2,
+            mb: 4,
+          }}
+        >
+          <Typography variant="body1">Score:</Typography>
+          <TextField
+            size="small"
+            type="number"
+            value={score}
+            onChange={(e) => handleScoreChange(e.target.value)}
+            inputProps={{
+              min: 0,
+              max: question.points,
+              step: 0.25,
+            }}
+          />
+          <Typography variant="body2" color="text.secondary">
+            / {question.points} points
+          </Typography>
+        </Box>
+      ) : (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            mb: 4,
+          }}
+        >
+          <Typography variant="body2" color="text.secondary">
+            {answer.score || 0} / {question.points} points
+          </Typography>
+          {answer.score === question.points && (
+            <CheckCircle size={20} color="#4caf50" />
+          )}
+        </Box>
+      )}
     </Box>
   );
 };

@@ -1,9 +1,15 @@
-import { Box, Typography, Button, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Button,
+  CircularProgress,
+  IconButton,
+} from "@mui/material";
 import { Layout, Card } from "../../components/common";
 import { useNavigate } from "react-router-dom";
 import type { Submission } from "../../shared/dtos";
 import { Leaderboard } from "../../components/student/Leaderboard";
-import { QuestionBreakdown } from "../../components/student/items/QuestionBreakdown";
+import { ArrowLeft } from "lucide-react";
 
 // Mock data
 const mockResult = {
@@ -93,13 +99,13 @@ export const StudentExamResultPage = () => {
             display: "grid",
             gridTemplateColumns: { xs: "1fr", lg: "1fr 1.5fr" },
             gap: 3,
-            mb: 3,
           }}
         >
           {/* Results Card */}
           <Card
             sx={{
-              p: 4,
+              px: 4,
+              py: 3,
               textAlign: "center",
               background: passed
                 ? "linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%)"
@@ -119,22 +125,34 @@ export const StudentExamResultPage = () => {
               },
             }}
           >
-            <Typography
-              variant="h5"
-              gutterBottom
-              fontWeight="bold"
-              sx={{ mt: 1 }}
+            {/* Header */}
+            <Box
+              sx={{ display: "flex", alignItems: "flex-start", gap: 1, mb: 4 }}
             >
-              Exam Results
-            </Typography>
-            <Typography
-              variant="subtitle1"
-              color="text.secondary"
-              gutterBottom
-              sx={{ mb: 2 }}
-            >
-              {mockResult.exam_title}
-            </Typography>
+              <IconButton onClick={() => navigate(-1)}>
+                <ArrowLeft size={20} color="black" />
+              </IconButton>
+
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                }}
+              >
+                <Typography variant="h5" fontWeight="bold">
+                  Exam Results
+                </Typography>
+                <Typography
+                  variant="subtitle1"
+                  color="text.secondary"
+                  gutterBottom
+                  sx={{ mb: 2 }}
+                >
+                  {mockResult.exam_title}
+                </Typography>
+              </Box>
+            </Box>
 
             <Box sx={{ my: 4, position: "relative", display: "inline-block" }}>
               <Box sx={{ position: "relative", display: "inline-flex" }}>
@@ -183,34 +201,34 @@ export const StudentExamResultPage = () => {
 
             <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
               <Button
-                variant="outlined"
-                onClick={() => navigate("/student/exams")}
+                variant="contained"
+                onClick={() =>
+                  navigate(
+                    `/student/submissions/${mockResult.submission.submission_id}`
+                  )
+                }
                 sx={{
                   minWidth: 140,
                   fontWeight: "bold",
-                  backgroundColor: "grey.400",
-                  color: "black",
-                  borderColor: "grey.400",
+                  color: passed ? "success.main" : "error.main",
+                  backgroundColor: passed ? "#4caf5020" : "#f4433620",
                   "&:hover": {
-                    backgroundColor: "grey.500",
-                    borderColor: "grey.500",
+                    backgroundColor: passed ? "#4caf5030" : "#f4433630",
                   },
                 }}
               >
-                Back to Exams
+                See Breakdown
               </Button>
               <Button
-                variant="outlined"
+                variant="contained"
                 onClick={() => navigate("/student/results")}
                 sx={{
                   minWidth: 140,
                   fontWeight: "bold",
-                  backgroundColor: "grey.400",
-                  color: "black",
-                  borderColor: "grey.400",
+                  color: passed ? "success.main" : "error.main",
+                  backgroundColor: passed ? "#4caf5020" : "#f4433620",
                   "&:hover": {
-                    backgroundColor: "grey.500",
-                    borderColor: "grey.500",
+                    backgroundColor: passed ? "#4caf5030" : "#f4433630",
                   },
                 }}
               >
@@ -226,19 +244,6 @@ export const StudentExamResultPage = () => {
             totalParticipants={mockResult.totalParticipants}
           />
         </Box>
-
-        {/* Question Breakdown */}
-        <Card sx={{ p: 3 }}>
-          <Typography
-            variant="h5"
-            gutterBottom
-            fontWeight="bold"
-            sx={{ mb: 3, textAlign: "left" }}
-          >
-            Question Breakdown
-          </Typography>
-          <QuestionBreakdown results={mockResult.questionResults} />
-        </Card>
       </Box>
     </Layout>
   );

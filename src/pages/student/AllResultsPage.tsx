@@ -1,5 +1,5 @@
 import { Box, Typography, Paper, Button, IconButton } from "@mui/material";
-import { Check, X, Eye } from "lucide-react";
+import { BookOpen, Eye, SquareTerminal } from "lucide-react";
 import { Layout } from "../../components/common/Layout";
 import { CustomDataGrid } from "../../components/common";
 import { calculatePercentage } from "../../shared/utils";
@@ -13,13 +13,38 @@ export const StudentAllResultsPage = () => {
   const columns: GridColDef[] = [
     {
       field: "title",
-      headerName: "Exam Title",
+      headerName: "Title",
       flex: 1,
       minWidth: 200,
       renderCell: (params) => (
-        <Typography variant="body2" fontWeight="medium">
-          {params.value}
-        </Typography>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 0 }}>
+          <Typography variant="body1" fontWeight="medium">
+            {params.row.title}
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            {params.row.description}
+          </Typography>
+        </Box>
+      ),
+    },
+    {
+      field: "type",
+      headerName: "Type",
+      width: 100,
+      renderCell: (params) => (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {params.value === "coding" ? (
+            <SquareTerminal size={22} />
+          ) : (
+            <BookOpen size={22} />
+          )}
+        </Box>
       ),
     },
     {
@@ -63,22 +88,32 @@ export const StudentAllResultsPage = () => {
       align: "center",
       headerAlign: "center",
       renderCell: (params) => (
-        <Box>
-          {params.value ? (
-            <Check size={20} color="#4caf50" />
-          ) : (
-            <X size={20} color="#f44336" />
-          )}
-        </Box>
+        <Typography
+          variant="body2"
+          color={params.value ? "success.main" : "error.main"}
+          fontWeight="medium"
+        >
+          {params.value ? "Passed" : "Failed"}
+        </Typography>
       ),
     },
     {
       field: "submitted_at",
       headerName: "Submitted At",
-      flex: 0.75,
+      flex: 0.6,
       minWidth: 180,
-      valueFormatter: (value) =>
-        value ? new Date(value).toLocaleString() : "N/A",
+      valueFormatter: (value) => {
+        if (!value) return "N/A";
+        const date = new Date(value);
+        return date.toLocaleString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: true,
+        });
+      },
     },
     {
       field: "actions",
@@ -90,6 +125,7 @@ export const StudentAllResultsPage = () => {
       renderCell: (params) => (
         <IconButton
           size="small"
+          disabled={params.row.status !== "graded"}
           onClick={() => navigate(`/student/exam/${params.row.exam_id}/result`)}
           sx={{
             color: "text.secondary",

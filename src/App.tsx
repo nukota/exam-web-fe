@@ -23,6 +23,7 @@ import {
   AdminExamSubmissionsPage,
 } from "./pages";
 import "./App.css";
+import { StudentCodeCompilerPage } from "./pages/student/CodeCompilerPage";
 
 const App = () => {
   return (
@@ -59,6 +60,14 @@ const App = () => {
               }
             />
             <Route
+              path="/student/exam/coding/:examId/compiler/:questionId"
+              element={
+                <ProtectedRoute allowedRoles={["student"]}>
+                  <StudentCodeCompilerPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/student/exam/:examId/result"
               element={
                 <ProtectedRoute allowedRoles={["student"]}>
@@ -71,6 +80,14 @@ const App = () => {
               element={
                 <ProtectedRoute allowedRoles={["student"]}>
                   <StudentAllResultsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/student/submissions/:submissionId"
+              element={
+                <ProtectedRoute allowedRoles={["student"]}>
+                  <AdminSubmissionDetailPage />
                 </ProtectedRoute>
               }
             />
@@ -156,6 +173,15 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/admin/submissions/:submissionId/grade"
+              element={
+                <ProtectedRoute allowedRoles={["admin", "teacher"]}>
+                  <AdminSubmissionDetailPage grading={true} />
+                </ProtectedRoute>
+              }
+            />
+
             {/* Default Route */}
             <Route path="/" element={<Navigate to="/signin" replace />} />
             <Route path="*" element={<Navigate to="/signin" replace />} />

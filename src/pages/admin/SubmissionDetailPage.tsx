@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { Box, Typography, IconButton } from "@mui/material";
-import { ArrowLeft, User, Award, AlertTriangle } from "lucide-react";
+import { Box, Typography, IconButton, Button } from "@mui/material";
+import { ArrowLeft, User, Award, AlertTriangle, Save } from "lucide-react";
 import { Layout } from "../../components/common";
 import { QuestionItem } from "../../components/admin/items";
 import {
@@ -8,15 +8,30 @@ import {
   mockSubmissionDetail,
 } from "../../shared/mockdata";
 import type { Answer } from "../../shared/dtos";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
-export const AdminSubmissionDetailPage = () => {
+export const AdminSubmissionDetailPage = ({ grading = false }) => {
   const navigate = useNavigate();
   const questionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const [scores, setScores] = useState<Record<string, number>>({});
+
+  const handleScoreChange = (questionId: string, score: number) => {
+    setScores((prev) => ({ ...prev, [questionId]: score }));
+  };
+
+  const handleSaveGrades = () => {
+    // TODO: Save grades to backend
+    console.log("Saving grades:", scores);
+    // Navigate back after saving
+    navigate(-1);
+  };
 
   // In a real app, fetch submission details from backend
   const submission = mockSubmissionDetail;
-  const questions = mockQuestionsExam1;
+  const allQuestions = mockQuestionsExam1;
+  const questions = grading
+    ? allQuestions.filter((q) => q.question_type === "essay")
+    : allQuestions;
   const flaggedQuestions = new Set(submission.flagged_questions || []);
 
   const answers = submission.answers.reduce((acc, answer) => {
@@ -73,7 +88,7 @@ export const AdminSubmissionDetailPage = () => {
               <ArrowLeft size={20} color="black" />
             </IconButton>
             <Typography variant="h5" fontWeight="bold">
-              Submission Review
+              {grading ? "Grading Submission" : "Submission Review"}
             </Typography>
           </Box>
 
@@ -92,9 +107,29 @@ export const AdminSubmissionDetailPage = () => {
                 questionRef={(el: HTMLDivElement | null) => {
                   questionRefs.current[question.question_id] = el;
                 }}
+                grading={grading}
+                onScoreChange={handleScoreChange}
               />
             );
           })}
+
+          {/* Save Button for Grading Mode */}
+          {grading && (
+            <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+              <Button
+                variant="contained"
+                startIcon={<Save size={20} />}
+                onClick={handleSaveGrades}
+                sx={{
+                  fontWeight: "bold",
+                  backgroundColor: "grey.300",
+                  color: "grey.800",
+                }}
+              >
+                Save Grades
+              </Button>
+            </Box>
+          )}
         </Box>
 
         {/* Right Section - Submission Info (Sticky) */}
@@ -135,28 +170,33 @@ export const AdminSubmissionDetailPage = () => {
           </Box>
 
           {/* Score Info */}
-          <Box
-            sx={{
-              p: 2,
-              bgcolor: "white",
-              borderRadius: 2,
-            }}
-          >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
-              <Award size={20} />
-              <Typography variant="subtitle2" fontWeight="bold">
-                Score
-              </Typography>
+          {!grading && (
+            <Box
+              sx={{
+                p: 2,
+                bgcolor: "white",
+                borderRadius: 2,
+              }}
+            >
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}
+              >
+                <Award size={20} />
+                <Typography variant="subtitle2" fontWeight="bold">
+                  Score
+                </Typography>
+              </Box>
+              <Box sx={{ textAlign: "left" }}>
+                <Typography variant="h5" fontWeight="bold" color="primary">
+                  {getTotalScore()} / {getMaxScore()}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {((getTotalScore() / getMaxScore()) * 100).toFixed(1)}%
+                  achieved
+                </Typography>
+              </Box>
             </Box>
-            <Box sx={{ textAlign: "left" }}>
-              <Typography variant="h5" fontWeight="bold" color="primary">
-                {getTotalScore()} / {getMaxScore()}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {((getTotalScore() / getMaxScore()) * 100).toFixed(1)}% achieved
-              </Typography>
-            </Box>
-          </Box>
+          )}
 
           {/* Submission Time & Question Summary */}
           <Box
