@@ -75,6 +75,7 @@ export const StudentExamListPage = () => {
             value={selectedType}
             onChange={(e) => setSelectedType(e.target.value)}
             size="small"
+            sx={{ minWidth: 120 }}
             displayEmpty
           >
             <MenuItem value="all">All Exams</MenuItem>

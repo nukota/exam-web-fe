@@ -1,19 +1,38 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Typography, Button, IconButton } from "@mui/material";
 import { Edit, Delete, Article, Add } from "@mui/icons-material";
 import { Layout } from "../../components/common";
 import { CustomDataGrid } from "../../components/common";
+import { CreateExamDialog } from "../../components/admin/CreateExamDialog";
 import { mockExams } from "../../shared/mockdata";
+import { useFeedback } from "../../shared/providers/FeedbackProvider";
 import type { GridColDef } from "@mui/x-data-grid";
 
 export const AdminExamsPage = () => {
   const navigate = useNavigate();
+  const { showSnackbar } = useFeedback();
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const handleDelete = (examId: string) => {
     if (window.confirm("Are you sure you want to delete this exam?")) {
       console.log("Deleting exam:", examId);
+      showSnackbar({
+        message: "Exam deleted successfully",
+        severity: "success",
+      });
       // Implement delete logic
     }
+  };
+
+  const handleCreateExam = (examData: any) => {
+    console.log("Creating exam:", examData);
+    // In a real app, submit to backend and get the created exam ID
+    const newExamId = "exam_" + Date.now();
+    showSnackbar({ message: "Exam created successfully", severity: "success" });
+    setDialogOpen(false);
+    // Navigate to edit page to add questions
+    navigate(`/admin/exams/${newExamId}/edit`);
   };
 
   const columns: GridColDef[] = [
@@ -123,7 +142,7 @@ export const AdminExamsPage = () => {
           <Button
             variant="contained"
             startIcon={<Add />}
-            onClick={() => navigate("/admin/exams/create")}
+            onClick={() => setDialogOpen(true)}
             sx={{
               fontWeight: "bold",
               backgroundColor: "grey.400",
@@ -140,6 +159,12 @@ export const AdminExamsPage = () => {
           getRowId={(row) => row.exam_id}
           pageSize={10}
           pageSizeOptions={[10, 20, 50]}
+        />
+
+        <CreateExamDialog
+          open={dialogOpen}
+          onClose={() => setDialogOpen(false)}
+          onSubmit={handleCreateExam}
         />
       </Box>
     </Layout>

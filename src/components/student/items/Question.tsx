@@ -236,9 +236,6 @@ export const Question = ({
           InputProps={{
             disableUnderline: true,
             sx: {
-              bgcolor: "grey.100",
-              borderRadius: 1,
-              border: "none",
               px: 2,
               py: 1.5,
             },
@@ -258,9 +255,6 @@ export const Question = ({
           InputProps={{
             disableUnderline: true,
             sx: {
-              bgcolor: "grey.100",
-              borderRadius: 1,
-              border: "none",
               px: 2,
               py: 1.5,
             },

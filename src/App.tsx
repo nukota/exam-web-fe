@@ -14,7 +14,6 @@ import {
   // Admin Pages
   AdminDashboardPage,
   AdminExamsPage,
-  AdminCreateExamPage,
   AdminEditExamPage,
   AdminGradingPage,
   AdminLeaderboardPage,
@@ -98,14 +97,6 @@ const App = () => {
               element={
                 <ProtectedRoute allowedRoles={["admin", "teacher"]}>
                   <AdminExamsPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/exams/create"
-              element={
-                <ProtectedRoute allowedRoles={["admin", "teacher"]}>
-                  <AdminCreateExamPage />
                 </ProtectedRoute>
               }
             />

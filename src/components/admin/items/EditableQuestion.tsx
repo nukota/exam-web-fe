@@ -1,0 +1,227 @@
+import {
+  Box,
+  Typography,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  IconButton,
+  ButtonGroup,
+} from "@mui/material";
+import {
+  AddCircleOutlineRounded,
+  Delete,
+  Remove,
+  KeyboardArrowUp,
+  KeyboardArrowDown,
+} from "@mui/icons-material";
+import TiptapEditor from "../tiptap-editor/TiptapEditor";
+
+import type { CreateQuestionDto } from "../../../shared/dtos";
+
+interface EditableQuestionProps {
+  question: Partial<CreateQuestionDto>;
+  questionIndex: number;
+  onQuestionChange: (index: number, field: string, value: any) => void;
+  onRemoveQuestion: (index: number) => void;
+  onMoveUp: (index: number) => void;
+  onMoveDown: (index: number) => void;
+  onAddChoice: (questionIndex: number) => void;
+  onRemoveChoice: (questionIndex: number, choiceIndex: number) => void;
+  onChoiceChange: (
+    questionIndex: number,
+    choiceIndex: number,
+    field: string,
+    value: any
+  ) => void;
+}
+
+export const EditableQuestion = ({
+  question,
+  questionIndex,
+  onQuestionChange,
+  onRemoveQuestion,
+  onMoveUp,
+  onMoveDown,
+  onAddChoice,
+  onRemoveChoice,
+  onChoiceChange,
+}: EditableQuestionProps) => {
+  return (
+    <Box sx={{ mb: 6 }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          px: 2,
+          py: 0.25,
+          borderRadius: 1,
+          bgcolor: "rgb(227, 193, 0, 0.25)",
+        }}
+      >
+        <Typography sx={{ fontSize: "1.25rem" }} fontWeight="bold">
+          Question {questionIndex + 1}
+        </Typography>
+        <ButtonGroup size="small" variant="outlined">
+          <IconButton onClick={() => onMoveUp(questionIndex)}>
+            <KeyboardArrowUp />
+          </IconButton>
+          <IconButton onClick={() => onMoveDown(questionIndex)}>
+            <KeyboardArrowDown />
+          </IconButton>
+          <IconButton onClick={() => onRemoveQuestion(questionIndex)}>
+            <Delete sx={{ fontSize: "1.25rem" }} />
+          </IconButton>
+        </ButtonGroup>
+      </Box>
+
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 1,
+        }}
+      >
+        {/* Tiptap Rich Text Editor for Question Text */}
+        <TiptapEditor
+          value={question.question_text || ""}
+          onChange={(value: string) =>
+            onQuestionChange(questionIndex, "question_text", value)
+          }
+          placeholder="Enter your question here..."
+        />
+
+        <Box sx={{ display: "flex", gap: 2 }}>
+          <FormControl fullWidth>
+            <InputLabel>Question Type</InputLabel>
+            <Select
+              size="small"
+              value={question.question_type}
+              label="Question Type"
+              onChange={(e) =>
+                onQuestionChange(questionIndex, "question_type", e.target.value)
+              }
+              sx={{
+                bgcolor: "white",
+              }}
+            >
+              <MenuItem value="single_choice">Single Choice</MenuItem>
+              <MenuItem value="multiple_choice">Multiple Choice</MenuItem>
+              <MenuItem value="short_answer">Short Answer</MenuItem>
+              <MenuItem value="essay">Essay</MenuItem>
+            </Select>
+          </FormControl>
+          <TextField
+            size="small"
+            label="Points"
+            type="number"
+            value={question.points}
+            onChange={(e) =>
+              onQuestionChange(
+                questionIndex,
+                "points",
+                parseFloat(e.target.value)
+              )
+            }
+            sx={{ width: 150 }}
+          />
+        </Box>
+
+        {/* Choices for Single/Multiple Choice Questions */}
+        {(question.question_type === "single_choice" ||
+          question.question_type === "multiple_choice") && (
+          <Box>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                mb: 1,
+              }}
+            >
+              <Typography variant="subtitle1" fontWeight="bold">
+                Choices
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => onAddChoice(questionIndex)}
+                sx={{
+                  color: "black",
+                }}
+              >
+                <AddCircleOutlineRounded />
+              </IconButton>
+            </Box>
+            {question.choices?.map((choice, cIndex) => (
+              <Box key={cIndex} sx={{ display: "flex", gap: 1, mb: 1 }}>
+                <TextField
+                  size="small"
+                  fullWidth
+                  label={`Choice ${cIndex + 1}`}
+                  value={choice.choice_text}
+                  onChange={(e) =>
+                    onChoiceChange(
+                      questionIndex,
+                      cIndex,
+                      "choice_text",
+                      e.target.value
+                    )
+                  }
+                />
+                <FormControl size="small" sx={{ minWidth: 120 }}>
+                  <Select
+                    size="small"
+                    value={choice.is_correct ? "yes" : "no"}
+                    label="Correct?"
+                    onChange={(e) =>
+                      onChoiceChange(
+                        questionIndex,
+                        cIndex,
+                        "is_correct",
+                        e.target.value === "yes"
+                      )
+                    }
+                    sx={{
+                      bgcolor: "white",
+                    }}
+                  >
+                    <MenuItem value="yes">Correct</MenuItem>
+                    <MenuItem value="no">Incorrect</MenuItem>
+                  </Select>
+                </FormControl>
+                {question.choices!.length > 2 && (
+                  <IconButton
+                    size="small"
+                    onClick={() => onRemoveChoice(questionIndex, cIndex)}
+                    sx={{
+                      color: "black",
+                    }}
+                  >
+                    <Remove fontSize="small" />
+                  </IconButton>
+                )}
+              </Box>
+            ))}
+          </Box>
+        )}
+
+        {/* Correct Answer for Short Answer Questions */}
+        {question.question_type === "short_answer" && (
+          <TextField
+            size="small"
+            fullWidth
+            label="Correct Answer"
+            placeholder="Enter the expected answer"
+            onChange={(e) =>
+              onQuestionChange(questionIndex, "correct_answer", [
+                e.target.value,
+              ])
+            }
+          />
+        )}
+      </Box>
+    </Box>
+  );
+};

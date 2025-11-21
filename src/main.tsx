@@ -23,17 +23,45 @@ const theme = createTheme({
         disableElevation: true,
       },
     },
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          "&.Mui-focused": {
+            color: "#000",
+          },
+        },
+      },
+    },
     MuiSelect: {
       styleOverrides: {
+        root: {
+          backgroundColor: "#f5f5f5",
+        },
         select: {
-          backgroundColor: "#fff",
+          backgroundColor: "#f5f5f5",
+        },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "#f5f5f5",
+          "& fieldset": {
+            border: "none",
+          },
+          "&:hover fieldset": {
+            border: "none",
+          },
+          "&.Mui-focused fieldset": {
+            border: "none",
+          },
         },
       },
     },
     MuiTextField: {
       styleOverrides: {
         root: {
-          backgroundColor: "#fff",
+          backgroundColor: "#f5f5f5",
         },
       },
     },
