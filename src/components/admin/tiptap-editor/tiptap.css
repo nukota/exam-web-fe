@@ -121,7 +121,8 @@
 
 /* Images */
 .tiptap-image {
-  max-width: 100%;
+  max-width: 480px; /* Maximum width for images */
+  width: 100%; /* Responsive to container, but never exceeds max-width */
   height: auto;
   display: block;
   margin: 1rem 0;
@@ -129,7 +130,8 @@
 }
 
 .tiptap-editor-content img {
-  max-width: 100%;
+  max-width: 480px; /* Maximum width for images */
+  width: 100%; /* Responsive to container, but never exceeds max-width */
   height: auto;
   display: block;
   margin: 1rem 0;

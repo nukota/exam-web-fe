@@ -357,14 +357,26 @@ export const AdminEditExamPage = () => {
                       />
                     </Box>
                   ))}
-                  <Button
-                    variant="outlined"
-                    startIcon={<Add />}
-                    onClick={handleAddQuestion}
-                    sx={{ fontWeight: "bold", mt: 2 }}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "flex-start",
+                      mt: -2,
+                    }}
                   >
-                    Add Question
-                  </Button>
+                    <Button
+                      startIcon={<Add />}
+                      onClick={handleAddQuestion}
+                      sx={{
+                        fontWeight: "bold",
+                        backgroundColor: "grey.300",
+                        color: "grey.800",
+                        px: 2,
+                      }}
+                    >
+                      Add Question
+                    </Button>
+                  </Box>
                 </>
               )}
 
@@ -388,11 +400,10 @@ export const AdminEditExamPage = () => {
           sx={{ display: "flex", gap: 2, justifyContent: "flex-end", mt: 2 }}
         >
           <Button
-            variant="outlined"
+            variant="text"
+            color="inherit"
             onClick={() => navigate("/admin/exams")}
             sx={{
-              px: 3,
-              py: 1,
               fontWeight: "bold",
             }}
           >
@@ -402,13 +413,10 @@ export const AdminEditExamPage = () => {
             variant="contained"
             onClick={handleSubmit}
             sx={{
-              px: 3,
-              py: 1,
+              px: 2,
               fontWeight: "bold",
-              bgcolor: "grey.800",
-              "&:hover": {
-                bgcolor: "grey.900",
-              },
+              backgroundColor: "grey.400",
+              color: "grey.900",
             }}
           >
             Save Changes

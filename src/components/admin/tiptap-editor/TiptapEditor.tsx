@@ -108,11 +108,25 @@ export default function TiptapEditor({
   const addImage = useCallback(() => {
     if (!editor) return;
 
-    const url = window.prompt("Enter image URL");
+    // Create a hidden file input element
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
 
-    if (url) {
-      editor.chain().focus().setImage({ src: url }).run();
-    }
+    input.onchange = async (e: Event) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      // Convert to base64 for display
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64 = e.target?.result as string;
+        editor.chain().focus().setImage({ src: base64 }).run();
+      };
+      reader.readAsDataURL(file);
+    };
+
+    input.click();
   }, [editor]);
 
   if (!editor) {
