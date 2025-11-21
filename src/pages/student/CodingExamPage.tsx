@@ -11,8 +11,9 @@ import {
   Tabs,
   Tab,
 } from "@mui/material";
-import { Timer, Send, PlayArrow } from "@mui/icons-material";
+import { Timer, Send } from "@mui/icons-material";
 import { CodeEditor } from "../../components/student/CodeEditor";
+import { testCases } from "../../shared/mockdata";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -39,8 +40,6 @@ export const StudentCodingExamPage = () => {
   const [timeRemaining, setTimeRemaining] = useState(5400); // 90 minutes
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
   const [tabValue, setTabValue] = useState(0);
-  const [consoleOutput, setConsoleOutput] = useState<string>("");
-  const [isRunning, setIsRunning] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -60,18 +59,6 @@ export const StudentCodingExamPage = () => {
     console.log("Submitting code:", code);
     console.log("Language:", language);
     navigate(`/student/exam/${examId}/result`);
-  };
-
-  const handleRunCode = () => {
-    setIsRunning(true);
-    setConsoleOutput("Running code...\n");
-
-    // Simulate code execution
-    setTimeout(() => {
-      const output = `Execution started...\n\nTest Case 1:\nInput: "babad"\nOutput: "bab"\nStatus: ✓ Passed\n\nTest Case 2:\nInput: "cbbd"\nOutput: "bb"\nStatus: ✓ Passed\n\nExecution completed successfully.\nTotal time: 0.12s`;
-      setConsoleOutput(output);
-      setIsRunning(false);
-    }, 1500);
   };
 
   const formatTime = (seconds: number) => {
@@ -139,7 +126,15 @@ export const StudentCodingExamPage = () => {
           <Tabs
             value={tabValue}
             onChange={(_, newValue) => setTabValue(newValue)}
-            sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}
+            sx={{
+              borderBottom: 1,
+              borderColor: "divider",
+              position: "sticky",
+              top: 0,
+              bgcolor: "white",
+              zIndex: 1,
+              mb: 2,
+            }}
           >
             <Tab label="Problem" />
             <Tab label="Test Cases" />
@@ -195,81 +190,59 @@ export const StudentCodingExamPage = () => {
                 Test Cases
               </Typography>
 
-              <Box sx={{ mb: 2, bgcolor: "grey.100", borderRadius: 1, p: 2 }}>
-                <Typography variant="subtitle2" gutterBottom>
-                  Test Case 1:
-                </Typography>
-                <Box sx={{ display: "flex", gap: 3 }}>
-                  <Box sx={{ flex: 1 }}>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      fontWeight="bold"
-                    >
-                      Input:
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{ fontFamily: "monospace", mt: 0.5 }}
-                    >
-                      "babad"
-                    </Typography>
-                  </Box>
-                  <Box sx={{ flex: 1 }}>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      fontWeight="bold"
-                    >
-                      Expected Output:
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{ fontFamily: "monospace", mt: 0.5 }}
-                    >
-                      "bab" or "aba"
-                    </Typography>
-                  </Box>
-                </Box>
-              </Box>
-
-              <Box sx={{ mb: 2, bgcolor: "grey.100", borderRadius: 1, p: 2 }}>
-                <Typography variant="subtitle2" gutterBottom>
-                  Test Case 2:
-                </Typography>
-                <Box sx={{ display: "flex", gap: 3 }}>
-                  <Box sx={{ flex: 1 }}>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      fontWeight="bold"
-                    >
-                      Input:
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{ fontFamily: "monospace", mt: 0.5 }}
-                    >
-                      "cbbd"
-                    </Typography>
-                  </Box>
-                  <Box sx={{ flex: 1 }}>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      fontWeight="bold"
-                    >
-                      Expected Output:
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{ fontFamily: "monospace", mt: 0.5 }}
-                    >
-                      "bb"
-                    </Typography>
+              {testCases.map((testCase, index) => (
+                <Box
+                  key={index}
+                  sx={{
+                    mb: 2,
+                    bgcolor: "grey.100",
+                    borderRadius: 2,
+                    px: 3,
+                    py: 1,
+                  }}
+                >
+                  <Box sx={{ display: "flex", gap: 3 }}>
+                    <Box sx={{ flex: 1 }}>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        fontWeight="bold"
+                      >
+                        Input:
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontFamily: "monospace",
+                          mt: 0.5,
+                          whiteSpace: "pre-wrap",
+                        }}
+                      >
+                        {testCase.input}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ flex: 1 }}>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        fontWeight="bold"
+                      >
+                        Expected Output:
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontFamily: "monospace",
+                          mt: 0.5,
+                          whiteSpace: "pre-wrap",
+                        }}
+                      >
+                        {testCase.expectedOutput}
+                      </Typography>
+                    </Box>
                   </Box>
                 </Box>
-              </Box>
+              ))}
 
               <Typography variant="caption" color="text.secondary">
                 Note: Some test cases may be hidden and will only be revealed
@@ -305,64 +278,16 @@ export const StudentCodingExamPage = () => {
           display: "flex",
           flexDirection: "column",
           p: 3,
-          bgcolor: "grey.50",
+          bgcolor: "grey.200",
           overflow: "hidden",
         }}
       >
-        <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-          <Button
-            variant="outlined"
-            startIcon={<PlayArrow />}
-            onClick={handleRunCode}
-            disabled={isRunning}
-          >
-            {isRunning ? "Running..." : "Run Code"}
-          </Button>
-        </Box>
-
-        {/* Code Editor - 60% height */}
-        <Box sx={{ height: "60%", mb: 2, overflow: "hidden" }}>
-          <CodeEditor
-            value={code}
-            onChange={(value) => setCode(value || "")}
-            language={language}
-            onLanguageChange={setLanguage}
-            height="100%"
-          />
-        </Box>
-
-        {/* Console Output - 40% height */}
-        <Box
-          sx={{
-            height: "40%",
-            border: "1px solid #e0e0e0",
-            borderRadius: 2,
-            bgcolor: "white",
-            p: 2,
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1 }}>
-            Console Output
-          </Typography>
-          <Box
-            sx={{
-              flex: 1,
-              overflowY: "auto",
-              fontFamily: "monospace",
-              fontSize: "13px",
-              whiteSpace: "pre-wrap",
-              bgcolor: "grey.50",
-              p: 2,
-              borderRadius: 1,
-              color: consoleOutput ? "text.primary" : "text.disabled",
-            }}
-          >
-            {consoleOutput ||
-              "No output yet. Click 'Run Code' to execute your code."}
-          </Box>
-        </Box>
+        <CodeEditor
+          value={code}
+          onChange={(value) => setCode(value || "")}
+          language={language}
+          onLanguageChange={setLanguage}
+        />
       </Box>
 
       {/* Submit Confirmation Dialog */}

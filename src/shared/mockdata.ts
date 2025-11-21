@@ -55,7 +55,7 @@ export const mockExams: Exam[] = [
     access_code: "PY202",
     duration_minutes: 90,
     start_at: "2025-11-14T10:00:00",
-    end_at: "2025-11-20T19:00:00",
+    end_at: "2025-11-24T19:00:00",
     created_at: "2025-11-02T10:00:00",
   },
   {
@@ -544,3 +544,34 @@ export const mockSubmissionDetail = {
     },
   ],
 };
+
+export const testCases = [
+  {
+    input: `121
+232
+343`,
+    expectedOutput: `121
+232
+343`,
+  },
+  {
+    input: `11
+99
+12321`,
+    expectedOutput: `11
+99
+12321`,
+  },
+  {
+    input: `ab121ba
+cd232dc`,
+    expectedOutput: `121
+232`,
+  },
+  {
+    input: `ab121ba
+cd232dc`,
+    expectedOutput: `121
+232`,
+  },
+];
