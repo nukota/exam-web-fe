@@ -1,14 +1,25 @@
+import type { QuestionType, ProgrammingLanguage } from "../enum";
+import type { Exam } from "./exam.dto";
+import type { Answer } from "./answer.dto";
+
 export interface Question {
   question_id: string;
   exam_id: string;
   question_text: string;
-  question_type: 'essay' | 'single_choice' | 'multiple_choice' | 'short_answer' | 'coding';
+  title?: string;
+  order: number;
+  question_type: QuestionType;
   points: number;
   correct_answer?: string[];
-  coding_template?: string;
+  correct_answer_text?: string[];
+  coding_template?: Record<string, string>;
+  programming_languages?: ProgrammingLanguage[];
   image_url?: string;
+  exam?: Exam;
   choices?: Choice[];
-  test_cases?: CodingTestCase[];
+  codingTestCases?: CodingTestCase[];
+  answers?: Answer[];
+  flags?: Flag[];
 }
 
 export interface Choice {
@@ -26,14 +37,26 @@ export interface CodingTestCase {
   is_hidden: boolean;
 }
 
+export interface Flag {
+  flag_id: string;
+  question_id: string;
+  submission_id: string;
+  reason: string;
+  flagged_at: string;
+}
+
 export interface CreateQuestionDto {
   exam_id: string;
-  question_text: string;
-  question_type: 'essay' | 'single_choice' | 'multiple_choice' | 'short_answer' | 'coding';
+  question_text?: string;
+  title?: string;
+  order: number;
+  question_type: QuestionType;
   points: number;
   correct_answer?: string[];
-  coding_template?: string;
+  correct_answer_text?: string[];
+  coding_template?: Record<string, string>;
+  programming_languages?: ProgrammingLanguage[];
   image_url?: string;
-  choices?: Omit<Choice, 'choice_id' | 'question_id'>[];
-  test_cases?: Omit<CodingTestCase, 'test_case_id' | 'question_id'>[];
+  choices?: Omit<Choice, "choice_id" | "question_id">[];
+  codingTestCases?: Omit<CodingTestCase, "test_case_id" | "question_id">[];
 }

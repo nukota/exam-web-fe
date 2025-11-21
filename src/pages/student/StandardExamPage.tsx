@@ -12,15 +12,16 @@ import {
 import { Timer, Send } from "@mui/icons-material";
 import { mockQuestionsExam1 } from "../../shared/mockdata";
 import { Question } from "../../components/student/items/Question";
+import { useExamTimer } from "../../shared/providers/ExamTimerProvider";
 
 export const StudentStandardExamPage = () => {
   const { examId } = useParams();
   const navigate = useNavigate();
+  const { timeRemaining, startTimer, formatTime } = useExamTimer();
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [flaggedQuestions, setFlaggedQuestions] = useState<Set<string>>(
     new Set()
   );
-  const [timeRemaining, setTimeRemaining] = useState(300); // 60 minutes in seconds
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
   const questionRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
@@ -33,17 +34,8 @@ export const StudentStandardExamPage = () => {
   `;
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeRemaining((prev) => {
-        if (prev <= 1) {
-          handleSubmit();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
+    // Start timer with 60 minutes (3600 seconds)
+    startTimer(3600, handleSubmit);
   }, []);
 
   const handleAnswerChange = (questionId: string, value: any) => {
@@ -66,15 +58,6 @@ export const StudentStandardExamPage = () => {
     // In a real app, submit answers to the backend
     console.log("Submitting answers:", answers);
     navigate(`/student/exam/${examId}/result`);
-  };
-
-  const formatTime = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    return `${hours.toString().padStart(2, "0")}:${minutes
-      .toString()
-      .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
   const scrollToQuestion = (questionId: string) => {

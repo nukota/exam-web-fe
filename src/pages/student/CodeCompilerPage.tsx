@@ -10,10 +10,12 @@ import {
   DialogActions,
   Tabs,
   Tab,
+  IconButton,
 } from "@mui/material";
-import { Timer, Send } from "@mui/icons-material";
+import { Timer, Send, ArrowBack } from "@mui/icons-material";
 import { CodeEditor } from "../../components/student/CodeEditor";
-import { testCases } from "../../shared/mockdata";
+import { mockCodingQuestions } from "../../shared/mockdata";
+import { useExamTimer } from "../../shared/providers/ExamTimerProvider";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -31,44 +33,45 @@ function TabPanel(props: TabPanelProps) {
 }
 
 export const StudentCodeCompilerPage = () => {
-  const { examId } = useParams();
+  const { examId, questionId } = useParams();
   const navigate = useNavigate();
+  const { timeRemaining, formatTime } = useExamTimer();
   const [code, setCode] = useState(
     "# Write your Python code here\n\ndef solution():\n    pass\n"
   );
   const [language, setLanguage] = useState("python");
-  const [timeRemaining, setTimeRemaining] = useState(5400); // 90 minutes
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
   const [tabValue, setTabValue] = useState(0);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeRemaining((prev) => {
-        if (prev <= 1) {
-          handleSubmit();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+  // Find the current question
+  const currentQuestion = mockCodingQuestions.find(
+    (q) => q.question_id === questionId
+  );
 
-    return () => clearInterval(timer);
-  }, []);
+  useEffect(() => {
+    // Navigate back if time runs out
+    if (timeRemaining <= 0) {
+      navigate(`/student/exam/coding/${examId}`);
+    }
+  }, [timeRemaining, navigate, examId]);
 
   const handleSubmit = () => {
     console.log("Submitting code:", code);
     console.log("Language:", language);
-    navigate(`/student/exam/${examId}/result`);
+    navigate(`/student/exam/coding/${examId}`);
   };
 
-  const formatTime = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    return `${hours.toString().padStart(2, "0")}:${minutes
-      .toString()
-      .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  const handleGoBack = () => {
+    navigate(`/student/exam/coding/${examId}`);
   };
+
+  if (!currentQuestion) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Typography>Question not found</Typography>
+      </Box>
+    );
+  }
 
   const shakeAnimation = `
     @keyframes shake {
@@ -95,9 +98,14 @@ export const StudentCodeCompilerPage = () => {
       >
         {/* Exam Title and Timer */}
         <Box sx={{ mb: 2 }}>
-          <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
-            Python Programming Challenge
-          </Typography>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+            <IconButton size="small" onClick={handleGoBack}>
+              <ArrowBack />
+            </IconButton>
+            <Typography variant="h6" fontWeight="bold">
+              Python Programming Challenge
+            </Typography>
+          </Box>
           <Box
             sx={{
               p: 1.5,
@@ -144,10 +152,14 @@ export const StudentCodeCompilerPage = () => {
             <Box sx={{ textAlign: "left" }}>
               <Box sx={{ display: "flex", gap: 3, mb: 2 }}>
                 <Typography variant="body2" color="text.secondary">
-                  Points: <strong>10</strong>
+                  Points: <strong>{currentQuestion.points}</strong>
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Difficulty: <strong>Medium</strong>
+                  Languages:{" "}
+                  <strong>
+                    {currentQuestion.programming_languages?.join(", ") ||
+                      "Python"}
+                  </strong>
                 </Typography>
               </Box>
 
@@ -155,31 +167,46 @@ export const StudentCodeCompilerPage = () => {
                 Problem Statement
               </Typography>
               <Typography variant="body1" paragraph>
-                Write a function that finds the longest palindromic substring in
-                a given string.
+                {currentQuestion.question_text || "Solve this coding problem."}
               </Typography>
 
-              <Typography variant="subtitle1" gutterBottom sx={{ mt: 3 }}>
-                Example:
-              </Typography>
-              <Box
-                sx={{
-                  p: 2,
-                  bgcolor: "grey.100",
-                  fontFamily: "monospace",
-                  borderRadius: 1,
-                }}
-              >
-                <Typography variant="body2">Input: "babad"</Typography>
-                <Typography variant="body2">Output: "bab" or "aba"</Typography>
-              </Box>
+              {currentQuestion.codingTestCases &&
+                currentQuestion.codingTestCases.length > 0 && (
+                  <>
+                    <Typography variant="subtitle1" gutterBottom sx={{ mt: 3 }}>
+                      Example:
+                    </Typography>
+                    <Box
+                      sx={{
+                        p: 2,
+                        bgcolor: "grey.100",
+                        fontFamily: "monospace",
+                        borderRadius: 1,
+                      }}
+                    >
+                      <Typography variant="body2">
+                        Input: {currentQuestion.codingTestCases[0].input_data}
+                      </Typography>
+                      <Typography variant="body2">
+                        Output:{" "}
+                        {currentQuestion.codingTestCases[0].expected_output}
+                      </Typography>
+                    </Box>
+                  </>
+                )}
 
               <Typography variant="subtitle1" gutterBottom sx={{ mt: 3 }}>
                 Constraints:
               </Typography>
               <Typography variant="body2" component="ul">
-                <li>1 ≤ string length ≤ 1000</li>
-                <li>String consists of lowercase letters only</li>
+                <li>Time limit: 2 seconds</li>
+                <li>Memory limit: 256 MB</li>
+                {currentQuestion.programming_languages && (
+                  <li>
+                    Supported languages:{" "}
+                    {currentQuestion.programming_languages.join(", ")}
+                  </li>
+                )}
               </Typography>
             </Box>
           </TabPanel>
@@ -190,9 +217,9 @@ export const StudentCodeCompilerPage = () => {
                 Test Cases
               </Typography>
 
-              {testCases.map((testCase, index) => (
+              {currentQuestion.codingTestCases?.map((testCase) => (
                 <Box
-                  key={index}
+                  key={testCase.test_case_id}
                   sx={{
                     mb: 2,
                     bgcolor: "grey.100",
@@ -218,7 +245,7 @@ export const StudentCodeCompilerPage = () => {
                           whiteSpace: "pre-wrap",
                         }}
                       >
-                        {testCase.input}
+                        {testCase.input_data}
                       </Typography>
                     </Box>
                     <Box sx={{ flex: 1 }}>
@@ -237,7 +264,7 @@ export const StudentCodeCompilerPage = () => {
                           whiteSpace: "pre-wrap",
                         }}
                       >
-                        {testCase.expectedOutput}
+                        {testCase.expected_output}
                       </Typography>
                     </Box>
                   </Box>

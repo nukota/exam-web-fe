@@ -19,7 +19,7 @@ interface Choice {
 interface QuestionProps {
   question: {
     question_id: string;
-    question_text: string;
+    question_text?: string;
     question_type: string;
     points: number;
     choices?: Choice[];
@@ -95,7 +95,7 @@ export const Question = ({
         </Box>
 
         <Typography variant="body1" sx={{ textAlign: "left" }}>
-          {question.question_text}
+          {question.question_text || "Question text not available"}
         </Typography>
       </Box>
 
