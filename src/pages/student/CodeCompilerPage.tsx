@@ -1,18 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  Box,
-  Typography,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Tabs,
-  Tab,
-  IconButton,
-} from "@mui/material";
-import { Timer, Send, ArrowBack } from "@mui/icons-material";
+import { Box, Typography, Tabs, Tab, IconButton, Button } from "@mui/material";
+import { Timer, ArrowBack, Save } from "@mui/icons-material";
 import { CodeEditor } from "../../components/student/CodeEditor";
 import { mockCodingQuestions } from "../../shared/mockdata";
 import { useExamTimer } from "../../shared/providers/ExamTimerProvider";
@@ -36,11 +25,6 @@ export const StudentCodeCompilerPage = () => {
   const { examId, questionId } = useParams();
   const navigate = useNavigate();
   const { timeRemaining, formatTime } = useExamTimer();
-  const [code, setCode] = useState(
-    "# Write your Python code here\n\ndef solution():\n    pass\n"
-  );
-  const [language, setLanguage] = useState("python");
-  const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
   const [tabValue, setTabValue] = useState(0);
 
   // Find the current question
@@ -48,21 +32,63 @@ export const StudentCodeCompilerPage = () => {
     (q) => q.question_id === questionId
   );
 
+  // Initialize language from localStorage or default to first available
+  const [language, setLanguage] = useState(() => {
+    const savedLanguage = localStorage.getItem(`language_${questionId}`);
+    return (
+      savedLanguage || currentQuestion?.programming_languages?.[0] || "python"
+    );
+  });
+
+  // Initialize code from localStorage or use template
+  const [code, setCode] = useState(() => {
+    const savedLanguage =
+      localStorage.getItem(`language_${questionId}`) ||
+      currentQuestion?.programming_languages?.[0] ||
+      "python";
+    const savedCode = localStorage.getItem(
+      `code_${questionId}_${savedLanguage}`
+    );
+    if (savedCode) return savedCode;
+
+    // Use the template from the question
+    return (
+      currentQuestion?.coding_template?.[savedLanguage] ||
+      "# Write your Python code here\n\ndef solution():\n    pass\n"
+    );
+  });
+
+  // Load code when language changes
+  useEffect(() => {
+    if (questionId && currentQuestion) {
+      const savedCode = localStorage.getItem(`code_${questionId}_${language}`);
+      if (savedCode) {
+        setCode(savedCode);
+      } else {
+        // Load the template for the new language
+        const template = currentQuestion.coding_template?.[language] || "";
+        setCode(template);
+      }
+    }
+  }, [language, questionId, currentQuestion]);
+
   useEffect(() => {
     // Navigate back if time runs out
     if (timeRemaining <= 0) {
-      navigate(`/student/exam/coding/${examId}`);
+      navigate(-2);
     }
   }, [timeRemaining, navigate, examId]);
 
-  const handleSubmit = () => {
-    console.log("Submitting code:", code);
-    console.log("Language:", language);
-    navigate(`/student/exam/coding/${examId}`);
+  const handleSave = () => {
+    if (questionId && language) {
+      localStorage.setItem(`code_${questionId}_${language}`, code);
+      localStorage.setItem(`language_${questionId}`, language);
+      console.log("Code saved successfully!");
+    }
   };
 
   const handleGoBack = () => {
-    navigate(`/student/exam/coding/${examId}`);
+    navigate(-1);
   };
 
   if (!currentQuestion) {
@@ -279,26 +305,24 @@ export const StudentCodeCompilerPage = () => {
           </TabPanel>
         </Box>
 
-        {/* Submit Button */}
+        {/* Save Button */}
         <Button
           variant="contained"
-          startIcon={<Send />}
-          onClick={() => setSubmitDialogOpen(true)}
+          startIcon={<Save />}
+          onClick={handleSave}
           sx={{
             mt: "auto",
-            width: 180,
+            width: 160,
             ml: "auto",
-            py: 1,
+            py: 0.75,
             fontWeight: "bold",
             backgroundColor: "grey.400",
             color: "black",
           }}
         >
-          Submit Code
+          Save Code
         </Button>
       </Box>
-
-      {/* Right Section - Code Editor */}
       <Box
         sx={{
           flex: 1,
@@ -316,26 +340,6 @@ export const StudentCodeCompilerPage = () => {
           onLanguageChange={setLanguage}
         />
       </Box>
-
-      {/* Submit Confirmation Dialog */}
-      <Dialog
-        open={submitDialogOpen}
-        onClose={() => setSubmitDialogOpen(false)}
-      >
-        <DialogTitle>Submit Code?</DialogTitle>
-        <DialogContent>
-          <Typography>
-            Are you sure you want to submit your code? Once submitted, you
-            cannot make changes.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setSubmitDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleSubmit} variant="contained" color="success">
-            Submit
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   );
 };

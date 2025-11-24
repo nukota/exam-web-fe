@@ -67,7 +67,7 @@ export const mockExams: AllExamsPageDTO = [
     end_at: "2025-11-24T19:00:00",
     created_at: "2025-11-02T10:00:00",
     question_amount: 0,
-    status: "started",
+    status: "graded",
   },
   {
     exam_id: "3",
@@ -82,6 +82,20 @@ export const mockExams: AllExamsPageDTO = [
     created_at: "2025-11-03T10:00:00",
     question_amount: 0,
     status: "started",
+  },
+  {
+    exam_id: "4",
+    teacher_id: "teacher1",
+    title: "Web Development Basics",
+    description: "HTML, CSS, and JavaScript fundamentals",
+    type: "standard",
+    access_code: "WD404",
+    duration_minutes: 80,
+    start_at: "2025-11-20T09:00:00",
+    end_at: "2025-11-20T17:00:00",
+    created_at: "2025-11-04T10:00:00",
+    question_amount: 0,
+    status: "not started",
   },
 ];
 
@@ -401,6 +415,7 @@ export const mockLeaderboardData = [
     name: "Alice Johnson",
     email: "alice@example.com",
     score: 11,
+    maxScore: 11,
     submitted_at: "2025-11-14T09:45:00",
   },
   {
@@ -408,6 +423,7 @@ export const mockLeaderboardData = [
     name: "Bob Smith",
     email: "bob@example.com",
     score: 10,
+    maxScore: 11,
     submitted_at: "2025-11-14T10:12:00",
   },
   {
@@ -415,6 +431,7 @@ export const mockLeaderboardData = [
     name: "Carol White",
     email: "carol@example.com",
     score: 9,
+    maxScore: 11,
     submitted_at: "2025-11-14T10:05:00",
   },
   {
@@ -422,6 +439,7 @@ export const mockLeaderboardData = [
     name: "David Brown",
     email: "david@example.com",
     score: 9,
+    maxScore: 11,
     submitted_at: "2025-11-14T10:20:00",
   },
   {
@@ -429,6 +447,7 @@ export const mockLeaderboardData = [
     name: "Eve Davis",
     email: "eve@example.com",
     score: 8,
+    maxScore: 11,
     submitted_at: "2025-11-14T10:30:00",
   },
 ];

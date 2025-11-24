@@ -152,6 +152,9 @@ export const AdminExamsPage = () => {
               navigate(`/admin/exams/${params.row.exam_id}/leaderboard`)
             }
             title="View Leaderboard"
+            disabled={
+              params.row.status !== "graded" && params.row.status !== "released"
+            }
           >
             <BarChart3 size={20} />
           </IconButton>
@@ -159,6 +162,7 @@ export const AdminExamsPage = () => {
             size="small"
             onClick={() => navigate(`/admin/exams/${params.row.exam_id}/edit`)}
             title="Edit Exam"
+            disabled={params.row.status !== "not started"}
           >
             <Edit size={20} />
           </IconButton>

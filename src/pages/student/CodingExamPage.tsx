@@ -9,7 +9,7 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
-import { Timer, Send, Code } from "@mui/icons-material";
+import { Timer, Send, Code, Check } from "@mui/icons-material";
 import { mockCodingQuestions } from "../../shared/mockdata";
 import { useExamTimer } from "../../shared/providers/ExamTimerProvider";
 import { Card } from "../../components/common";
@@ -18,7 +18,9 @@ export const StudentCodingExamPage = () => {
   const { examId } = useParams();
   const navigate = useNavigate();
   const { timeRemaining, startTimer, formatTime } = useExamTimer();
-  const [completedQuestions] = useState<Set<string>>(new Set());
+  const [completedQuestions, setCompletedQuestions] = useState<Set<string>>(
+    new Set()
+  );
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
 
   const shakeAnimation = `
@@ -34,9 +36,77 @@ export const StudentCodingExamPage = () => {
     startTimer(5400, handleSubmit);
   }, []);
 
-  const handleSubmit = () => {
-    console.log("Submitting coding exam");
-    navigate(`/student/exam/${examId}/result`);
+  // Check for completed questions whenever localStorage might change
+  const checkCompletedQuestions = () => {
+    const completed = new Set<string>();
+    mockCodingQuestions.forEach((question) => {
+      // Check if any language has code saved for this question
+      const languages = question.programming_languages || ["python"];
+      const hasCode = languages.some((lang) => {
+        const savedCode = localStorage.getItem(
+          `code_${question.question_id}_${lang}`
+        );
+        return savedCode && savedCode.trim() !== "";
+      });
+
+      if (hasCode) {
+        completed.add(question.question_id);
+      }
+    });
+    setCompletedQuestions(completed);
+  };
+
+  useEffect(() => {
+    checkCompletedQuestions();
+  }, [examId]);
+
+  // Listen for storage changes to update completion status in real-time
+  useEffect(() => {
+    const handleStorageChange = () => {
+      checkCompletedQuestions();
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  const handleSubmit = async () => {
+    // Collect all saved code from localStorage for all questions and all languages
+    const allAnswers = mockCodingQuestions.map((question) => {
+      const languages = question.programming_languages || ["python"];
+      const savedLanguage =
+        localStorage.getItem(`language_${question.question_id}`) ||
+        languages[0];
+      const code =
+        localStorage.getItem(`code_${question.question_id}_${savedLanguage}`) ||
+        "";
+
+      return {
+        question_id: question.question_id,
+        language: savedLanguage,
+        code: code,
+      };
+    });
+
+    console.log("Submitting coding exam with all answers:", allAnswers);
+
+    try {
+      // TODO: Send allAnswers to backend
+      // await submitCodingExam(examId, allAnswers);
+
+      // Clear all code from localStorage after successful submission
+      mockCodingQuestions.forEach((question) => {
+        const languages = question.programming_languages || ["python"];
+        languages.forEach((lang) => {
+          localStorage.removeItem(`code_${question.question_id}_${lang}`);
+        });
+        localStorage.removeItem(`language_${question.question_id}`);
+      });
+
+      navigate(`/student/exam/${examId}/result`);
+    } catch (error) {
+      console.error("Failed to submit exam:", error);
+      // Don't clear localStorage if submission fails
+    }
   };
 
   const handleQuestionClick = (questionId: string) => {
@@ -280,10 +350,15 @@ export const StudentCodingExamPage = () => {
                   </Typography>
                 </Box>
                 <Box sx={{ flex: 1, textAlign: "left" }}>
-                  <Typography variant="h6" fontWeight="bold">
-                    {question.title || question.question_text} (
-                    {question.points} pts)
-                  </Typography>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <Typography variant="h6" fontWeight="bold">
+                      {question.title || question.question_text} (
+                      {question.points} pts)
+                    </Typography>
+                    {completedQuestions.has(question.question_id) && (
+                      <Check sx={{ color: "success.main", fontSize: 20 }} />
+                    )}
+                  </Box>
                   <Typography
                     variant="body2"
                     color="text.secondary"

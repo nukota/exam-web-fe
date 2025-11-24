@@ -1,47 +1,48 @@
-import { Box, Typography, Chip } from "@mui/material";
-import { EmojiEvents } from "@mui/icons-material";
+import { Box, Typography, IconButton } from "@mui/material";
 import { Layout } from "../../components/common/Layout";
 import { CustomDataGrid } from "../../components/common";
 import Card from "../../components/common/Card";
 import { mockLeaderboardData } from "../../shared/mockdata";
 import type { GridColDef } from "@mui/x-data-grid";
+import { ArrowLeft, Trophy, Crown } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export const AdminLeaderboardPage = () => {
   // const { examId } = useParams(); // For future use to fetch exam-specific leaderboard
-
+  const navigate = useNavigate();
   const columns: GridColDef[] = [
     {
       field: "rank",
       headerName: "Rank",
       width: 100,
-      renderCell: (params) =>
-        params.value <= 3 ? (
-          <Chip
-            label={params.value}
-            color={params.value === 1 ? "warning" : "default"}
-            size="small"
-            sx={{ fontWeight: "bold" }}
-          />
-        ) : (
-          <Typography>{params.value}</Typography>
-        ),
-    },
-    {
-      field: "name",
-      headerName: "Student Name",
-      flex: 1,
-      minWidth: 180,
       renderCell: (params) => (
-        <Typography fontWeight={params.row.rank <= 3 ? "bold" : "normal"}>
-          {params.value}
+        <Typography
+          variant="body2"
+          fontWeight="bold"
+          color={params.value <= 3 ? "primary.main" : "text.primary"}
+        >
+          #{params.value}
         </Typography>
       ),
     },
     {
-      field: "email",
-      headerName: "Email",
+      field: "name",
+      headerName: "Student",
       flex: 1,
-      minWidth: 200,
+      minWidth: 220,
+      renderCell: (params) => (
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 0 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Typography fontWeight={params.row.rank <= 3 ? "bold" : "normal"}>
+              {params.value}
+            </Typography>
+            {params.row.rank === 1 && <Crown size={16} color="#f59e0b" />}
+          </Box>
+          <Typography variant="caption" color="text.secondary">
+            {params.row.email}
+          </Typography>
+        </Box>
+      ),
     },
     {
       field: "score",
@@ -50,17 +51,51 @@ export const AdminLeaderboardPage = () => {
       align: "center",
       headerAlign: "center",
       renderCell: (params) => (
-        <Typography fontWeight="bold" color="primary">
-          {params.value}
+        <Typography fontWeight="bold" color="success.main">
+          {params.value !== null && params.value !== undefined
+            ? `${params.value}/${params.row.maxScore}`
+            : "-"}
         </Typography>
       ),
     },
     {
+      field: "percentage",
+      headerName: "Percentage",
+      width: 120,
+      align: "center",
+      headerAlign: "center",
+      renderCell: (params) => {
+        if (params.row.score === null || params.row.score === undefined) {
+          return (
+            <Typography fontWeight="bold" color="text.secondary">
+              -
+            </Typography>
+          );
+        }
+        const percentage = (params.row.score / params.row.maxScore) * 100;
+        return (
+          <Typography
+            fontWeight="bold"
+            color={
+              percentage >= 80
+                ? "#4caf50"
+                : percentage >= 60
+                ? "#ff9800"
+                : "#f44336"
+            }
+          >
+            {percentage.toFixed(1)}%
+          </Typography>
+        );
+      },
+    },
+    {
       field: "submitted_at",
       headerName: "Submitted At",
-      width: 180,
+      flex: 0.75,
+      minWidth: 180,
       align: "right",
-      headerAlign: "right",
+      headerAlign: "center",
       valueFormatter: (value) => {
         if (!value) return "N/A";
         const date = new Date(value);
@@ -80,30 +115,40 @@ export const AdminLeaderboardPage = () => {
     <Layout>
       <Box>
         <Box sx={{ display: "flex", alignItems: "center", mb: 3, gap: 1 }}>
-          <EmojiEvents sx={{ color: "warning.main", fontSize: "2rem" }} />
-          <Typography variant="h4" component="h1" fontWeight="bold">
+          <IconButton onClick={() => navigate("/admin/exams")}>
+            <ArrowLeft size={32} color="black" />
+          </IconButton>
+          <Typography
+            variant="h4"
+            component="h1"
+            fontWeight="bold"
+            sx={{ mr: 1 }}
+          >
             Exam Leaderboard
           </Typography>
+          <Trophy size={28} color="#999" />
         </Box>
 
-        <Card sx={{ p: 3, mb: 3, bgcolor: "grey.50" }}>
-          <Typography variant="h6" fontWeight="bold" gutterBottom>
-            Introduction to Computer Science
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {mockLeaderboardData.length} students have submitted
-          </Typography>
-        </Card>
+        <Box sx={{ px: { xs: 0, lg: "7%", xl: "20%" } }}>
+          <Card sx={{ p: 3, mb: 3, bgcolor: "grey.50" }}>
+            <Typography variant="h6" fontWeight="bold" gutterBottom>
+              Introduction to Computer Science
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {mockLeaderboardData.length} students have submitted
+            </Typography>
+          </Card>
 
-        <Card sx={{ p: 0, overflow: "hidden" }}>
-          <CustomDataGrid
-            rows={mockLeaderboardData}
-            columns={columns}
-            getRowId={(row) => row.rank.toString()}
-            pageSize={10}
-            pageSizeOptions={[10, 20, 50]}
-          />
-        </Card>
+          <Card sx={{ p: 0, overflow: "hidden" }}>
+            <CustomDataGrid
+              rows={mockLeaderboardData}
+              columns={columns}
+              getRowId={(row) => row.rank.toString()}
+              pageSize={10}
+              pageSizeOptions={[10, 20, 50]}
+            />
+          </Card>
+        </Box>
       </Box>
     </Layout>
   );

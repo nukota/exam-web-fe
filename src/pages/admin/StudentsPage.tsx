@@ -1,4 +1,5 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, IconButton } from "@mui/material";
+import { Trash2 } from "lucide-react";
 import { Layout, CustomDataGrid } from "../../components/common";
 import type { GridColDef } from "@mui/x-data-grid";
 
@@ -9,6 +10,7 @@ interface Student {
   email: string;
   class_name: string;
   school_name: string;
+  dob?: string;
   enrolled_date?: string;
   exams_taken: number;
   average_score?: number;
@@ -23,6 +25,7 @@ const mockStudents: Student[] = [
     email: "alice.johnson@example.com",
     class_name: "Class 12A",
     school_name: "Tech University",
+    dob: "2005-03-15",
     enrolled_date: "2024-09-01",
     exams_taken: 5,
     average_score: 85.5,
@@ -34,6 +37,7 @@ const mockStudents: Student[] = [
     email: "bob.smith@example.com",
     class_name: "Class 12B",
     school_name: "Tech University",
+    dob: "2005-07-22",
     enrolled_date: "2024-09-01",
     exams_taken: 3,
     average_score: 78.3,
@@ -45,6 +49,7 @@ const mockStudents: Student[] = [
     email: "carol.white@example.com",
     class_name: "Class 12A",
     school_name: "Tech University",
+    dob: "2005-11-08",
     enrolled_date: "2024-09-05",
     exams_taken: 4,
     average_score: 92.0,
@@ -56,6 +61,7 @@ const mockStudents: Student[] = [
     email: "david.brown@example.com",
     class_name: "Class 12C",
     school_name: "Tech University",
+    dob: "2005-01-30",
     enrolled_date: "2024-09-10",
     exams_taken: 2,
     average_score: 70.5,
@@ -67,6 +73,7 @@ const mockStudents: Student[] = [
     email: "emma.davis@example.com",
     class_name: "Class 12B",
     school_name: "Tech University",
+    dob: "2005-09-18",
     enrolled_date: "2024-09-15",
     exams_taken: 6,
     average_score: 88.7,
@@ -74,6 +81,11 @@ const mockStudents: Student[] = [
 ];
 
 export const AdminStudentsPage = () => {
+  const handleDelete = (studentId: string) => {
+    // TODO: Implement delete logic with API integration
+    console.log("Deleting student:", studentId);
+  };
+
   const columns: GridColDef[] = [
     {
       field: "full_name",
@@ -92,16 +104,27 @@ export const AdminStudentsPage = () => {
       ),
     },
     {
-      field: "school_name",
-      flex: 0.4,
-      headerName: "School",
-      minWidth: 180,
+      field: "school_class",
+      flex: 0.6,
+      headerName: "School & Class",
+      minWidth: 200,
+      renderCell: (params) => (
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 0 }}>
+          <Typography variant="body2" fontWeight="medium">
+            {params.row.school_name}
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            {params.row.class_name}
+          </Typography>
+        </Box>
+      ),
     },
     {
-      field: "class_name",
-      flex: 0.4,
-      headerName: "Class",
-      minWidth: 120,
+      field: "dob",
+      headerName: "Date of Birth",
+      width: 130,
+      valueFormatter: (value) =>
+        value ? new Date(value).toLocaleDateString() : "N/A",
     },
     {
       field: "enrolled_date",
@@ -140,6 +163,23 @@ export const AdminStudentsPage = () => {
         >
           {params.value ? `${params.value.toFixed(1)}%` : "N/A"}
         </Typography>
+      ),
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 100,
+      sortable: false,
+      align: "center",
+      headerAlign: "center",
+      renderCell: (params) => (
+        <IconButton
+          size="small"
+          onClick={() => handleDelete(params.row.user_id)}
+          title="Delete Student"
+        >
+          <Trash2 size={20} />
+        </IconButton>
       ),
     },
   ];
