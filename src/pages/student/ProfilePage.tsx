@@ -2,19 +2,22 @@ import { useState } from "react";
 import {
   Box,
   Typography,
-  Paper,
   TextField,
   Button,
   Avatar,
   IconButton,
   Stack,
 } from "@mui/material";
-import { Edit, PhotoCamera } from "@mui/icons-material";
+import { Edit } from "@mui/icons-material";
+import { ArrowLeft, User } from "lucide-react";
 import { Layout } from "../../components/common";
 import { useAuth } from "../../shared/providers/AuthProvider";
+import { useNavigate } from "react-router-dom";
+import Card from "../../components/common/Card";
 
 export const StudentProfilePage = () => {
   const { currentUser } = useAuth();
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState({
     full_name: currentUser?.full_name || "",
@@ -33,131 +36,139 @@ export const StudentProfilePage = () => {
   return (
     <Layout>
       <Box>
-        <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom>
-          My Profile
-        </Typography>
+        <Box sx={{ display: "flex", alignItems: "center", mb: 3, gap: 1 }}>
+          <IconButton onClick={() => navigate("/student/exams")}>
+            <ArrowLeft size={32} color="black" />
+          </IconButton>
+          <Typography
+            variant="h4"
+            component="h1"
+            fontWeight="bold"
+            sx={{ mr: 1 }}
+          >
+            My Profile
+          </Typography>
+          <User size={28} color="#999" />
+        </Box>
 
-        <Paper elevation={2} sx={{ p: 4, mt: 3 }}>
-          <Box sx={{ display: "flex", alignItems: "center", mb: 4 }}>
-            <Box sx={{ position: "relative" }}>
-              <Avatar
-                sx={{
-                  width: 120,
-                  height: 120,
-                  fontSize: "3rem",
-                  bgcolor: "primary.main",
-                }}
-              >
-                {profile.full_name?.charAt(0) ||
-                  currentUser?.username?.charAt(0)}
-              </Avatar>
-              {isEditing && (
-                <IconButton
+        <Box sx={{ px: { xs: 0, md: "5%", lg: "15%", xl: "25%" } }}>
+          <Card sx={{ p: 4, mt: 3 }}>
+            <Box sx={{ display: "flex", alignItems: "center", mb: 4 }}>
+              <Box sx={{ position: "relative" }}>
+                <Avatar
                   sx={{
-                    position: "absolute",
-                    bottom: 0,
-                    right: 0,
-                    bgcolor: "background.paper",
+                    width: 80,
+                    height: 80,
+                    fontSize: "2.25rem",
+                    bgcolor: "primary.main",
                   }}
                 >
-                  <PhotoCamera />
-                </IconButton>
+                  {profile.full_name?.charAt(0) ||
+                    currentUser?.username?.charAt(0)}
+                </Avatar>
+              </Box>
+              <Box
+                sx={{
+                  ml: 3,
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 0.25,
+                  textAlign: "left",
+                }}
+              >
+                <Typography variant="h5" fontWeight="bold">
+                  {profile.full_name || currentUser?.username}
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                  {currentUser?.email}
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                  Role: Student
+                </Typography>
+              </Box>
+              {!isEditing && (
+                <Button
+                  variant="contained"
+                  startIcon={<Edit />}
+                  onClick={() => setIsEditing(true)}
+                  sx={{
+                    backgroundColor: "grey.400",
+                    color: "black",
+                  }}
+                >
+                  Edit Profile
+                </Button>
               )}
             </Box>
-            <Box sx={{ ml: 3, flex: 1 }}>
-              <Typography variant="h5" fontWeight="bold">
-                {profile.full_name || currentUser?.username}
-              </Typography>
-              <Typography variant="body1" color="text.secondary">
-                {currentUser?.email}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Role: Student
-              </Typography>
-            </Box>
-            {!isEditing && (
-              <Button
-                variant="outlined"
-                startIcon={<Edit />}
-                onClick={() => setIsEditing(true)}
+
+            <Stack spacing={3}>
+              <Box sx={{ display: "flex", gap: 2 }}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="Date of Birth"
+                  type="date"
+                  value={profile.dob}
+                  onChange={(e) =>
+                    setProfile({ ...profile, dob: e.target.value })
+                  }
+                  disabled={!isEditing}
+                  InputLabelProps={{ shrink: true }}
+                />
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="Class"
+                  value={profile.class_name}
+                  onChange={(e) =>
+                    setProfile({ ...profile, class_name: e.target.value })
+                  }
+                  disabled={!isEditing}
+                />
+              </Box>
+              <TextField
+                fullWidth
+                size="small"
+                label="School Name"
+                value={profile.school_name}
+                onChange={(e) =>
+                  setProfile({ ...profile, school_name: e.target.value })
+                }
+                disabled={!isEditing}
+              />
+            </Stack>
+
+            {isEditing && (
+              <Box
+                sx={{
+                  mt: 3,
+                  display: "flex",
+                  gap: 2,
+                  justifyContent: "flex-end",
+                }}
               >
-                Edit Profile
-              </Button>
+                <Button
+                  variant="text"
+                  color="inherit"
+                  onClick={() => setIsEditing(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={handleSave}
+                  sx={{
+                    backgroundColor: "grey.400",
+                    color: "black",
+                  }}
+                >
+                  Save Changes
+                </Button>
+              </Box>
             )}
-          </Box>
-
-          <Stack spacing={3}>
-            <Box sx={{ display: "flex", gap: 2 }}>
-              <TextField
-                fullWidth
-                label="Full Name"
-                value={profile.full_name}
-                onChange={(e) =>
-                  setProfile({ ...profile, full_name: e.target.value })
-                }
-                disabled={!isEditing}
-              />
-              <TextField
-                fullWidth
-                label="Email"
-                value={profile.email}
-                onChange={(e) =>
-                  setProfile({ ...profile, email: e.target.value })
-                }
-                disabled={!isEditing}
-              />
-            </Box>
-            <Box sx={{ display: "flex", gap: 2 }}>
-              <TextField
-                fullWidth
-                label="Date of Birth"
-                type="date"
-                value={profile.dob}
-                onChange={(e) =>
-                  setProfile({ ...profile, dob: e.target.value })
-                }
-                disabled={!isEditing}
-                InputLabelProps={{ shrink: true }}
-              />
-              <TextField
-                fullWidth
-                label="Class"
-                value={profile.class_name}
-                onChange={(e) =>
-                  setProfile({ ...profile, class_name: e.target.value })
-                }
-                disabled={!isEditing}
-              />
-            </Box>
-            <TextField
-              fullWidth
-              label="School Name"
-              value={profile.school_name}
-              onChange={(e) =>
-                setProfile({ ...profile, school_name: e.target.value })
-              }
-              disabled={!isEditing}
-            />
-          </Stack>
-
-          {isEditing && (
-            <Box
-              sx={{
-                mt: 3,
-                display: "flex",
-                gap: 2,
-                justifyContent: "flex-end",
-              }}
-            >
-              <Button variant="outlined" onClick={() => setIsEditing(false)}>
-                Cancel
-              </Button>
-              <Button variant="contained" onClick={handleSave}>
-                Save Changes
-              </Button>
-            </Box>
-          )}
-        </Paper>
+          </Card>
+        </Box>
       </Box>
     </Layout>
   );

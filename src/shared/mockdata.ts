@@ -53,7 +53,7 @@ export const mockExams: AllExamsPageDTO = [
     end_at: "2025-12-1T18:00:00",
     created_at: "2025-11-01T10:00:00",
     question_amount: 12,
-    status: "ended",
+    status: "released",
   },
   {
     exam_id: "2",
