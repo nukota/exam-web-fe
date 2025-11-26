@@ -9,7 +9,7 @@ export interface Answer {
   graded_at?: string;
 }
 
-export interface CreateAnswerDto {
+export interface CreateAnswerDTO {
   question_id: string;
   answer_text?: string;
   selected_choices?: string[];

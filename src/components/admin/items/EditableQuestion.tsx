@@ -18,10 +18,10 @@ import {
 } from "@mui/icons-material";
 import TiptapEditor from "../tiptap-editor/TiptapEditor";
 
-import type { CreateQuestionDto } from "../../../shared/dtos";
+import type { UpdateQuestionDTO } from "../../../shared/dtos";
 
 interface EditableQuestionProps {
-  question: Partial<CreateQuestionDto>;
+  question: UpdateQuestionDTO;
   questionIndex: number;
   onQuestionChange: (index: number, field: string, value: any) => void;
   onRemoveQuestion: (index: number) => void;
@@ -173,16 +173,42 @@ export const EditableQuestion = ({
                 <FormControl size="small" sx={{ minWidth: 120 }}>
                   <Select
                     size="small"
-                    value={choice.is_correct ? "yes" : "no"}
-                    label="Correct?"
-                    onChange={(e) =>
-                      onChoiceChange(
-                        questionIndex,
-                        cIndex,
-                        "is_correct",
-                        e.target.value === "yes"
-                      )
+                    value={
+                      question.correct_answer?.includes(choice.choice_id || "")
+                        ? "yes"
+                        : "no"
                     }
+                    label="Correct?"
+                    onChange={(e) => {
+                      const isCorrect = e.target.value === "yes";
+                      const currentCorrectAnswers =
+                        question.correct_answer || [];
+                      const choiceId = choice.choice_id || "";
+
+                      let newCorrectAnswers;
+                      if (isCorrect) {
+                        // Add to correct answers if not already there
+                        if (!currentCorrectAnswers.includes(choiceId)) {
+                          newCorrectAnswers = [
+                            ...currentCorrectAnswers,
+                            choiceId,
+                          ];
+                        } else {
+                          newCorrectAnswers = currentCorrectAnswers;
+                        }
+                      } else {
+                        // Remove from correct answers
+                        newCorrectAnswers = currentCorrectAnswers.filter(
+                          (id) => id !== choiceId
+                        );
+                      }
+
+                      onQuestionChange(
+                        questionIndex,
+                        "correct_answer",
+                        newCorrectAnswers
+                      );
+                    }}
                     sx={{
                       bgcolor: "white",
                     }}

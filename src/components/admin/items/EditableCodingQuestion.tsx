@@ -19,11 +19,11 @@ import {
   ExpandMore,
 } from "@mui/icons-material";
 import TiptapEditor from "../tiptap-editor/TiptapEditor";
-import type { CreateQuestionDto } from "../../../shared/dtos";
+import type { UpdateQuestionDTO } from "../../../shared/dtos";
 import type { ProgrammingLanguage } from "../../../shared/enum";
 
 interface EditableCodingQuestionProps {
-  question: Partial<CreateQuestionDto>;
+  question: UpdateQuestionDTO;
   questionIndex: number;
   availableLanguages: ProgrammingLanguage[];
   onQuestionChange: (field: string, value: any) => void;

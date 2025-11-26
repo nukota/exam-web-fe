@@ -56,7 +56,9 @@ export const QuestionItem: React.FC<QuestionProps> = ({
         >
           {question.choices?.map((choice: Choice) => {
             const isSelected = selectedChoices.includes(choice.choice_id);
-            const isCorrect = choice.is_correct;
+            const isCorrect = question.correct_answer?.includes(
+              choice.choice_id
+            );
 
             return (
               <Box

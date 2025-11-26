@@ -12,18 +12,13 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
+import type { CreateExamDTO } from "../../shared/dtos";
+import type { ExamType } from "../../shared/enum";
 
 interface CreateExamDialogProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (examData: {
-    title: string;
-    description: string;
-    type: string;
-    duration_minutes: number;
-    start_at: string;
-    end_at: string;
-  }) => void;
+  onSubmit: (examData: CreateExamDTO) => void;
 }
 
 export const CreateExamDialog: React.FC<CreateExamDialogProps> = ({
@@ -31,7 +26,7 @@ export const CreateExamDialog: React.FC<CreateExamDialogProps> = ({
   onClose,
   onSubmit,
 }) => {
-  const [exam, setExam] = useState({
+  const [exam, setExam] = useState<CreateExamDTO>({
     title: "",
     description: "",
     type: "standard",
@@ -95,7 +90,9 @@ export const CreateExamDialog: React.FC<CreateExamDialogProps> = ({
               <Select
                 value={exam.type}
                 label="Exam Type"
-                onChange={(e) => setExam({ ...exam, type: e.target.value })}
+                onChange={(e) =>
+                  setExam({ ...exam, type: e.target.value as ExamType })
+                }
               >
                 <MenuItem value="standard">Standard</MenuItem>
                 <MenuItem value="coding">Coding</MenuItem>

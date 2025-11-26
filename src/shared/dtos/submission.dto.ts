@@ -1,4 +1,4 @@
-import type { CreateAnswerDto } from "./answer.dto";
+import type { CreateAnswerDTO } from "./answer.dto";
 
 export interface Submission {
   submission_id: string;
@@ -15,7 +15,7 @@ export interface Submission {
   };
 }
 
-export interface CreateSubmissionDto {
+export interface CreateSubmissionDTO {
   exam_id: string;
-  answers: CreateAnswerDto[];
+  answers: CreateAnswerDTO[];
 }

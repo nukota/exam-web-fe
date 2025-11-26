@@ -7,15 +7,18 @@ import Card from "../../components/common/Card";
 import { EditableQuestion } from "../../components/admin/items/EditableQuestion";
 import { ExamInfoSection } from "../../components/admin/ExamInfoSection";
 import { useFeedback } from "../../shared/providers/FeedbackProvider";
-import type { UpdateExamDto, CreateQuestionDto } from "../../shared/dtos";
+import type { Exam, UpdateExamDTO, UpdateQuestionDTO } from "../../shared/dtos";
 import { mockExams } from "../../shared/mockdata";
+
+// Helper function to generate temporary IDs for new items
+const generateTempId = () => `temp_${crypto.randomUUID()}`;
 
 export const AdminEditStandardExamPage = () => {
   const { examId } = useParams();
   const navigate = useNavigate();
   const { showSnackbar } = useFeedback();
-  const [exam, setExam] = useState<Partial<UpdateExamDto>>({});
-  const [questions, setQuestions] = useState<Partial<CreateQuestionDto>[]>([]);
+  const [exam, setExam] = useState<Partial<Exam>>({});
+  const [questions, setQuestions] = useState<UpdateQuestionDTO[]>([]);
   const [hasEndTime, setHasEndTime] = useState<boolean>(true);
   const questionRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
@@ -23,11 +26,7 @@ export const AdminEditStandardExamPage = () => {
     // In a real app, fetch exam by ID
     const examData: any = mockExams[0];
     setExam({
-      title: examData.title,
-      description: examData.description,
-      type: examData.type,
-      access_code: examData.access_code,
-      duration_minutes: examData.duration_minutes,
+      ...examData,
       start_at: examData.start_at?.substring(0, 16),
       end_at: examData.end_at?.substring(0, 16),
     });
@@ -36,12 +35,15 @@ export const AdminEditStandardExamPage = () => {
     // Load existing questions if any - add initial question
     setQuestions([
       {
+        question_id: null, // null indicates this is a new question
         question_text: "",
         question_type: "single_choice",
+        order: 0,
         points: 1,
+        correct_answer: [],
         choices: [
-          { choice_text: "", is_correct: false },
-          { choice_text: "", is_correct: false },
+          { choice_id: generateTempId(), choice_text: "" }, // temp ID for new choice
+          { choice_id: generateTempId(), choice_text: "" },
         ],
       },
     ]);
@@ -51,12 +53,15 @@ export const AdminEditStandardExamPage = () => {
     setQuestions([
       ...questions,
       {
+        question_id: null, // null indicates this is a new question
         question_text: "",
         question_type: "single_choice",
+        order: questions.length,
         points: 1,
+        correct_answer: [],
         choices: [
-          { choice_text: "", is_correct: false },
-          { choice_text: "", is_correct: false },
+          { choice_id: generateTempId(), choice_text: "" },
+          { choice_id: generateTempId(), choice_text: "" },
         ],
       },
     ]);
@@ -100,8 +105,8 @@ export const AdminEditStandardExamPage = () => {
       newQuestions[questionIndex].choices = [];
     }
     newQuestions[questionIndex].choices!.push({
+      choice_id: generateTempId(), // Generate temp UUID for new choice
       choice_text: "",
-      is_correct: false,
     });
     setQuestions(newQuestions);
   };
@@ -128,23 +133,6 @@ export const AdminEditStandardExamPage = () => {
     setQuestions(newQuestions);
   };
 
-  const handleCopyAccessCode = async () => {
-    if (exam.access_code) {
-      try {
-        await navigator.clipboard.writeText(exam.access_code);
-        showSnackbar({
-          message: "Access code copied to clipboard",
-          severity: "success",
-        });
-      } catch (err) {
-        showSnackbar({
-          message: "Failed to copy access code",
-          severity: "error",
-        });
-      }
-    }
-  };
-
   const scrollToQuestion = (index: number) => {
     questionRefs.current[index]?.scrollIntoView({
       behavior: "smooth",
@@ -152,9 +140,27 @@ export const AdminEditStandardExamPage = () => {
     });
   };
 
+  const handleExamChange = (updatedFields: Partial<UpdateExamDTO>) => {
+    setExam({ ...exam, ...updatedFields });
+  };
+
   const handleSubmit = () => {
-    console.log("Updating exam:", examId, exam, "with questions:", questions);
-    // In a real app, submit to backend
+    // Update order field for all questions based on their position
+    const questionsWithOrder = questions.map((q, index) => ({
+      ...q,
+      order: index,
+    }));
+
+    const payload: any = {
+      exam,
+      questions: questionsWithOrder,
+    };
+
+    console.log("Updating exam:", examId, payload);
+    // In a real app, submit to backend API
+    // Questions with question_id: null will be created
+    // Questions with question_id: <uuid> will be updated
+    // Questions not in the array will be deleted
     showSnackbar({ message: "Exam updated successfully", severity: "success" });
     navigate("/admin/exams");
   };
@@ -176,10 +182,9 @@ export const AdminEditStandardExamPage = () => {
           {/* Left Section - Exam Info */}
           <ExamInfoSection
             exam={exam}
-            onExamChange={setExam}
+            onExamChange={handleExamChange}
             hasEndTime={hasEndTime}
             onEndTimeToggle={setHasEndTime}
-            onCopyAccessCode={handleCopyAccessCode}
             questions={questions}
             onScrollToQuestion={scrollToQuestion}
           />

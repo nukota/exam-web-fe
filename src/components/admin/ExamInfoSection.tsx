@@ -2,19 +2,19 @@ import {
   Box,
   Typography,
   TextField,
-  IconButton,
   Checkbox,
+  IconButton,
 } from "@mui/material";
 import { ContentCopy } from "@mui/icons-material";
 import Card from "../common/Card";
-import type { UpdateExamDto } from "../../shared/dtos";
+import type { UpdateExamDTO, Exam } from "../../shared/dtos";
+import { useFeedback } from "../../shared/providers/FeedbackProvider";
 
 interface ExamInfoSectionProps {
-  exam: Partial<UpdateExamDto>;
-  onExamChange: (exam: Partial<UpdateExamDto>) => void;
+  exam: Partial<Exam>; // Full exam data including access_code for display
+  onExamChange: (exam: Partial<UpdateExamDTO>) => void; // Only editable fields
   hasEndTime: boolean;
   onEndTimeToggle: (enabled: boolean) => void;
-  onCopyAccessCode: () => void;
   questions?: any[];
   onScrollToQuestion?: (index: number) => void;
 }
@@ -24,11 +24,28 @@ export const ExamInfoSection = ({
   onExamChange,
   hasEndTime,
   onEndTimeToggle,
-  onCopyAccessCode,
   questions = [],
   onScrollToQuestion,
 }: ExamInfoSectionProps) => {
+  const { showSnackbar } = useFeedback();
   const showQuestionMap = exam.type !== "coding" && questions.length > 0;
+
+  const handleCopyAccessCode = async () => {
+    if (exam.access_code) {
+      try {
+        await navigator.clipboard.writeText(exam.access_code);
+        showSnackbar({
+          message: "Access code copied to clipboard",
+          severity: "success",
+        });
+      } catch (err) {
+        showSnackbar({
+          message: "Failed to copy access code",
+          severity: "error",
+        });
+      }
+    }
+  };
 
   return (
     <Box sx={{ flex: 1, maxWidth: 540, position: "sticky", top: 80 }}>
@@ -54,8 +71,9 @@ export const ExamInfoSection = ({
             </Typography>
             <IconButton
               size="small"
-              onClick={onCopyAccessCode}
+              onClick={handleCopyAccessCode}
               sx={{ color: "primary.main" }}
+              disabled={!exam.access_code}
             >
               <ContentCopy fontSize="small" />
             </IconButton>

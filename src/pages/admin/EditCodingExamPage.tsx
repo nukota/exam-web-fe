@@ -7,9 +7,12 @@ import Card from "../../components/common/Card";
 import { ExamInfoSection } from "../../components/admin/ExamInfoSection";
 import { EditableCodingQuestion } from "../../components/admin/items";
 import { useFeedback } from "../../shared/providers/FeedbackProvider";
-import type { UpdateExamDto, CreateQuestionDto } from "../../shared/dtos";
+import type { Exam, UpdateExamDTO, UpdateQuestionDTO } from "../../shared/dtos";
 import type { ProgrammingLanguage } from "../../shared/enum";
 import { mockExams } from "../../shared/mockdata";
+
+// Helper function to generate temporary IDs for new items
+const generateTempId = () => `temp_${crypto.randomUUID()}`;
 
 const AVAILABLE_LANGUAGES: ProgrammingLanguage[] = [
   "python",
@@ -22,8 +25,8 @@ export const AdminEditCodingExamPage = () => {
   const { examId } = useParams();
   const navigate = useNavigate();
   const { showSnackbar } = useFeedback();
-  const [exam, setExam] = useState<Partial<UpdateExamDto>>({});
-  const [questions, setQuestions] = useState<Partial<CreateQuestionDto>[]>([]);
+  const [exam, setExam] = useState<Partial<Exam>>({});
+  const [questions, setQuestions] = useState<UpdateQuestionDTO[]>([]);
   const [hasEndTime, setHasEndTime] = useState<boolean>(true);
 
   useEffect(() => {
@@ -31,11 +34,7 @@ export const AdminEditCodingExamPage = () => {
     const examData: any = mockExams.find((e) => e.exam_id === examId);
     if (examData) {
       setExam({
-        title: examData.title,
-        description: examData.description,
-        type: examData.type,
-        access_code: examData.access_code,
-        duration_minutes: examData.duration_minutes,
+        ...examData,
         start_at: examData.start_at?.substring(0, 16),
         end_at: examData.end_at?.substring(0, 16),
       });
@@ -45,52 +44,49 @@ export const AdminEditCodingExamPage = () => {
     // Initialize with one coding question
     setQuestions([
       {
+        question_id: null, // null indicates this is a new question
         question_text: "",
         title: "",
         question_type: "coding",
+        order: 0,
         points: 10,
         programming_languages: ["python"],
         coding_template: {
           python: "def solution():\n    # Your code here\n    pass",
         },
         codingTestCases: [
-          { input_data: "", expected_output: "", is_hidden: false },
+          {
+            test_case_id: generateTempId(),
+            input_data: "",
+            expected_output: "",
+            is_hidden: false,
+          },
         ],
       },
     ]);
   }, [examId]);
 
-  const handleCopyAccessCode = async () => {
-    if (exam.access_code) {
-      try {
-        await navigator.clipboard.writeText(exam.access_code);
-        showSnackbar({
-          message: "Access code copied to clipboard",
-          severity: "success",
-        });
-      } catch (err) {
-        showSnackbar({
-          message: "Failed to copy access code",
-          severity: "error",
-        });
-      }
-    }
-  };
-
   const handleAddQuestion = () => {
     setQuestions([
       ...questions,
       {
+        question_id: null, // null indicates this is a new question
         question_text: "",
         title: "",
         question_type: "coding",
+        order: questions.length,
         points: 10,
         programming_languages: ["python"],
         coding_template: {
           python: "def solution():\n    # Your code here\n    pass",
         },
         codingTestCases: [
-          { input_data: "", expected_output: "", is_hidden: false },
+          {
+            test_case_id: generateTempId(),
+            input_data: "",
+            expected_output: "",
+            is_hidden: false,
+          },
         ],
       },
     ]);
@@ -147,7 +143,9 @@ export const AdminEditCodingExamPage = () => {
     if (currentLanguages.includes(language)) {
       // Remove language
       newQuestions[questionIndex].programming_languages =
-        currentLanguages.filter((lang) => lang !== language);
+        currentLanguages.filter(
+          (lang: ProgrammingLanguage) => lang !== language
+        );
       const { [language]: removed, ...remainingTemplates } = currentTemplates;
       newQuestions[questionIndex].coding_template = remainingTemplates;
     } else {
@@ -189,6 +187,7 @@ export const AdminEditCodingExamPage = () => {
       newQuestions[questionIndex].codingTestCases = [];
     }
     newQuestions[questionIndex].codingTestCases!.push({
+      test_case_id: generateTempId(), // Generate temp UUID for new test case
       input_data: "",
       expected_output: "",
       is_hidden: false,
@@ -203,7 +202,7 @@ export const AdminEditCodingExamPage = () => {
     const newQuestions = [...questions];
     newQuestions[questionIndex].codingTestCases = newQuestions[
       questionIndex
-    ].codingTestCases!.filter((_, i) => i !== testCaseIndex);
+    ].codingTestCases!.filter((_: any, i: number) => i !== testCaseIndex);
     setQuestions(newQuestions);
   };
 
@@ -221,15 +220,28 @@ export const AdminEditCodingExamPage = () => {
     setQuestions(newQuestions);
   };
 
+  const handleExamChange = (updatedFields: Partial<UpdateExamDTO>) => {
+    setExam({ ...exam, ...updatedFields });
+  };
+
   const handleSubmit = () => {
-    console.log(
-      "Updating coding exam:",
-      examId,
+    // Update order field for all questions based on their position
+    const questionsWithOrder = questions.map((q, index) => ({
+      ...q,
+      order: index,
+    }));
+
+    const payload: any = {
       exam,
-      "with questions:",
-      questions
-    );
-    // In a real app, submit to backend
+      questions: questionsWithOrder,
+    };
+
+    console.log("Updating coding exam:", examId, payload);
+    // In a real app, submit to backend API
+    // Questions with question_id: null will be created
+    // Questions with question_id: <uuid> will be updated
+    // Questions not in the array will be deleted
+    // Same logic applies to choices and codingTestCases
     showSnackbar({
       message: "Coding exam updated successfully",
       severity: "success",
@@ -254,10 +266,9 @@ export const AdminEditCodingExamPage = () => {
           {/* Left Section - Exam Info */}
           <ExamInfoSection
             exam={exam}
-            onExamChange={setExam}
+            onExamChange={handleExamChange}
             hasEndTime={hasEndTime}
             onEndTimeToggle={setHasEndTime}
-            onCopyAccessCode={handleCopyAccessCode}
           />
 
           {/* Right Section - Coding Questions */}

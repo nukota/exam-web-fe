@@ -1,5 +1,5 @@
 import type { AttemptStatus, ExamStatus, ExamType } from "../enum";
-import type { Question, CreateQuestionDto } from "./question.dto";
+import type { Question, UpdateQuestionDTO } from "./question.dto";
 
 export interface Exam {
   exam_id: string;
@@ -15,18 +15,16 @@ export interface Exam {
   results_released?: boolean;
 }
 
-export interface CreateExamDto {
-  teacher_id: string;
+export interface CreateExamDTO {
   title: string;
   description?: string;
-  type: "standard" | "coding";
-  access_code: string;
+  type: ExamType;
   start_at?: string;
-  end_at?: string;
+  end_at: string;
   duration_minutes?: number;
 }
 
-export type UpdateExamDto = Partial<CreateExamDto>;
+export type UpdateExamDTO = Partial<CreateExamDTO>;
 
 export interface AllExamsPageItemDTO extends Exam {
   question_amount: number;
@@ -40,15 +38,9 @@ export interface EditExamPageDTO {
   questions: Question[];
 }
 
-export interface UpdateExamWithQuestionsDto {
-  exam: UpdateExamDto;
-  questions: {
-    create?: Omit<CreateQuestionDto, "exam_id">[];
-    update?: (Partial<Omit<CreateQuestionDto, "exam_id">> & {
-      question_id: string;
-    })[];
-    delete?: string[]; // question_ids to delete
-  };
+export interface UpdateExamWithQuestionsDTO {
+  exam: UpdateExamDTO;
+  questions: UpdateQuestionDTO[]; // Array of questions with null IDs for new, non-null for updates. Missing IDs will be deleted.
 }
 
 export interface GradingPageItemDTO {
