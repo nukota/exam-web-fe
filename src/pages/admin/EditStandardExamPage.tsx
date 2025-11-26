@@ -1,22 +1,16 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  Box,
-  Typography,
-  TextField,
-  Button,
-  IconButton,
-  Checkbox,
-} from "@mui/material";
-import { Add, ContentCopy } from "@mui/icons-material";
+import { Box, Typography, Button } from "@mui/material";
+import { Add } from "@mui/icons-material";
 import { Layout } from "../../components/common";
 import Card from "../../components/common/Card";
 import { EditableQuestion } from "../../components/admin/items/EditableQuestion";
+import { ExamInfoSection } from "../../components/admin/ExamInfoSection";
 import { useFeedback } from "../../shared/providers/FeedbackProvider";
 import type { UpdateExamDto, CreateQuestionDto } from "../../shared/dtos";
 import { mockExams } from "../../shared/mockdata";
 
-export const AdminEditExamPage = () => {
+export const AdminEditStandardExamPage = () => {
   const { examId } = useParams();
   const navigate = useNavigate();
   const { showSnackbar } = useFeedback();
@@ -180,157 +174,15 @@ export const AdminEditExamPage = () => {
 
         <Box sx={{ display: "flex", gap: 3, alignItems: "flex-start" }}>
           {/* Left Section - Exam Info */}
-          <Box sx={{ flex: 1, maxWidth: 540, position: "sticky", top: 80 }}>
-            <Card sx={{ p: 3 }}>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  mb: 3,
-                }}
-              >
-                <Typography variant="h6">
-                  <strong>Exam Information</strong>{" "}
-                  <span style={{ color: "#9e9e9e" }}>({exam.type})</span>
-                </Typography>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Access Code:
-                  </Typography>
-                  <Typography variant="body1" fontWeight="medium">
-                    {exam.access_code || "N/A"}
-                  </Typography>
-                  <IconButton
-                    size="small"
-                    onClick={handleCopyAccessCode}
-                    sx={{ color: "primary.main" }}
-                  >
-                    <ContentCopy fontSize="small" />
-                  </IconButton>
-                </Box>
-              </Box>
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
-                <TextField
-                  size="small"
-                  fullWidth
-                  label="Exam Title"
-                  value={exam.title || ""}
-                  onChange={(e) => setExam({ ...exam, title: e.target.value })}
-                  required
-                />
-                <TextField
-                  size="small"
-                  fullWidth
-                  label="Description"
-                  multiline
-                  rows={3}
-                  value={exam.description || ""}
-                  onChange={(e) =>
-                    setExam({ ...exam, description: e.target.value })
-                  }
-                />
-                <TextField
-                  size="small"
-                  fullWidth
-                  label="Duration (minutes)"
-                  type="number"
-                  value={exam.duration_minutes || 60}
-                  onChange={(e) =>
-                    setExam({
-                      ...exam,
-                      duration_minutes: parseInt(e.target.value),
-                    })
-                  }
-                />
-                <TextField
-                  size="small"
-                  fullWidth
-                  label="Start Time"
-                  type="datetime-local"
-                  value={exam.start_at || ""}
-                  onChange={(e) =>
-                    setExam({ ...exam, start_at: e.target.value })
-                  }
-                  sx={{ width: 440 }}
-                  InputLabelProps={{ shrink: true }}
-                />
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <TextField
-                    size="small"
-                    label="End Time"
-                    type="datetime-local"
-                    value={exam.end_at || ""}
-                    onChange={(e) =>
-                      setExam({ ...exam, end_at: e.target.value })
-                    }
-                    sx={{ width: 440 }}
-                    InputLabelProps={{ shrink: true }}
-                    disabled={!hasEndTime}
-                  />
-                  <Checkbox
-                    checked={hasEndTime}
-                    onChange={(e) => {
-                      setHasEndTime(e.target.checked);
-                      if (!e.target.checked) {
-                        setExam({ ...exam, end_at: undefined });
-                      }
-                    }}
-                    sx={{
-                      color: "grey.500",
-                      "&.Mui-checked": {
-                        color: "grey.600",
-                      },
-                    }}
-                  />
-                </Box>
-              </Box>
-
-              {/* Question Grid Map */}
-              {exam.type !== "coding" && questions.length > 0 && (
-                <Box sx={{ mt: 2 }}>
-                  <Typography
-                    variant="body1"
-                    fontWeight="bold"
-                    gutterBottom
-                    sx={{ textAlign: "left" }}
-                  >
-                    Question Map
-                  </Typography>
-                  <Box
-                    sx={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(14, 1fr)",
-                      gap: 0.5,
-                    }}
-                  >
-                    {questions.map((_, index) => (
-                      <Box
-                        key={index}
-                        onClick={() => scrollToQuestion(index)}
-                        sx={{
-                          width: "100%",
-                          aspectRatio: "1",
-                          cursor: "pointer",
-                          bgcolor: "grey.100",
-                          borderRadius: "4px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          color: "text.secondary",
-                          "&:hover": {
-                            bgcolor: "grey.300",
-                          },
-                        }}
-                      >
-                        <Typography variant="body2">{index + 1}</Typography>
-                      </Box>
-                    ))}
-                  </Box>
-                </Box>
-              )}
-            </Card>
-          </Box>
+          <ExamInfoSection
+            exam={exam}
+            onExamChange={setExam}
+            hasEndTime={hasEndTime}
+            onEndTimeToggle={setHasEndTime}
+            onCopyAccessCode={handleCopyAccessCode}
+            questions={questions}
+            onScrollToQuestion={scrollToQuestion}
+          />
 
           {/* Right Section - Questions */}
           <Box sx={{ flex: 1.5, minWidth: 0 }}>

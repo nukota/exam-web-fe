@@ -9,7 +9,8 @@ export { StudentProfilePage } from "./student/ProfilePage";
 // Admin Pages
 export { AdminDashboardPage } from "./admin/DashboardPage";
 export { AdminExamsPage } from "./admin/AllExamsPage";
-export { AdminEditExamPage } from "./admin/EditExamPage";
+export { AdminEditStandardExamPage } from "./admin/EditStandardExamPage";
+export { AdminEditCodingExamPage } from "./admin/EditCodingExamPage";
 export { AdminGradingPage } from "./admin/GradingPage";
 export { AdminLeaderboardPage } from "./admin/LeaderboardPage";
 export { AdminStudentsPage } from "./admin/StudentsPage";

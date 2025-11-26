@@ -40,8 +40,12 @@ export const AdminExamsPage = () => {
     const newExamId = "exam_" + Date.now();
     showSnackbar({ message: "Exam created successfully", severity: "success" });
     setDialogOpen(false);
-    // Navigate to edit page to add questions
-    navigate(`/admin/exams/${newExamId}/edit`);
+    // Navigate to edit page based on exam type
+    const editPath =
+      examData.type === "coding"
+        ? `/admin/exams/${newExamId}/edit-coding`
+        : `/admin/exams/${newExamId}/edit-standard`;
+    navigate(editPath);
   };
 
   const handleCopyAccessCode = async (accessCode: string) => {
@@ -160,7 +164,13 @@ export const AdminExamsPage = () => {
           </IconButton>
           <IconButton
             size="small"
-            onClick={() => navigate(`/admin/exams/${params.row.exam_id}/edit`)}
+            onClick={() => {
+              const editPath =
+                params.row.type === "coding"
+                  ? `/admin/exams/${params.row.exam_id}/edit-coding`
+                  : `/admin/exams/${params.row.exam_id}/edit-standard`;
+              navigate(editPath);
+            }}
             title="Edit Exam"
             disabled={params.row.status !== "not started"}
           >

@@ -15,7 +15,8 @@ import {
   // Admin Pages
   AdminDashboardPage,
   AdminExamsPage,
-  AdminEditExamPage,
+  AdminEditStandardExamPage,
+  AdminEditCodingExamPage,
   AdminGradingPage,
   AdminLeaderboardPage,
   AdminStudentsPage,
@@ -120,10 +121,26 @@ const App = () => {
                 }
               />
               <Route
-                path="/admin/exams/:examId/edit"
+                path="/admin/exams/:examId/edit-standard"
                 element={
                   <ProtectedRoute allowedRoles={["admin", "teacher"]}>
-                    <AdminEditExamPage />
+                    <AdminEditStandardExamPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/exams/:examId/edit-coding"
+                element={
+                  <ProtectedRoute allowedRoles={["admin", "teacher"]}>
+                    <AdminEditCodingExamPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/exams/:examId/edit-coding"
+                element={
+                  <ProtectedRoute allowedRoles={["admin", "teacher"]}>
+                    <AdminEditCodingExamPage />
                   </ProtectedRoute>
                 }
               />
