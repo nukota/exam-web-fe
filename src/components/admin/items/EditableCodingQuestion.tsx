@@ -226,7 +226,7 @@ export const EditableCodingQuestion: React.FC<EditableCodingQuestionProps> = ({
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
-          {question.codingTestCases?.map((testCase, tcIndex) => (
+          {question.coding_test_cases?.map((testCase, tcIndex) => (
             <Box
               key={tcIndex}
               sx={{

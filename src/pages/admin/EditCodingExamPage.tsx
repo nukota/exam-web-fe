@@ -54,7 +54,7 @@ export const AdminEditCodingExamPage = () => {
         coding_template: {
           python: "def solution():\n    # Your code here\n    pass",
         },
-        codingTestCases: [
+        coding_test_cases: [
           {
             test_case_id: generateTempId(),
             input_data: "",
@@ -80,7 +80,7 @@ export const AdminEditCodingExamPage = () => {
         coding_template: {
           python: "def solution():\n    # Your code here\n    pass",
         },
-        codingTestCases: [
+        coding_test_cases: [
           {
             test_case_id: generateTempId(),
             input_data: "",
@@ -183,10 +183,10 @@ export const AdminEditCodingExamPage = () => {
 
   const handleAddTestCase = (questionIndex: number) => {
     const newQuestions = [...questions];
-    if (!newQuestions[questionIndex].codingTestCases) {
-      newQuestions[questionIndex].codingTestCases = [];
+    if (!newQuestions[questionIndex].coding_test_cases) {
+      newQuestions[questionIndex].coding_test_cases = [];
     }
-    newQuestions[questionIndex].codingTestCases!.push({
+    newQuestions[questionIndex].coding_test_cases!.push({
       test_case_id: generateTempId(), // Generate temp UUID for new test case
       input_data: "",
       expected_output: "",
@@ -200,9 +200,9 @@ export const AdminEditCodingExamPage = () => {
     testCaseIndex: number
   ) => {
     const newQuestions = [...questions];
-    newQuestions[questionIndex].codingTestCases = newQuestions[
+    newQuestions[questionIndex].coding_test_cases = newQuestions[
       questionIndex
-    ].codingTestCases!.filter((_: any, i: number) => i !== testCaseIndex);
+    ].coding_test_cases!.filter((_: any, i: number) => i !== testCaseIndex);
     setQuestions(newQuestions);
   };
 
@@ -213,8 +213,8 @@ export const AdminEditCodingExamPage = () => {
     value: any
   ) => {
     const newQuestions = [...questions];
-    newQuestions[questionIndex].codingTestCases![testCaseIndex] = {
-      ...newQuestions[questionIndex].codingTestCases![testCaseIndex],
+    newQuestions[questionIndex].coding_test_cases![testCaseIndex] = {
+      ...newQuestions[questionIndex].coding_test_cases![testCaseIndex],
       [field]: value,
     };
     setQuestions(newQuestions);

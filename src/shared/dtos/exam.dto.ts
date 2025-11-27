@@ -1,5 +1,5 @@
-import type { AttemptStatus, ExamStatus, ExamType } from "../enum";
-import type { Question, UpdateQuestionDTO } from "./question.dto";
+import type { ExamStatus, ExamType } from "../enum";
+import type { QuestionDTO, UpdateQuestionDTO } from "./question.dto";
 
 export interface Exam {
   exam_id: string;
@@ -15,6 +15,7 @@ export interface Exam {
   results_released?: boolean;
 }
 
+// DTO for creating a new exam (no questions)
 export interface CreateExamDTO {
   title: string;
   description?: string;
@@ -31,13 +32,10 @@ export interface AllExamsPageItemDTO extends Exam {
   status: ExamStatus;
 }
 
+// DTO for the All Exams Page
 export type AllExamsPageDTO = AllExamsPageItemDTO[];
 
-export interface EditExamPageDTO {
-  exam: Exam;
-  questions: Question[];
-}
-
+// DTO for updating an exam with detailed questions
 export interface UpdateExamWithQuestionsDTO {
   exam: UpdateExamDTO;
   questions: UpdateQuestionDTO[]; // Array of questions with null IDs for new, non-null for updates. Missing IDs will be deleted.
@@ -54,21 +52,10 @@ export interface GradingPageItemDTO {
   teacher_email: string;
 }
 
+// DTO for the Grading Page
 export type GradingPageDTO = GradingPageItemDTO[];
 
-export interface ExamAttemptItemDTO {
-  attempt_id: string;
-  student_name: string;
-  student_email: string;
-  submitted_at: string;
-  score: number;
-  status: AttemptStatus;
-  cheated: boolean;
-}
-
-export interface ExamAttemptsPageDTO {
-  exam_id: string;
-  exam_title: string;
-  max_score: number;
-  attempts: ExamAttemptItemDTO[];
+// DTO for Exam Taking Page
+export interface ExamTakingPageDTO extends Exam {
+  questions: QuestionDTO[];
 }

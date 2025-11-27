@@ -1,6 +1,6 @@
 import type {
   User,
-  Question,
+  QuestionDTO,
   Submission,
   AllExamsPageDTO,
   GradingPageDTO,
@@ -50,7 +50,7 @@ export const mockExams: AllExamsPageDTO = [
     access_code: "CS101",
     duration_minutes: 60,
     start_at: "2025-11-15T09:00:00",
-    end_at: "2025-12-1T18:00:00",
+    end_at: "2025-12-11T18:00:00",
     created_at: "2025-11-01T10:00:00",
     question_amount: 12,
     status: "released",
@@ -100,7 +100,7 @@ export const mockExams: AllExamsPageDTO = [
 ];
 
 // Mock Questions for Exam 1
-export const mockQuestionsExam1: Question[] = [
+export const mockQuestionsExam1: QuestionDTO[] = [
   {
     question_id: "q1",
     exam_id: "1",
@@ -113,22 +113,18 @@ export const mockQuestionsExam1: Question[] = [
     choices: [
       {
         choice_id: "q1c1",
-        question_id: "q1",
         choice_text: "O(n)",
       },
       {
         choice_id: "q1c2",
-        question_id: "q1",
         choice_text: "O(log n)",
       },
       {
         choice_id: "q1c3",
-        question_id: "q1",
         choice_text: "O(n²)",
       },
       {
         choice_id: "q1c4",
-        question_id: "q1",
         choice_text: "O(1)",
       },
     ],
@@ -145,22 +141,18 @@ export const mockQuestionsExam1: Question[] = [
     choices: [
       {
         choice_id: "q2c1",
-        question_id: "q2",
         choice_text: "Object-Oriented Programming",
       },
       {
         choice_id: "q2c2",
-        question_id: "q2",
         choice_text: "Functional Programming",
       },
       {
         choice_id: "q2c3",
-        question_id: "q2",
         choice_text: "Binary Programming",
       },
       {
         choice_id: "q2c4",
-        question_id: "q2",
         choice_text: "Procedural Programming",
       },
     ],
@@ -194,22 +186,18 @@ export const mockQuestionsExam1: Question[] = [
     choices: [
       {
         choice_id: "q5c1",
-        question_id: "q5",
         choice_text: "To execute code directly",
       },
       {
         choice_id: "q5c2",
-        question_id: "q5",
         choice_text: "To translate source code to machine code",
       },
       {
         choice_id: "q5c3",
-        question_id: "q5",
         choice_text: "To debug programs",
       },
       {
         choice_id: "q5c4",
-        question_id: "q5",
         choice_text: "To format code",
       },
     ],
@@ -226,22 +214,18 @@ export const mockQuestionsExam1: Question[] = [
     choices: [
       {
         choice_id: "q6c1",
-        question_id: "q6",
         choice_text: "Stack",
       },
       {
         choice_id: "q6c2",
-        question_id: "q6",
         choice_text: "Queue",
       },
       {
         choice_id: "q6c3",
-        question_id: "q6",
         choice_text: "Array",
       },
       {
         choice_id: "q6c4",
-        question_id: "q6",
         choice_text: "Call Stack",
       },
     ],
@@ -270,22 +254,18 @@ export const mockQuestionsExam1: Question[] = [
     choices: [
       {
         choice_id: "q8c1",
-        question_id: "q8",
         choice_text: "String",
       },
       {
         choice_id: "q8c2",
-        question_id: "q8",
         choice_text: "Boolean",
       },
       {
         choice_id: "q8c3",
-        question_id: "q8",
         choice_text: "Character",
       },
       {
         choice_id: "q8c4",
-        question_id: "q8",
         choice_text: "Symbol",
       },
     ],
@@ -321,22 +301,18 @@ export const mockQuestionsExam1: Question[] = [
     choices: [
       {
         choice_id: "q11c1",
-        question_id: "q11",
         choice_text: "Faster code execution",
       },
       {
         choice_id: "q11c2",
-        question_id: "q11",
         choice_text: "Track changes and collaborate",
       },
       {
         choice_id: "q11c3",
-        question_id: "q11",
         choice_text: "Automatic bug fixing",
       },
       {
         choice_id: "q11c4",
-        question_id: "q11",
         choice_text: "Code compilation",
       },
     ],
@@ -563,7 +539,7 @@ export const mockSubmissionDetail = {
 };
 
 // Mock Coding Questions for Exam 2
-export const mockCodingQuestions: Question[] = [
+export const mockCodingQuestions: QuestionDTO[] = [
   {
     question_id: "cq1",
     exam_id: "2",
@@ -596,17 +572,15 @@ Constraints:
         'string longestPalindrome(string s) {\n    // Your code here\n    return "";\n}',
     },
     programming_languages: ["python", "javascript", "java", "c++"],
-    codingTestCases: [
+    coding_test_cases: [
       {
         test_case_id: "tc1",
-        question_id: "cq1",
         input_data: "babad",
         expected_output: "bab",
         is_hidden: false,
       },
       {
         test_case_id: "tc2",
-        question_id: "cq1",
         input_data: "cbbd",
         expected_output: "bb",
         is_hidden: false,
@@ -649,17 +623,15 @@ Constraints:
         "vector<int> twoSum(vector<int>& nums, int target) {\n    // Your code here\n    return {};\n}",
     },
     programming_languages: ["python", "javascript", "java", "c++"],
-    codingTestCases: [
+    coding_test_cases: [
       {
         test_case_id: "tc3",
-        question_id: "cq2",
         input_data: "[2,7,11,15]\n9",
         expected_output: "[0,1]",
         is_hidden: false,
       },
       {
         test_case_id: "tc4",
-        question_id: "cq2",
         input_data: "[3,2,4]\n6",
         expected_output: "[1,2]",
         is_hidden: false,
@@ -701,17 +673,15 @@ Follow up: A linked list can be reversed either iteratively or recursively. Coul
         "ListNode* reverseList(ListNode* head) {\n    // Your code here\n    return nullptr;\n}",
     },
     programming_languages: ["python", "javascript", "java", "c++"],
-    codingTestCases: [
+    coding_test_cases: [
       {
         test_case_id: "tc5",
-        question_id: "cq3",
         input_data: "1->2->3->4->5",
         expected_output: "5->4->3->2->1",
         is_hidden: false,
       },
       {
         test_case_id: "tc6",
-        question_id: "cq3",
         input_data: "1->2",
         expected_output: "2->1",
         is_hidden: false,
@@ -755,17 +725,15 @@ Constraints:
         "bool isValid(string s) {\n    // Your code here\n    return false;\n}",
     },
     programming_languages: ["python", "javascript", "java", "c++"],
-    codingTestCases: [
+    coding_test_cases: [
       {
         test_case_id: "tc7",
-        question_id: "cq4",
         input_data: "()[]{}",
         expected_output: "true",
         is_hidden: false,
       },
       {
         test_case_id: "tc8",
-        question_id: "cq4",
         input_data: "(]",
         expected_output: "false",
         is_hidden: false,
@@ -805,17 +773,15 @@ Constraints:
         "int maxPathSum(TreeNode* root) {\n    // Your code here\n    return 0;\n}",
     },
     programming_languages: ["python", "javascript", "java", "c++"],
-    codingTestCases: [
+    coding_test_cases: [
       {
         test_case_id: "tc9",
-        question_id: "cq5",
         input_data: "[-10,9,20,null,null,15,7]",
         expected_output: "42",
         is_hidden: false,
       },
       {
         test_case_id: "tc10",
-        question_id: "cq5",
         input_data: "[1,2,3]",
         expected_output: "6",
         is_hidden: false,
@@ -892,60 +858,88 @@ export const mockExamsForGrading: GradingPageDTO = [
 // Mock Exam Attempts Page
 export const mockExamAttemptsPage: ExamAttemptsPageDTO = {
   exam_id: "1",
-  exam_title: "Introduction to Computer Science",
+  title: "Introduction to Computer Science",
+  description: "A comprehensive introduction to computer science fundamentals",
   max_score: 33,
+  total_attempts: 6,
+  graded_attempts: 3,
+  flagged_attempts: 1,
   attempts: [
     {
       attempt_id: "sub1",
-      student_name: "Alice Johnson",
-      student_email: "alice@example.com",
+      student: {
+        user_id: "user1",
+        full_name: "Alice Johnson",
+        email: "alice@example.com",
+      },
       submitted_at: "2025-11-14T10:30:00",
-      score: 30.5,
+      percentage_score: 92.42,
+      total_score: 30.5,
       status: "graded",
       cheated: false,
     },
     {
       attempt_id: "sub2",
-      student_name: "Bob Smith",
-      student_email: "bob@example.com",
+      student: {
+        user_id: "user2",
+        full_name: "Bob Smith",
+        email: "bob@example.com",
+      },
       submitted_at: "2025-11-14T10:45:00",
-      score: 28,
+      percentage_score: 84.85,
+      total_score: 28,
       status: "graded",
       cheated: false,
     },
     {
       attempt_id: "sub3",
-      student_name: "Carol White",
-      student_email: "carol@example.com",
+      student: {
+        user_id: "user3",
+        full_name: "Carol White",
+        email: "carol@example.com",
+      },
       submitted_at: "2025-11-14T11:00:00",
-      score: 25,
+      percentage_score: 75.76,
+      total_score: 25,
       status: "graded",
       cheated: true,
     },
     {
       attempt_id: "sub4",
-      student_name: "David Brown",
-      student_email: "david@example.com",
+      student: {
+        user_id: "user4",
+        full_name: "David Brown",
+        email: "david@example.com",
+      },
       submitted_at: "2025-11-14T11:15:00",
-      score: 0,
+      percentage_score: undefined,
+      total_score: 0,
       status: "overdue",
       cheated: false,
     },
     {
       attempt_id: "sub5",
-      student_name: "Eve Davis",
-      student_email: "eve@example.com",
+      student: {
+        user_id: "user5",
+        full_name: "Eve Davis",
+        email: "eve@example.com",
+      },
       submitted_at: "2025-11-14T11:30:00",
-      score: 0,
+      percentage_score: undefined,
+      total_score: 0,
       status: "submitted",
       cheated: false,
     },
     {
       attempt_id: "sub6",
-      student_name: "Frank Miller",
-      student_email: "frank@example.com",
+      student: {
+        user_id: "user6",
+        full_name: "Frank Miller",
+        email: "frank@example.com",
+      },
       submitted_at: "2025-11-14T11:45:00",
-      score: 0,
+      percentage_score: undefined,
+      total_score: 0,
       status: "cancelled",
       cheated: false,
     },

@@ -1,6 +1,9 @@
 import type { QuestionType, ProgrammingLanguage } from "../enum";
-import type { Exam } from "./exam.dto";
-import type { Answer } from "./answer.dto";
+import type { Choice, ReviewChoiceDTO, UpdateChoiceDTO } from "./choice.dto";
+import type {
+  CodingTestCase,
+  UpdatingCodingTestCaseDTO,
+} from "./coding-test-cases.dto";
 
 export interface Question {
   question_id: string;
@@ -14,52 +17,11 @@ export interface Question {
   correct_answer_text?: string[];
   coding_template?: Record<string, string>;
   programming_languages?: ProgrammingLanguage[];
-  exam?: Exam;
-  choices?: Choice[];
-  codingTestCases?: CodingTestCase[];
-  answers?: Answer[];
-  flags?: Flag[];
 }
 
-export interface Choice {
-  choice_id: string;
-  question_id: string;
-  choice_text: string;
-}
-
-export interface CodingTestCase {
-  test_case_id: string;
-  question_id: string;
-  input_data: string;
-  expected_output: string;
-  is_hidden: boolean;
-}
-
-export interface QuestionDTO {
-  question_id: string;
-  question_text: string;
-  title?: string;
-  order: number;
-  question_type: string;
-  points: number;
-  correct_answer?: string[];
-  correct_answer_text?: string[];
-  coding_template?: Record<string, string>;
-  programming_languages?: ProgrammingLanguage[];
-  choices?: Omit<Choice, "choice_id" | "question_id">[];
-  codingTestCases?: Omit<CodingTestCase, "test_case_id" | "question_id">[];
-}
-
-export interface UpdateChoiceDTO {
-  choice_id: string; // Temp ID for new choices (format: 'temp_<uuid>'), or real UUID for existing choices
-  choice_text: string;
-}
-
-export interface UpdatingCodingTestCaseDTO {
-  test_case_id: string; // Temp ID for new test cases (format: 'temp_<uuid>'), or real UUID for existing test cases
-  input_data: string;
-  expected_output: string;
-  is_hidden: boolean;
+export interface QuestionDTO extends Question {
+  choices?: Omit<Choice, "question_id">[];
+  coding_test_cases?: Omit<CodingTestCase, "question_id">[];
 }
 
 export interface UpdateQuestionDTO {
@@ -74,11 +36,15 @@ export interface UpdateQuestionDTO {
   coding_template?: Record<string, string>;
   programming_languages?: ProgrammingLanguage[];
   choices?: UpdateChoiceDTO[];
-  codingTestCases?: UpdatingCodingTestCaseDTO[];
+  coding_test_cases?: UpdatingCodingTestCaseDTO[];
 }
 
-export interface Flag {
-  user_id: string;
-  question_id: string;
-  flagged_at: string;
+export interface ReviewQuestionDTO extends Question {
+  answer_text?: string;
+  selected_choices?: string[];
+  score?: number;
+  choices?: ReviewChoiceDTO[];
+  is_flagged?: boolean;
+  answered_correctly?: boolean;
+  // Only Standard type questions are reviewed, no Coding type questions
 }

@@ -5,17 +5,25 @@ import type { GridColDef } from "@mui/x-data-grid";
 import { Layout, CustomDataGrid } from "../../components/common";
 import Card from "../../components/common/Card";
 import { mockExamAttemptsPage } from "../../shared/mockdata";
+import type { ExamAttemptsPageItemDTO } from "../../shared/dtos/attempt.dto";
 import { Flag } from "lucide-react";
 
 export const AdminExamSubmissionsPage = () => {
   const { examId: _ } = useParams();
   const navigate = useNavigate();
 
-  const { exam_title, max_score, attempts } = mockExamAttemptsPage;
+  const {
+    title,
+    max_score,
+    total_attempts,
+    graded_attempts,
+    flagged_attempts,
+    attempts,
+  } = mockExamAttemptsPage;
 
-  const gradedCount = attempts.filter((s) => s.status === "graded").length;
-  const pendingCount = attempts.filter((s) => s.status === "submitted").length;
-  const flaggedCount = attempts.filter((s) => s.cheated).length;
+  const pendingCount = attempts.filter(
+    (s: ExamAttemptsPageItemDTO) => s.status === "submitted"
+  ).length;
 
   const handleViewAttempt = (attemptId: string) => {
     navigate(`/admin/submissions/${attemptId}`);
@@ -46,10 +54,10 @@ export const AdminExamSubmissionsPage = () => {
       renderCell: (params) => (
         <Box>
           <Typography variant="body1" fontWeight="bold">
-            {params.row.student_name}
+            {params.row.student.full_name}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {params.row.student_email}
+            {params.row.student.email}
           </Typography>
         </Box>
       ),
@@ -79,7 +87,7 @@ export const AdminExamSubmissionsPage = () => {
       renderCell: (params) => (
         <Typography variant="body2">
           {params.row.status === "graded"
-            ? `${params.value} / ${max_score}`
+            ? `${params.row.total_score} / ${max_score}`
             : "-"}
         </Typography>
       ),
@@ -91,16 +99,16 @@ export const AdminExamSubmissionsPage = () => {
       align: "center",
       headerAlign: "center",
       renderCell: (params) => {
-        const percentage = (params.row.score / max_score) * 100;
+        const percentage = params.row.percentage_score;
         const color =
-          percentage >= 70
+          percentage && percentage >= 70
             ? "success.main"
-            : percentage >= 50
+            : percentage && percentage >= 50
             ? "warning.main"
             : "error.main";
         return (
           <Typography variant="body2" color={color}>
-            {params.row.status === "graded" ? `${percentage.toFixed(1)}%` : "-"}
+            {percentage ? `${percentage.toFixed(1)}%` : "-"}
           </Typography>
         );
       },
@@ -200,23 +208,23 @@ export const AdminExamSubmissionsPage = () => {
               </Typography>
             </Box>
             <Typography color="text.secondary" sx={{ pl: 6, fontSize: "1rem" }}>
-              {exam_title}
+              {title}
             </Typography>
           </Box>
 
           {/* Stats */}
           <Box sx={{ pl: 6, gap: 8, display: "flex", flexWrap: "wrap" }}>
             <Typography variant="body1" color="text.secondary">
-              Total Attempts: <strong>{attempts.length}</strong>
+              Total Attempts: <strong>{total_attempts}</strong>
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              Graded: <strong>{gradedCount}</strong>
+              Graded: <strong>{graded_attempts}</strong>
             </Typography>
             <Typography variant="body1" color="text.secondary">
               Pending: <strong>{pendingCount}</strong>
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              Flagged: <strong>{flaggedCount}</strong>
+              Flagged: <strong>{flagged_attempts}</strong>
             </Typography>
           </Box>
         </Card>

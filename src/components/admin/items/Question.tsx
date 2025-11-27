@@ -1,11 +1,8 @@
 import React, { useState } from "react";
 import { Box, Typography, TextField } from "@mui/material";
 import { CheckCircle, X, Check, Flag } from "lucide-react";
-import type {
-  Question as QuestionType,
-  Answer,
-  Choice,
-} from "../../../shared/dtos";
+import type { QuestionDTO as QuestionType } from "../../../shared/dtos/question.dto";
+import type { Answer } from "../../../shared/dtos/answer.dto";
 
 interface QuestionProps {
   question: QuestionType;
@@ -54,7 +51,7 @@ export const QuestionItem: React.FC<QuestionProps> = ({
             mb: 2,
           }}
         >
-          {question.choices?.map((choice: Choice) => {
+          {question.choices?.map((choice) => {
             const isSelected = selectedChoices.includes(choice.choice_id);
             const isCorrect = question.correct_answer?.includes(
               choice.choice_id

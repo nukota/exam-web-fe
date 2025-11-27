@@ -196,8 +196,8 @@ export const StudentCodeCompilerPage = () => {
                 {currentQuestion.question_text || "Solve this coding problem."}
               </Typography>
 
-              {currentQuestion.codingTestCases &&
-                currentQuestion.codingTestCases.length > 0 && (
+              {currentQuestion.coding_test_cases &&
+                currentQuestion.coding_test_cases.length > 0 && (
                   <>
                     <Typography variant="subtitle1" gutterBottom sx={{ mt: 3 }}>
                       Example:
@@ -211,11 +211,11 @@ export const StudentCodeCompilerPage = () => {
                       }}
                     >
                       <Typography variant="body2">
-                        Input: {currentQuestion.codingTestCases[0].input_data}
+                        Input: {currentQuestion.coding_test_cases[0].input_data}
                       </Typography>
                       <Typography variant="body2">
                         Output:{" "}
-                        {currentQuestion.codingTestCases[0].expected_output}
+                        {currentQuestion.coding_test_cases[0].expected_output}
                       </Typography>
                     </Box>
                   </>
@@ -243,7 +243,7 @@ export const StudentCodeCompilerPage = () => {
                 Test Cases
               </Typography>
 
-              {currentQuestion.codingTestCases?.map((testCase) => (
+              {currentQuestion.coding_test_cases?.map((testCase) => (
                 <Box
                   key={testCase.test_case_id}
                   sx={{
