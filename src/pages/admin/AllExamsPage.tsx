@@ -13,8 +13,12 @@ import {
 import { Layout } from "../../components/common";
 import { CustomDataGrid } from "../../components/common";
 import { CreateExamDialog } from "../../components/admin/CreateExamDialog";
-import { mockExams } from "../../shared/mockdata";
 import { useFeedback } from "../../shared/providers/FeedbackProvider";
+import {
+  useExams,
+  useCreateExam,
+  useDeleteExam,
+} from "../../services/examsService";
 import { formatExamDateRange } from "../../shared/utils/utils";
 import type { GridColDef } from "@mui/x-data-grid";
 
@@ -23,29 +27,51 @@ export const AdminExamsPage = () => {
   const { showSnackbar } = useFeedback();
   const [dialogOpen, setDialogOpen] = useState(false);
 
+  const { data: exams, isLoading, error } = useExams();
+  const createExamMutation = useCreateExam();
+  const deleteExamMutation = useDeleteExam();
+
   const handleDelete = (examId: string) => {
     if (window.confirm("Are you sure you want to delete this exam?")) {
-      console.log("Deleting exam:", examId);
-      showSnackbar({
-        message: "Exam deleted successfully",
-        severity: "success",
+      deleteExamMutation.mutate(examId, {
+        onSuccess: () => {
+          showSnackbar({
+            message: "Exam deleted successfully",
+            severity: "success",
+          });
+        },
+        onError: (error: any) => {
+          showSnackbar({
+            message: error.message || "Failed to delete exam",
+            severity: "error",
+          });
+        },
       });
-      // Implement delete logic
     }
   };
 
   const handleCreateExam = (examData: any) => {
-    console.log("Creating exam:", examData);
-    // In a real app, submit to backend and get the created exam ID
-    const newExamId = "exam_" + Date.now();
-    showSnackbar({ message: "Exam created successfully", severity: "success" });
-    setDialogOpen(false);
-    // Navigate to edit page based on exam type
-    const editPath =
-      examData.type === "coding"
-        ? `/admin/exams/${newExamId}/edit-coding`
-        : `/admin/exams/${newExamId}/edit-standard`;
-    navigate(editPath);
+    createExamMutation.mutate(examData, {
+      onSuccess: (createdExam) => {
+        showSnackbar({
+          message: "Exam created successfully",
+          severity: "success",
+        });
+        setDialogOpen(false);
+        // Navigate to edit page based on exam type
+        const editPath =
+          examData.type === "coding"
+            ? `/admin/exams/${createdExam.exam_id}/edit-coding`
+            : `/admin/exams/${createdExam.exam_id}/edit-standard`;
+        navigate(editPath);
+      },
+      onError: (error: any) => {
+        showSnackbar({
+          message: error.message || "Failed to create exam",
+          severity: "error",
+        });
+      },
+    });
   };
 
   const handleCopyAccessCode = async (accessCode: string) => {
@@ -216,13 +242,19 @@ export const AdminExamsPage = () => {
           </Button>
         </Box>
 
-        <CustomDataGrid
-          rows={mockExams}
-          columns={columns}
-          getRowId={(row) => row.exam_id}
-          pageSize={10}
-          pageSizeOptions={[10, 20, 50]}
-        />
+        {isLoading ? (
+          <Typography>Loading exams...</Typography>
+        ) : error ? (
+          <Typography color="error">Failed to load exams</Typography>
+        ) : (
+          <CustomDataGrid
+            rows={exams || []}
+            columns={columns}
+            getRowId={(row) => row.exam_id}
+            pageSize={10}
+            pageSizeOptions={[10, 20, 50]}
+          />
+        )}
 
         <CreateExamDialog
           open={dialogOpen}

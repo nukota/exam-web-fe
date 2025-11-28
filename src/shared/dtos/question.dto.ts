@@ -13,8 +13,8 @@ export interface Question {
   order: number;
   question_type: QuestionType;
   points: number;
-  correct_answer?: string[];
-  correct_answer_text?: string[];
+  correct_answer?: string[]; // for multiple_choice and single_choice questions
+  correct_answer_text?: string[]; // for short_answer questions
   coding_template?: Record<string, string>;
   programming_languages?: ProgrammingLanguage[];
 }

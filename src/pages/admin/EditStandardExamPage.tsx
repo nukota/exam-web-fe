@@ -7,8 +7,8 @@ import Card from "../../components/common/Card";
 import { EditableQuestion } from "../../components/admin/items/EditableQuestion";
 import { ExamInfoSection } from "../../components/admin/ExamInfoSection";
 import { useFeedback } from "../../shared/providers/FeedbackProvider";
-import type { Exam, UpdateExamDTO, UpdateQuestionDTO } from "../../shared/dtos";
-import { mockExams } from "../../shared/mockdata";
+import type { CreateExamDTO, Exam, UpdateQuestionDTO } from "../../shared/dtos";
+import { useExam, useUpdateExam } from "../../services/examsService";
 
 // Helper function to generate temporary IDs for new items
 const generateTempId = () => `temp_${crypto.randomUUID()}`;
@@ -22,32 +22,53 @@ export const AdminEditStandardExamPage = () => {
   const [hasEndTime, setHasEndTime] = useState<boolean>(true);
   const questionRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
+  const { data: examData, isLoading, error } = useExam(examId || "", !!examId);
+  const updateExamMutation = useUpdateExam();
+
   useEffect(() => {
-    // In a real app, fetch exam by ID
-    const examData: any = mockExams[0];
-    setExam({
-      ...examData,
-      start_at: examData.start_at?.substring(0, 16),
-      end_at: examData.end_at?.substring(0, 16),
-    });
-    // Set hasEndTime based on whether end_at exists
-    setHasEndTime(!!examData.end_at);
-    // Load existing questions if any - add initial question
-    setQuestions([
-      {
-        question_id: null, // null indicates this is a new question
-        question_text: "",
-        question_type: "single_choice",
-        order: 0,
-        points: 1,
-        correct_answer: [],
-        choices: [
-          { choice_id: generateTempId(), choice_text: "" }, // temp ID for new choice
-          { choice_id: generateTempId(), choice_text: "" },
-        ],
-      },
-    ]);
-  }, [examId]);
+    if (examData) {
+      setExam({
+        ...examData,
+        start_at: examData.start_at?.substring(0, 16),
+        end_at: examData.end_at?.substring(0, 16),
+      });
+      setHasEndTime(!!examData.end_at);
+
+      // Load existing questions or add initial question
+      if (examData.questions && examData.questions.length > 0) {
+        setQuestions(
+          examData.questions.map((q) => ({
+            question_id: q.question_id,
+            question_text: q.question_text,
+            question_type: q.question_type,
+            order: q.order,
+            points: q.points,
+            correct_answer: q.correct_answer || [],
+            choices:
+              q.choices?.map((c) => ({
+                choice_id: c.choice_id,
+                choice_text: c.choice_text,
+              })) || [],
+          }))
+        );
+      } else {
+        setQuestions([
+          {
+            question_id: null,
+            question_text: "",
+            question_type: "single_choice",
+            order: 0,
+            points: 1,
+            correct_answer: [],
+            choices: [
+              { choice_id: generateTempId(), choice_text: "" },
+              { choice_id: generateTempId(), choice_text: "" },
+            ],
+          },
+        ]);
+      }
+    }
+  }, [examData]);
 
   const handleAddQuestion = () => {
     setQuestions([
@@ -96,6 +117,33 @@ export const AdminEditStandardExamPage = () => {
   const handleQuestionChange = (index: number, field: string, value: any) => {
     const newQuestions = [...questions];
     newQuestions[index] = { ...newQuestions[index], [field]: value };
+
+    // If question type changes to short_answer or essay, remove choices
+    if (
+      field === "question_type" &&
+      (value === "short_answer" || value === "essay")
+    ) {
+      newQuestions[index].choices = [];
+      newQuestions[index].correct_answer = [];
+    }
+
+    // If question type changes to single_choice or multiple_choice and no choices exist, add default choices
+    if (
+      field === "question_type" &&
+      (value === "single_choice" || value === "multiple_choice")
+    ) {
+      if (
+        !newQuestions[index].choices ||
+        newQuestions[index].choices!.length === 0
+      ) {
+        newQuestions[index].choices = [
+          { choice_id: generateTempId(), choice_text: "" },
+          { choice_id: generateTempId(), choice_text: "" },
+        ];
+      }
+      newQuestions[index].correct_answer_text = [];
+    }
+
     setQuestions(newQuestions);
   };
 
@@ -140,11 +188,13 @@ export const AdminEditStandardExamPage = () => {
     });
   };
 
-  const handleExamChange = (updatedFields: Partial<UpdateExamDTO>) => {
+  const handleExamChange = (updatedFields: Partial<CreateExamDTO>) => {
     setExam({ ...exam, ...updatedFields });
   };
 
   const handleSubmit = () => {
+    if (!examId) return;
+
     // Update order field for all questions based on their position
     const questionsWithOrder = questions.map((q, index) => ({
       ...q,
@@ -152,18 +202,50 @@ export const AdminEditStandardExamPage = () => {
     }));
 
     const payload: any = {
-      exam,
+      title: exam.title,
+      description: exam.description,
+      type: exam.type,
+      start_at: exam.start_at,
+      end_at: exam.end_at,
+      duration_minutes: exam.duration_minutes,
       questions: questionsWithOrder,
     };
 
-    console.log("Updating exam:", examId, payload);
-    // In a real app, submit to backend API
-    // Questions with question_id: null will be created
-    // Questions with question_id: <uuid> will be updated
-    // Questions not in the array will be deleted
-    showSnackbar({ message: "Exam updated successfully", severity: "success" });
-    navigate("/admin/exams");
+    updateExamMutation.mutate(
+      { examId, data: payload },
+      {
+        onSuccess: () => {
+          showSnackbar({
+            message: "Exam updated successfully",
+            severity: "success",
+          });
+          navigate("/admin/exams");
+        },
+        onError: (error: any) => {
+          showSnackbar({
+            message: error.message || "Failed to update exam",
+            severity: "error",
+          });
+        },
+      }
+    );
   };
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <Typography>Loading exam data...</Typography>
+      </Layout>
+    );
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        <Typography color="error">Failed to load exam data</Typography>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>

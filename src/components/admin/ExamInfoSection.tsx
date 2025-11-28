@@ -7,12 +7,12 @@ import {
 } from "@mui/material";
 import { ContentCopy } from "@mui/icons-material";
 import Card from "../common/Card";
-import type { UpdateExamDTO, Exam } from "../../shared/dtos";
+import type { CreateExamDTO, Exam } from "../../shared/dtos";
 import { useFeedback } from "../../shared/providers/FeedbackProvider";
 
 interface ExamInfoSectionProps {
   exam: Partial<Exam>; // Full exam data including access_code for display
-  onExamChange: (exam: Partial<UpdateExamDTO>) => void; // Only editable fields
+  onExamChange: (exam: Partial<CreateExamDTO>) => void; // Only editable fields
   hasEndTime: boolean;
   onEndTimeToggle: (enabled: boolean) => void;
   questions?: any[];

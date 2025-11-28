@@ -10,13 +10,9 @@ import type {
   Exam,
 } from "../shared/dtos/exam.dto";
 
-// ============================================
-// API Functions - Token automatically added by interceptor
-// ============================================
-
 const getAllExams = async (): Promise<AllExamsPageDTO> => {
   if (!auth.currentUser) throw new Error("Not authenticated");
-  return api.get<AllExamsPageDTO>("/exams");
+  return api.get<AllExamsPageDTO>("/exams/all");
 };
 
 const getExamById = async (examId: string): Promise<ExamTakingPageDTO> => {
@@ -37,7 +33,7 @@ const updateExam = async ({
   data: UpdateExamWithQuestionsDTO;
 }): Promise<Exam> => {
   if (!auth.currentUser) throw new Error("Not authenticated");
-  return api.put<Exam>(`/exams/${examId}`, data);
+  return api.patch<Exam>(`/exams/${examId}`, data);
 };
 
 const deleteExam = async (examId: string): Promise<void> => {
@@ -45,13 +41,7 @@ const deleteExam = async (examId: string): Promise<void> => {
   return api.delete<void>(`/exams/${examId}`);
 };
 
-// ============================================
 // React Query Hooks
-// ============================================
-
-/**
- * Fetch all exams with automatic caching
- */
 export const useExams = (enabled: boolean = true) => {
   return useQuery({
     queryKey: queryKeys.exams.list(),
@@ -61,9 +51,6 @@ export const useExams = (enabled: boolean = true) => {
   });
 };
 
-/**
- * Fetch single exam by ID
- */
 export const useExam = (examId: string, enabled: boolean = true) => {
   return useQuery({
     queryKey: queryKeys.exams.detail(examId),
@@ -73,9 +60,6 @@ export const useExam = (examId: string, enabled: boolean = true) => {
   });
 };
 
-/**
- * Create new exam
- */
 export const useCreateExam = () => {
   const queryClient = useQueryClient();
 
@@ -90,9 +74,6 @@ export const useCreateExam = () => {
   });
 };
 
-/**
- * Update exam
- */
 export const useUpdateExam = () => {
   const queryClient = useQueryClient();
 
@@ -110,9 +91,6 @@ export const useUpdateExam = () => {
   });
 };
 
-/**
- * Delete exam
- */
 export const useDeleteExam = () => {
   const queryClient = useQueryClient();
 

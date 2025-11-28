@@ -25,8 +25,6 @@ export interface CreateExamDTO {
   duration_minutes?: number;
 }
 
-export type UpdateExamDTO = Partial<CreateExamDTO>;
-
 export interface AllExamsPageItemDTO extends Exam {
   question_amount: number;
   status: ExamStatus;
@@ -36,8 +34,7 @@ export interface AllExamsPageItemDTO extends Exam {
 export type AllExamsPageDTO = AllExamsPageItemDTO[];
 
 // DTO for updating an exam with detailed questions
-export interface UpdateExamWithQuestionsDTO {
-  exam: UpdateExamDTO;
+export interface UpdateExamWithQuestionsDTO extends Partial<CreateExamDTO> {
   questions: UpdateQuestionDTO[]; // Array of questions with null IDs for new, non-null for updates. Missing IDs will be deleted.
 }
 
@@ -55,7 +52,7 @@ export interface GradingPageItemDTO {
 // DTO for the Grading Page
 export type GradingPageDTO = GradingPageItemDTO[];
 
-// DTO for Exam Taking Page
+// DTO for Exam Taking Page and Exam Editing Page
 export interface ExamTakingPageDTO extends Exam {
   questions: QuestionDTO[];
 }

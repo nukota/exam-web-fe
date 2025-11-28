@@ -7,9 +7,9 @@ import Card from "../../components/common/Card";
 import { ExamInfoSection } from "../../components/admin/ExamInfoSection";
 import { EditableCodingQuestion } from "../../components/admin/items";
 import { useFeedback } from "../../shared/providers/FeedbackProvider";
-import type { Exam, UpdateExamDTO, UpdateQuestionDTO } from "../../shared/dtos";
+import type { Exam, CreateExamDTO, UpdateQuestionDTO } from "../../shared/dtos";
 import type { ProgrammingLanguage } from "../../shared/enum";
-import { mockExams } from "../../shared/mockdata";
+import { useExam, useUpdateExam } from "../../services/examsService";
 
 // Helper function to generate temporary IDs for new items
 const generateTempId = () => `temp_${crypto.randomUUID()}`;
@@ -29,9 +29,10 @@ export const AdminEditCodingExamPage = () => {
   const [questions, setQuestions] = useState<UpdateQuestionDTO[]>([]);
   const [hasEndTime, setHasEndTime] = useState<boolean>(true);
 
+  const { data: examData, isLoading, error } = useExam(examId || "", !!examId);
+  const updateExamMutation = useUpdateExam();
+
   useEffect(() => {
-    // In a real app, fetch exam by ID
-    const examData: any = mockExams.find((e) => e.exam_id === examId);
     if (examData) {
       setExam({
         ...examData,
@@ -39,32 +40,62 @@ export const AdminEditCodingExamPage = () => {
         end_at: examData.end_at?.substring(0, 16),
       });
       setHasEndTime(!!examData.end_at);
-    }
 
-    // Initialize with one coding question
-    setQuestions([
-      {
-        question_id: null, // null indicates this is a new question
-        question_text: "",
-        title: "",
-        question_type: "coding",
-        order: 0,
-        points: 10,
-        programming_languages: ["python"],
-        coding_template: {
-          python: "def solution():\n    # Your code here\n    pass",
-        },
-        coding_test_cases: [
+      // Load existing questions or initialize with one coding question
+      if (examData.questions && examData.questions.length > 0) {
+        setQuestions(
+          examData.questions.map((q) => ({
+            question_id: q.question_id,
+            question_text: q.question_text,
+            title: q.title,
+            question_type: q.question_type,
+            order: q.order,
+            points: q.points,
+            programming_languages: q.programming_languages || ["python"],
+            coding_template: q.coding_template || {
+              python: "def solution():\n    # Your code here\n    pass",
+            },
+            coding_test_cases: q.coding_test_cases?.map((tc) => ({
+              test_case_id: tc.test_case_id,
+              input_data: tc.input_data,
+              expected_output: tc.expected_output,
+              is_hidden: tc.is_hidden,
+            })) || [
+              {
+                test_case_id: generateTempId(),
+                input_data: "",
+                expected_output: "",
+                is_hidden: false,
+              },
+            ],
+          }))
+        );
+      } else {
+        setQuestions([
           {
-            test_case_id: generateTempId(),
-            input_data: "",
-            expected_output: "",
-            is_hidden: false,
+            question_id: null,
+            question_text: "",
+            title: "",
+            question_type: "coding",
+            order: 0,
+            points: 10,
+            programming_languages: ["python"],
+            coding_template: {
+              python: "def solution():\n    # Your code here\n    pass",
+            },
+            coding_test_cases: [
+              {
+                test_case_id: generateTempId(),
+                input_data: "",
+                expected_output: "",
+                is_hidden: false,
+              },
+            ],
           },
-        ],
-      },
-    ]);
-  }, [examId]);
+        ]);
+      }
+    }
+  }, [examData]);
 
   const handleAddQuestion = () => {
     setQuestions([
@@ -220,11 +251,13 @@ export const AdminEditCodingExamPage = () => {
     setQuestions(newQuestions);
   };
 
-  const handleExamChange = (updatedFields: Partial<UpdateExamDTO>) => {
+  const handleExamChange = (updatedFields: Partial<CreateExamDTO>) => {
     setExam({ ...exam, ...updatedFields });
   };
 
   const handleSubmit = () => {
+    if (!examId) return;
+
     // Update order field for all questions based on their position
     const questionsWithOrder = questions.map((q, index) => ({
       ...q,
@@ -232,22 +265,50 @@ export const AdminEditCodingExamPage = () => {
     }));
 
     const payload: any = {
-      exam,
+      title: exam.title,
+      description: exam.description,
+      type: exam.type,
+      start_at: exam.start_at,
+      end_at: exam.end_at,
+      duration_minutes: exam.duration_minutes,
       questions: questionsWithOrder,
     };
 
-    console.log("Updating coding exam:", examId, payload);
-    // In a real app, submit to backend API
-    // Questions with question_id: null will be created
-    // Questions with question_id: <uuid> will be updated
-    // Questions not in the array will be deleted
-    // Same logic applies to choices and codingTestCases
-    showSnackbar({
-      message: "Coding exam updated successfully",
-      severity: "success",
-    });
-    navigate("/admin/exams");
+    updateExamMutation.mutate(
+      { examId, data: payload },
+      {
+        onSuccess: () => {
+          showSnackbar({
+            message: "Coding exam updated successfully",
+            severity: "success",
+          });
+          navigate("/admin/exams");
+        },
+        onError: (error: any) => {
+          showSnackbar({
+            message: error.message || "Failed to update coding exam",
+            severity: "error",
+          });
+        },
+      }
+    );
   };
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <Typography>Loading exam data...</Typography>
+      </Layout>
+    );
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        <Typography color="error">Failed to load exam data</Typography>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>

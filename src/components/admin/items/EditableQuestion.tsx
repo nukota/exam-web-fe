@@ -233,19 +233,79 @@ export const EditableQuestion = ({
           </Box>
         )}
 
-        {/* Correct Answer for Short Answer Questions */}
+        {/* Multiple Correct Answers for Short Answer Questions */}
         {question.question_type === "short_answer" && (
-          <TextField
-            size="small"
-            fullWidth
-            label="Correct Answer"
-            placeholder="Enter the expected answer"
-            onChange={(e) =>
-              onQuestionChange(questionIndex, "correct_answer", [
-                e.target.value,
-              ])
-            }
-          />
+          <Box>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                mb: 1,
+              }}
+            >
+              <Typography variant="subtitle1" fontWeight="bold">
+                Correct Answers
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => {
+                  const currentAnswers = question.correct_answer_text || [];
+                  onQuestionChange(questionIndex, "correct_answer_text", [
+                    ...currentAnswers,
+                    "",
+                  ]);
+                }}
+                sx={{
+                  color: "black",
+                }}
+              >
+                <AddCircleOutlineRounded />
+              </IconButton>
+            </Box>
+            {(question.correct_answer_text || [""]).map((answer, aIndex) => (
+              <Box key={aIndex} sx={{ display: "flex", gap: 1, mb: 1 }}>
+                <TextField
+                  size="small"
+                  fullWidth
+                  label={`Correct Answer ${aIndex + 1}`}
+                  placeholder="Enter a correct answer"
+                  value={answer}
+                  onChange={(e) => {
+                    const currentAnswers = question.correct_answer_text || [];
+                    const newAnswers = [...currentAnswers];
+                    newAnswers[aIndex] = e.target.value;
+                    onQuestionChange(
+                      questionIndex,
+                      "correct_answer_text",
+                      newAnswers
+                    );
+                  }}
+                />
+                {(question.correct_answer_text?.length || 0) > 1 && (
+                  <IconButton
+                    size="small"
+                    onClick={() => {
+                      const currentAnswers = question.correct_answer_text || [];
+                      const newAnswers = currentAnswers.filter(
+                        (_, i) => i !== aIndex
+                      );
+                      onQuestionChange(
+                        questionIndex,
+                        "correct_answer_text",
+                        newAnswers.length > 0 ? newAnswers : [""]
+                      );
+                    }}
+                    sx={{
+                      color: "black",
+                    }}
+                  >
+                    <Remove fontSize="small" />
+                  </IconButton>
+                )}
+              </Box>
+            ))}
+          </Box>
         )}
       </Box>
     </Box>

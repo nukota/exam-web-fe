@@ -61,7 +61,11 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   // Check if user profile is incomplete
   const isProfileIncomplete =
     currentUser &&
-    (!currentUser.dob || !currentUser.class_name || !currentUser.school_name);
+    (currentUser.role === "admin" || currentUser.role === "teacher"
+      ? !currentUser.school_name
+      : !currentUser.dob ||
+        !currentUser.class_name ||
+        !currentUser.school_name);
 
   return (
     <Box

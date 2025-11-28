@@ -91,7 +91,8 @@ export const QuestionItem: React.FC<QuestionProps> = ({
 
   const renderAnswer = () => {
     if (question.question_type === "short_answer") {
-      const isCorrect = question.correct_answer?.some((correct: string) =>
+      const correctAnswers = question.correct_answer_text || [];
+      const isCorrect = correctAnswers.some((correct: string) =>
         answer.answer_text?.toLowerCase().includes(correct.toLowerCase())
       );
       return (
@@ -120,15 +121,14 @@ export const QuestionItem: React.FC<QuestionProps> = ({
             )}
           </Box>
 
-          {/* Correct Answer */}
-          {question.correct_answer && (
+          {/* Correct Answers */}
+          {correctAnswers.length > 0 && (
             <Typography
               variant="body2"
               color="text.secondary"
               sx={{ textAlign: "left", mt: 1, pl: 2 }}
             >
-              <strong>Accepted Answers:</strong>{" "}
-              {question.correct_answer.join(", ")}
+              <strong>Accepted Answers:</strong> {correctAnswers.join(", ")}
             </Typography>
           )}
         </Box>
