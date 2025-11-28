@@ -1,28 +1,35 @@
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '../../shared/providers/AuthProvider';
-import { Box, CircularProgress } from '@mui/material';
-import type { ReactNode } from 'react';
+import { Navigate } from "react-router-dom";
+import { Box, CircularProgress } from "@mui/material";
+import type { ReactNode } from "react";
+import { useCurrentUser } from "../../services/authService";
+import { auth } from "../../shared/lib/firebase";
 
 interface ProtectedRouteProps {
   children: ReactNode;
-  allowedRoles?: Array<'student' | 'teacher' | 'admin'>;
+  allowedRoles?: Array<"student" | "teacher" | "admin">;
 }
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
-  children, 
-  allowedRoles 
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  children,
+  allowedRoles,
 }) => {
-  const { currentUser, loading } = useAuth();
+  const { data: currentUser, isLoading } = useCurrentUser();
+  const firebaseUser = auth.currentUser;
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+      >
         <CircularProgress />
       </Box>
     );
   }
 
-  if (!currentUser) {
+  if (!firebaseUser || !currentUser) {
     return <Navigate to="/signin" replace />;
   }
 

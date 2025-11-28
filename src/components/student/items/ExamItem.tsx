@@ -1,40 +1,58 @@
-import React from "react";
-import { Box, Typography, IconButton, Button } from "@mui/material";
+import React, { useState } from "react";
 import {
-  MoreVert,
+  Box,
+  Typography,
+  IconButton,
+  Button,
+  Menu,
+  MenuItem,
+} from "@mui/material";
+import {
   Timer,
   CalendarToday,
   PlayArrow,
   Pause,
+  MoreVert,
 } from "@mui/icons-material";
 import { Card } from "../../common";
-import type { Exam } from "../../../shared/dtos/exam.dto";
+import type { AllExamsPageItemDTO } from "../../../shared/dtos/exam.dto";
 
 interface ExamItemProps {
-  exam: Exam;
+  exam: AllExamsPageItemDTO;
   onStart: (examId: string, examType: string) => void;
-  onMenuClick?: (event: React.MouseEvent<HTMLElement>, exam: Exam) => void;
+  onLeave?: (examId: string) => void;
   disabled?: boolean;
 }
 
 const ExamItem: React.FC<ExamItemProps> = ({
   exam,
   onStart,
-  onMenuClick,
+  onLeave = () => {},
   disabled = false,
 }) => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
   const handleStartExam = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    if (!disabled) {
+    if (!disabled && exam.status === "started") {
       onStart(exam.exam_id, exam.type);
     }
   };
 
   const handleMenuClick = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
-    if (onMenuClick) {
-      onMenuClick(e, exam);
+    setAnchorEl(e.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLeaveExam = () => {
+    if (onLeave) {
+      onLeave(exam.exam_id);
     }
+    handleMenuClose();
   };
 
   return (
@@ -61,19 +79,22 @@ const ExamItem: React.FC<ExamItemProps> = ({
         }}
       >
         <Box sx={{ minWidth: 0, flex: 1 }}>
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 600,
-              color: "text.primary",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {exam.title}
-          </Typography>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 0.5 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 600,
+                color: "text.primary",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                flex: 1,
+                minWidth: 0,
+                textAlign: "left",
+              }}
+            >
+              {exam.title}
+            </Typography>
             <Typography
               variant="caption"
               sx={{
@@ -90,18 +111,16 @@ const ExamItem: React.FC<ExamItemProps> = ({
             </Typography>
           </Box>
         </Box>
-        {onMenuClick && (
-          <IconButton
-            onClick={handleMenuClick}
-            size="small"
-            sx={{
-              color: "text.secondary",
-              "&:hover": { color: "text.primary" },
-            }}
-          >
-            <MoreVert />
-          </IconButton>
-        )}
+        <IconButton
+          onClick={handleMenuClick}
+          size="small"
+          sx={{
+            color: "text.secondary",
+            "&:hover": { color: "text.primary" },
+          }}
+        >
+          <MoreVert />
+        </IconButton>
       </Box>
 
       {/* Exam Details */}
@@ -225,13 +244,23 @@ const ExamItem: React.FC<ExamItemProps> = ({
       <Box sx={{ mt: "auto" }}>
         <Button
           variant="contained"
+          size="small"
           fullWidth
           onClick={handleStartExam}
-          disabled={disabled}
+          disabled={disabled || exam.status !== "started"}
         >
-          {disabled ? "Not Available" : "Take Exam"}
+          {exam.status === "started" ? "Take Exam" : exam.status}
         </Button>
       </Box>
+
+      {/* Menu */}
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+      >
+        <MenuItem onClick={handleLeaveExam}>Leave</MenuItem>
+      </Menu>
     </Card>
   );
 };

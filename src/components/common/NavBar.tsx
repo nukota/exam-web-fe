@@ -15,7 +15,7 @@ import {
   Trophy,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../../shared/providers/AuthProvider";
+import { useCurrentUser } from "../../services/authService";
 
 interface NavItem {
   text: string;
@@ -68,7 +68,7 @@ export const NavBar: React.FC<NavBarProps> = ({ role }) => {
     return location.pathname.startsWith(path);
   };
 
-  const { currentUser } = useAuth();
+  const { data: currentUser } = useCurrentUser();
 
   return (
     <Box

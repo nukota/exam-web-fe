@@ -99,6 +99,7 @@ export const StudentExamListPage = () => {
               key={exam.exam_id}
               exam={exam}
               onStart={handleStartExam}
+              onLeave={() => {}}
               disabled={!isExamActive(exam)}
             />
           ))}

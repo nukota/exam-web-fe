@@ -6,6 +6,8 @@ import {
   MenuItem,
   Divider,
   ListItemIcon,
+  Typography,
+  Alert,
 } from "@mui/material";
 import {
   AccountCircleRounded,
@@ -15,7 +17,9 @@ import {
 import { Calendar, Bell } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../shared/providers/AuthProvider";
+import { signOut as firebaseSignOut } from "firebase/auth";
+import { auth } from "../../shared/lib/firebase";
+import { useCurrentUser } from "../../services/authService";
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -25,7 +29,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
-  const { currentUser, signOut } = useAuth();
+  const { data: currentUser } = useCurrentUser();
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -37,7 +41,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
 
   const handleSignOut = async () => {
     try {
-      await signOut();
+      await firebaseSignOut(auth);
       navigate("/signin");
     } catch (error) {
       console.error("Error signing out:", error);
@@ -53,6 +57,11 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
     navigate(profilePath);
   };
 
+  // Check if user profile is incomplete
+  const isProfileIncomplete =
+    currentUser &&
+    (!currentUser.dob || !currentUser.class_name || !currentUser.school_name);
+
   return (
     <Box
       sx={{
@@ -63,6 +72,37 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
         borderColor: "divider",
       }}
     >
+      {isProfileIncomplete && (
+        <Alert
+          severity="warning"
+          sx={{
+            borderRadius: 0,
+            borderBottom: 1,
+            borderColor: "divider",
+            "& .MuiAlert-message": {
+              width: "100%",
+              textAlign: "center",
+            },
+          }}
+        >
+          <Typography variant="body2">
+            Please complete your profile information.{" "}
+            <Typography
+              component="span"
+              variant="body2"
+              sx={{
+                color: "primary.main",
+                cursor: "pointer",
+                textDecoration: "underline",
+                fontWeight: 600,
+              }}
+              onClick={handleProfile}
+            >
+              Update Profile
+            </Typography>
+          </Typography>
+        </Alert>
+      )}
       <Box
         sx={{
           display: "flex",

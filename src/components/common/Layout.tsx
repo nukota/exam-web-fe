@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Box, Drawer, useMediaQuery, useTheme } from "@mui/material";
 import { Header } from "./Header";
 import { NavBar } from "./NavBar";
-import { useAuth } from "../../shared/providers/AuthProvider";
 import type { ReactNode } from "react";
+import { useCurrentUser } from "../../services/authService";
 
 interface LayoutProps {
   children: ReactNode;
@@ -11,7 +11,7 @@ interface LayoutProps {
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { currentUser } = useAuth();
+  const { data: currentUser } = useCurrentUser();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 

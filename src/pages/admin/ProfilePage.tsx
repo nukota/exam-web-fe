@@ -11,12 +11,12 @@ import {
 import { Edit } from "@mui/icons-material";
 import { ArrowLeft, User } from "lucide-react";
 import { Layout } from "../../components/common";
-import { useAuth } from "../../shared/providers/AuthProvider";
+import { useCurrentUser } from "../../services/authService";
 import { useNavigate } from "react-router-dom";
 import Card from "../../components/common/Card";
 
 export const AdminProfilePage = () => {
-  const { currentUser } = useAuth();
+  const { data: currentUser } = useCurrentUser();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState({

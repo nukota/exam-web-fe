@@ -33,6 +33,7 @@
     "@tiptap/extension-underline": "^3.11.0",
     "@tiptap/react": "^3.11.0",
     "@tiptap/starter-kit": "^3.11.0",
+    "axios": "^1.13.2",
     "firebase": "^12.6.0",
     "lexical": "^0.38.2",
     "lucide-react": "^0.553.0",

@@ -2,11 +2,14 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Typography, Button, Container } from "@mui/material";
 import { Google as GoogleIcon } from "@mui/icons-material";
-import { useAuth } from "../shared/providers/AuthProvider";
+import { signInWithPopup } from "firebase/auth";
+import { auth, googleProvider } from "../shared/lib/firebase";
+import { useSyncUser, useCurrentUser } from "../services/authService";
 
 export const SignInPage = () => {
-  const { signInWithGoogle, currentUser } = useAuth();
   const navigate = useNavigate();
+  const syncUser = useSyncUser();
+  const { data: currentUser } = useCurrentUser();
 
   useEffect(() => {
     if (currentUser) {
@@ -21,7 +24,8 @@ export const SignInPage = () => {
 
   const handleSignIn = async () => {
     try {
-      await signInWithGoogle();
+      await signInWithPopup(auth, googleProvider);
+      await syncUser.mutateAsync();
     } catch (error) {
       console.error("Sign in failed:", error);
     }
