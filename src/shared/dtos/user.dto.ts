@@ -3,6 +3,7 @@ export interface User {
   username: string;
   full_name?: string;
   email?: string;
+  photo_url?: string;
   role: "student" | "teacher" | "admin";
   dob?: string;
   class_name?: string;

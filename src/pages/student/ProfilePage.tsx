@@ -62,6 +62,7 @@ export const StudentProfilePage = () => {
                     fontSize: "2.25rem",
                     bgcolor: "primary.main",
                   }}
+                  src={currentUser?.photo_url}
                 >
                   {profile.full_name?.charAt(0) ||
                     currentUser?.username?.charAt(0)}

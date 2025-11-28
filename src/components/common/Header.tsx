@@ -17,9 +17,7 @@ import {
 import { Calendar, Bell } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { signOut as firebaseSignOut } from "firebase/auth";
-import { auth } from "../../shared/lib/firebase";
-import { useCurrentUser } from "../../services/authService";
+import { useCurrentUser, useSignOut } from "../../services/authService";
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -30,6 +28,8 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
   const { data: currentUser } = useCurrentUser();
+  const signOut = useSignOut();
+  console.log("This is rendering Header component");
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -41,7 +41,8 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
 
   const handleSignOut = async () => {
     try {
-      await firebaseSignOut(auth);
+      await signOut.mutateAsync();
+      handleClose();
       navigate("/signin");
     } catch (error) {
       console.error("Error signing out:", error);
@@ -72,37 +73,6 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
         borderColor: "divider",
       }}
     >
-      {isProfileIncomplete && (
-        <Alert
-          severity="warning"
-          sx={{
-            borderRadius: 0,
-            borderBottom: 1,
-            borderColor: "divider",
-            "& .MuiAlert-message": {
-              width: "100%",
-              textAlign: "center",
-            },
-          }}
-        >
-          <Typography variant="body2">
-            Please complete your profile information.{" "}
-            <Typography
-              component="span"
-              variant="body2"
-              sx={{
-                color: "primary.main",
-                cursor: "pointer",
-                textDecoration: "underline",
-                fontWeight: 600,
-              }}
-              onClick={handleProfile}
-            >
-              Update Profile
-            </Typography>
-          </Typography>
-        </Alert>
-      )}
       <Box
         sx={{
           display: "flex",
@@ -134,10 +104,11 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
             <Bell size={24} />
           </IconButton>
           <IconButton onClick={handleClick} size="small">
-            <Avatar sx={{ width: 36, height: 36, bgcolor: "primary.main" }}>
-              {currentUser?.full_name?.charAt(0) ||
-                currentUser?.username?.charAt(0) ||
-                "U"}
+            <Avatar
+              sx={{ width: 36, height: 36, bgcolor: "primary.main" }}
+              src={currentUser?.photo_url}
+            >
+              {currentUser?.full_name?.charAt(0) || "U"}
             </Avatar>
           </IconButton>
         </Box>
@@ -173,6 +144,36 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           </MenuItem>
         </Menu>
       </Box>
+      {isProfileIncomplete && (
+        <Alert
+          severity="warning"
+          sx={{
+            borderRadius: 0,
+            borderTop: 1,
+            borderColor: "divider",
+            "& .MuiAlert-message": {
+              width: "100%",
+              textAlign: "left",
+            },
+          }}
+        >
+          <Typography variant="body2">
+            Please complete your profile information.{" "}
+            <Typography
+              component="span"
+              variant="body2"
+              sx={{
+                cursor: "pointer",
+                textDecoration: "underline",
+                fontWeight: 600,
+              }}
+              onClick={handleProfile}
+            >
+              Update Profile
+            </Typography>
+          </Typography>
+        </Alert>
+      )}
     </Box>
   );
 };

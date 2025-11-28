@@ -3,6 +3,7 @@ import { api } from "../shared/lib/apiClient";
 import { queryKeys } from "../shared/lib/queryKeys";
 import type { User } from "../shared/dtos/user.dto";
 import { auth } from "../shared/lib/firebase";
+import { signOut as firebaseSignOut } from "firebase/auth";
 
 // API functions - Token automatically added by interceptor
 const getMe = async (): Promise<User> => {
@@ -18,6 +19,10 @@ const syncUser = async (): Promise<User> => {
 const updateUserProfile = async (data: Partial<User>): Promise<User> => {
   if (!auth.currentUser) throw new Error("Not authenticated");
   return api.patch<User>("/users/me", data);
+};
+
+const signOutUser = async (): Promise<void> => {
+  await firebaseSignOut(auth);
 };
 
 // React Query Hooks
@@ -67,6 +72,17 @@ export const useUpdateProfile = () => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.auth.currentUser,
       });
+    },
+  });
+};
+
+export const useSignOut = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: signOutUser,
+    onSuccess: () => {
+      queryClient.removeQueries({ queryKey: queryKeys.auth.currentUser });
     },
   });
 };
