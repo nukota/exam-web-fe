@@ -12,22 +12,30 @@ import { Edit } from "@mui/icons-material";
 import { ArrowLeft, User } from "lucide-react";
 import { Layout } from "../../components/common";
 import { useCurrentUser } from "../../services/authService";
+import { useUpdateProfile } from "../../services/usersService";
 import { useNavigate } from "react-router-dom";
 import Card from "../../components/common/Card";
 
 export const AdminProfilePage = () => {
   const { data: currentUser } = useCurrentUser();
   const navigate = useNavigate();
+  const updateProfile = useUpdateProfile();
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState({
-    full_name: currentUser?.full_name || "",
-    email: currentUser?.email || "",
     school_name: currentUser?.school_name || "",
   });
 
   const handleSave = () => {
-    console.log("Saving profile:", profile);
-    setIsEditing(false);
+    const updateData = Object.fromEntries(
+      Object.entries(profile).filter(
+        ([_, value]) => value !== "" && value !== null && value !== undefined
+      )
+    );
+    updateProfile.mutate(updateData, {
+      onSuccess: () => {
+        setIsEditing(false);
+      },
+    });
   };
 
   return (
@@ -61,8 +69,7 @@ export const AdminProfilePage = () => {
                   }}
                   src={currentUser?.photo_url}
                 >
-                  {profile.full_name?.charAt(0) ||
-                    currentUser?.username?.charAt(0)}
+                  {currentUser?.full_name?.charAt(0)}
                 </Avatar>
               </Box>
               <Box
@@ -76,7 +83,7 @@ export const AdminProfilePage = () => {
                 }}
               >
                 <Typography variant="h5" fontWeight="bold">
-                  {profile.full_name || currentUser?.username}
+                  {currentUser?.full_name}
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
                   {currentUser?.email}

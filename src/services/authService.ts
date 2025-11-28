@@ -5,7 +5,6 @@ import type { User } from "../shared/dtos/user.dto";
 import { auth } from "../shared/lib/firebase";
 import { signOut as firebaseSignOut } from "firebase/auth";
 
-// API functions - Token automatically added by interceptor
 const getMe = async (): Promise<User> => {
   if (!auth.currentUser) throw new Error("Not authenticated");
   return api.get<User>("/auth/me");
@@ -14,11 +13,6 @@ const getMe = async (): Promise<User> => {
 const syncUser = async (): Promise<User> => {
   if (!auth.currentUser) throw new Error("Not authenticated");
   return api.post<User>("/auth/sync", {});
-};
-
-const updateUserProfile = async (data: Partial<User>): Promise<User> => {
-  if (!auth.currentUser) throw new Error("Not authenticated");
-  return api.patch<User>("/users/me", data);
 };
 
 const signOutUser = async (): Promise<void> => {
@@ -41,10 +35,6 @@ export const useCurrentUser = (enabled: boolean = true) => {
   });
 };
 
-/**
- * Hook to sync Firebase user with backend
- * Use this during login/signup
- */
 export const useSyncUser = () => {
   const queryClient = useQueryClient();
 
@@ -53,25 +43,6 @@ export const useSyncUser = () => {
     onSuccess: (data) => {
       // Update cached user data
       queryClient.setQueryData(queryKeys.auth.currentUser, data);
-    },
-  });
-};
-
-/**
- * Hook to update user profile
- */
-export const useUpdateProfile = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: updateUserProfile,
-    onSuccess: (data) => {
-      // Update cached user data
-      queryClient.setQueryData(queryKeys.auth.currentUser, data);
-      // Invalidate to refetch
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.auth.currentUser,
-      });
     },
   });
 };
