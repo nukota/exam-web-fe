@@ -5,7 +5,14 @@ import Underline from "@tiptap/extension-underline";
 import Placeholder from "@tiptap/extension-placeholder";
 import Image from "@tiptap/extension-image";
 import TextAlign from "@tiptap/extension-text-align";
-import { Box, IconButton, Divider, Select, MenuItem } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  Divider,
+  Select,
+  MenuItem,
+  CircularProgress,
+} from "@mui/material";
 import {
   FormatBold,
   FormatItalic,
@@ -19,7 +26,8 @@ import {
   Undo,
   Redo,
 } from "@mui/icons-material";
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
+import { uploadImageToCloudinary } from "../../../services/cloudinaryService";
 import "./tiptap.css";
 
 interface TiptapEditorProps {
@@ -33,6 +41,8 @@ export default function TiptapEditor({
   onChange,
   placeholder = "Enter text here...",
 }: TiptapEditorProps) {
+  const [isUploading, setIsUploading] = useState(false);
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -49,7 +59,7 @@ export default function TiptapEditor({
       Underline,
       Image.configure({
         inline: true,
-        allowBase64: true,
+        allowBase64: false, // Disable base64 to prevent 413 errors
         HTMLAttributes: {
           class: "tiptap-image",
         },
@@ -90,12 +100,9 @@ export default function TiptapEditor({
     const previousUrl = editor.getAttributes("link").href;
     const url = window.prompt("URL", previousUrl);
 
-    // cancelled
     if (url === null) {
       return;
     }
-
-    // empty
     if (url === "") {
       editor.chain().focus().extendMarkRange("link").unsetLink().run();
       return;
@@ -105,7 +112,7 @@ export default function TiptapEditor({
     editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
   }, [editor]);
 
-  const addImage = useCallback(() => {
+  const addImage = useCallback(async () => {
     if (!editor) return;
 
     // Create a hidden file input element
@@ -117,13 +124,26 @@ export default function TiptapEditor({
       const file = (e.target as HTMLInputElement).files?.[0];
       if (!file) return;
 
-      // Convert to base64 for display
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const base64 = e.target?.result as string;
-        editor.chain().focus().setImage({ src: base64 }).run();
-      };
-      reader.readAsDataURL(file);
+      // Check file size (optional: warn if over 10MB)
+      const maxSize = 10 * 1024 * 1024; // 10MB
+      if (file.size > maxSize) {
+        alert("Image is too large. Please select an image under 10MB.");
+        return;
+      }
+
+      try {
+        setIsUploading(true);
+
+        // Upload to Cloudinary
+        const imageUrl = await uploadImageToCloudinary(file);
+
+        editor.chain().focus().setImage({ src: imageUrl }).run();
+      } catch (error) {
+        console.error("Failed to upload image:", error);
+        alert("Failed to upload image. Please try again.");
+      } finally {
+        setIsUploading(false);
+      }
     };
 
     input.click();
@@ -333,11 +353,16 @@ export default function TiptapEditor({
         <IconButton
           size="small"
           onClick={addImage}
+          disabled={isUploading}
           sx={{
             color: "text.secondary",
           }}
         >
-          <ImageIcon fontSize="small" />
+          {isUploading ? (
+            <CircularProgress size={20} />
+          ) : (
+            <ImageIcon fontSize="small" />
+          )}
         </IconButton>
       </Box>
 
