@@ -14,7 +14,7 @@ export const SignInPage = () => {
   useEffect(() => {
     if (currentUser) {
       // Redirect based on user role
-      if (currentUser.role === "admin" || currentUser.role === "teacher") {
+      if (currentUser.role === "admin") {
         navigate("/admin/dashboard");
       } else {
         navigate("/student/exams");

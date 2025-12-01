@@ -1,5 +1,6 @@
 // Student Pages
 export { StudentExamListPage } from "./student/ExamListPage";
+export { StudentExamSetupPage } from "./student/ExamSetupPage";
 export { StudentStandardExamPage } from "./student/StandardExamPage";
 export { StudentCodingExamPage } from "./student/CodingExamPage";
 export { StudentExamResultPage } from "./student/ExamResultPage";

@@ -13,11 +13,13 @@ import { Timer, Send } from "@mui/icons-material";
 import { mockQuestionsExam1 } from "../../shared/mockdata";
 import { Question } from "../../components/student/items/Question";
 import { useExamTimer } from "../../shared/providers/ExamTimerProvider";
+import { useWebcam } from "../../shared/providers/WebcamProvider";
 
 export const StudentStandardExamPage = () => {
   const { examId } = useParams();
   const navigate = useNavigate();
   const { timeRemaining, startTimer, formatTime } = useExamTimer();
+  const { isRecording, stopRecording, stopWebcam } = useWebcam();
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [flaggedQuestions, setFlaggedQuestions] = useState<Set<string>>(
     new Set()
@@ -55,6 +57,13 @@ export const StudentStandardExamPage = () => {
   };
 
   const handleSubmit = () => {
+    // Stop recording if active
+    if (isRecording) {
+      stopRecording();
+    }
+    // Stop webcam
+    stopWebcam();
+
     // In a real app, submit answers to the backend
     console.log("Submitting answers:", answers);
     navigate(`/student/exam/${examId}/result`);

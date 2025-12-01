@@ -26,12 +26,9 @@ export const StudentExamListPage = () => {
   const joinExamMutation = useJoinExam();
   const leaveExamMutation = useLeaveExam();
 
-  const handleStartExam = (examId: string, examType: string) => {
-    if (examType === "coding") {
-      navigate(`/student/exam/coding/${examId}`);
-    } else {
-      navigate(`/student/exam/${examId}`);
-    }
+  const handleStartExam = (examId: string, _examType: string) => {
+    // Always navigate to setup page first
+    navigate(`/student/exam/${examId}/setup`);
   };
 
   const filteredExams = (exams || []).filter(
@@ -54,11 +51,8 @@ export const StudentExamListPage = () => {
           severity: "success",
         });
         setAccessCode("");
-        // Navigate to the exam
-        const exam = exams?.find((e) => e.exam_id === attempt.exam_id);
-        if (exam) {
-          handleStartExam(exam.exam_id, exam.type);
-        }
+        // Navigate to the exam setup page
+        navigate(`/student/exam/${attempt.exam_id}/setup`);
       },
       onError: (error: any) => {
         showSnackbar({

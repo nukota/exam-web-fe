@@ -12,12 +12,14 @@ import {
 import { Timer, Send, Code, Check } from "@mui/icons-material";
 import { mockCodingQuestions } from "../../shared/mockdata";
 import { useExamTimer } from "../../shared/providers/ExamTimerProvider";
+import { useWebcam } from "../../shared/providers/WebcamProvider";
 import { Card } from "../../components/common";
 
 export const StudentCodingExamPage = () => {
   const { examId } = useParams();
   const navigate = useNavigate();
   const { timeRemaining, startTimer, formatTime } = useExamTimer();
+  const { isRecording, stopRecording, stopWebcam } = useWebcam();
   const [completedQuestions, setCompletedQuestions] = useState<Set<string>>(
     new Set()
   );
@@ -70,6 +72,13 @@ export const StudentCodingExamPage = () => {
   }, []);
 
   const handleSubmit = async () => {
+    // Stop recording if active
+    if (isRecording) {
+      stopRecording();
+    }
+    // Stop webcam
+    stopWebcam();
+
     // Collect all saved code from localStorage for all questions and all languages
     const allAnswers = mockCodingQuestions.map((question) => {
       const languages = question.programming_languages || ["python"];

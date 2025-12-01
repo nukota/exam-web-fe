@@ -29,7 +29,6 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const navigate = useNavigate();
   const { data: currentUser } = useCurrentUser();
   const signOut = useSignOut();
-  console.log("This is rendering Header component");
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -52,16 +51,14 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const handleProfile = () => {
     handleClose();
     const profilePath =
-      currentUser?.role === "admin" || currentUser?.role === "teacher"
-        ? "/admin/profile"
-        : "/student/profile";
+      currentUser?.role === "admin" ? "/admin/profile" : "/student/profile";
     navigate(profilePath);
   };
 
   // Check if user profile is incomplete
   const isProfileIncomplete =
     currentUser &&
-    (currentUser.role === "admin" || currentUser.role === "teacher"
+    (currentUser.role === "admin"
       ? !currentUser.school_name
       : !currentUser.dob ||
         !currentUser.class_name ||
