@@ -47,10 +47,10 @@ export const AdminGradingPage = () => {
       renderCell: (params) => (
         <Box sx={{ display: "flex", flexDirection: "column", gap: 0 }}>
           <Typography variant="body2" fontWeight="medium">
-            {params.row.teacher_name}
+            {params.row.teacher.full_name}
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            {params.row.teacher_email}
+            {params.row.teacher.email}
           </Typography>
         </Box>
       ),

@@ -45,14 +45,17 @@ export interface GradingPageItemDTO {
   end_at: string;
   total_submissions: number;
   pending_submissions: number;
-  teacher_name: string;
-  teacher_email: string;
+  teacher: {
+    teacher_id: string;
+    full_name?: string;
+    email?: string;
+  };
 }
 
 // DTO for the Grading Page
 export type GradingPageDTO = GradingPageItemDTO[];
 
 // DTO for Exam Taking Page and Exam Editing Page
-export interface ExamTakingPageDTO extends Exam {
+export interface DetailedExamDTO extends Exam {
   questions: QuestionDTO[];
 }

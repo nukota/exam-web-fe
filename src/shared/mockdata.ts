@@ -5,6 +5,7 @@ import type {
   AllExamsPageDTO,
   GradingPageDTO,
   ExamAttemptsPageDTO,
+  DashboardDTO,
 } from "./dtos";
 
 // Mock Users
@@ -830,8 +831,11 @@ export const mockExamsForGrading: GradingPageDTO = [
     end_at: "2025-11-15T18:00:00",
     total_submissions: 25,
     pending_submissions: 5,
-    teacher_name: "Dr. Sarah Admin",
-    teacher_email: "admin@example.com",
+    teacher: {
+      teacher_id: "teacher1",
+      full_name: "Dr. Sarah Admin",
+      email: "admin@example.com",
+    },
   },
   {
     exam_id: "2",
@@ -840,8 +844,11 @@ export const mockExamsForGrading: GradingPageDTO = [
     end_at: "2025-11-16T20:00:00",
     total_submissions: 18,
     pending_submissions: 0,
-    teacher_name: "Dr. Sarah Admin",
-    teacher_email: "admin@example.com",
+    teacher: {
+      teacher_id: "teacher1",
+      full_name: "Dr. Sarah Admin",
+      email: "admin@example.com",
+    },
   },
   {
     exam_id: "3",
@@ -850,8 +857,11 @@ export const mockExamsForGrading: GradingPageDTO = [
     end_at: "2025-11-20T22:00:00",
     total_submissions: 10,
     pending_submissions: 10,
-    teacher_name: "Dr. Sarah Admin",
-    teacher_email: "admin@example.com",
+    teacher: {
+      teacher_id: "teacher1",
+      full_name: "Dr. Sarah Admin",
+      email: "admin@example.com",
+    },
   },
 ];
 
@@ -943,5 +953,41 @@ export const mockExamAttemptsPage: ExamAttemptsPageDTO = {
       status: "cancelled",
       cheated: false,
     },
+  ],
+};
+
+// Mock Dashboard Data
+export const mockDashboardData: DashboardDTO = {
+  total_exams: 15,
+  total_students: 250,
+  pending_grading: 8,
+  avg_score: "78%",
+  exam_scores_data: [
+    { date: "Nov 10", avg_score: 72 },
+    { date: "Nov 12", avg_score: 75 },
+    { date: "Nov 14", avg_score: 78 },
+    { date: "Nov 16", avg_score: 76 },
+    { date: "Nov 18", avg_score: 80 },
+    { date: "Nov 20", avg_score: 82 },
+    { date: "Nov 22", avg_score: 79 },
+  ],
+  exam_type_data: [
+    { name: "Standard", value: 60 },
+    { name: "Coding", value: 40 },
+  ],
+  top_exams_data: [
+    { exam: "CS101", submissions: 45 },
+    { exam: "PY202", submissions: 38 },
+    { exam: "DS301", submissions: 32 },
+    { exam: "WD401", submissions: 28 },
+  ],
+  student_activity_data: [
+    { date: "Nov 10", students: 120 },
+    { date: "Nov 12", students: 135 },
+    { date: "Nov 14", students: 142 },
+    { date: "Nov 16", students: 138 },
+    { date: "Nov 18", students: 155 },
+    { date: "Nov 20", students: 160 },
+    { date: "Nov 22", students: 158 },
   ],
 };

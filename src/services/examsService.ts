@@ -4,7 +4,7 @@ import { queryKeys } from "../shared/lib/queryKeys";
 import { auth } from "../shared/lib/firebase";
 import type {
   AllExamsPageDTO,
-  ExamTakingPageDTO,
+  DetailedExamDTO,
   CreateExamDTO,
   UpdateExamWithQuestionsDTO,
   Exam,
@@ -15,9 +15,9 @@ const getAllExams = async (): Promise<AllExamsPageDTO> => {
   return api.get<AllExamsPageDTO>("/exams/all");
 };
 
-const getExamById = async (examId: string): Promise<ExamTakingPageDTO> => {
+const getExamById = async (examId: string): Promise<DetailedExamDTO> => {
   if (!auth.currentUser) throw new Error("Not authenticated");
-  return api.get<ExamTakingPageDTO>(`/exams/${examId}`);
+  return api.get<DetailedExamDTO>(`/exams/${examId}`);
 };
 
 const createExam = async (data: CreateExamDTO): Promise<Exam> => {

@@ -18,47 +18,39 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { mockDashboardData } from "../../shared/mockdata";
 
 export const AdminDashboardPage = () => {
   const stats = [
-    { title: "Total Exams", value: 15, icon: <Assignment /> },
-    { title: "Total Students", value: 250, icon: <People /> },
-    { title: "Pending Grading", value: 8, icon: <Grading /> },
-    { title: "Avg Score", value: "78%", icon: <TrendingUp /> },
+    {
+      title: "Total Exams",
+      value: mockDashboardData.total_exams,
+      icon: <Assignment />,
+    },
+    {
+      title: "Total Students",
+      value: mockDashboardData.total_students,
+      icon: <People />,
+    },
+    {
+      title: "Pending Grading",
+      value: mockDashboardData.pending_grading,
+      icon: <Grading />,
+    },
+    {
+      title: "Avg Score",
+      value: mockDashboardData.avg_score,
+      icon: <TrendingUp />,
+    },
   ];
 
-  // Mock data for charts
-  const examScoresData = [
-    { date: "Nov 10", avgScore: 72 },
-    { date: "Nov 12", avgScore: 75 },
-    { date: "Nov 14", avgScore: 78 },
-    { date: "Nov 16", avgScore: 76 },
-    { date: "Nov 18", avgScore: 80 },
-    { date: "Nov 20", avgScore: 82 },
-    { date: "Nov 22", avgScore: 79 },
-  ];
-
-  const examTypeData = [
-    { name: "Standard", value: 60 },
-    { name: "Coding", value: 40 },
-  ];
-
-  const topExamsData = [
-    { exam: "CS101", submissions: 45 },
-    { exam: "PY202", submissions: 38 },
-    { exam: "DS301", submissions: 32 },
-    { exam: "WD401", submissions: 28 },
-  ];
-
-  const studentActivityData = [
-    { date: "Nov 10", students: 120 },
-    { date: "Nov 12", students: 135 },
-    { date: "Nov 14", students: 142 },
-    { date: "Nov 16", students: 138 },
-    { date: "Nov 18", students: 155 },
-    { date: "Nov 20", students: 160 },
-    { date: "Nov 22", students: 158 },
-  ];
+  // Use data from mockDashboardData
+  const {
+    exam_scores_data,
+    exam_type_data,
+    top_exams_data,
+    student_activity_data,
+  } = mockDashboardData;
 
   return (
     <Layout>
@@ -82,9 +74,9 @@ export const AdminDashboardPage = () => {
             mb: 4,
           }}
         >
-          {stats.map((stat) => (
+          {stats.map((stat, index: number) => (
             <StatCard
-              key={stat.title}
+              key={index}
               title={stat.title}
               value={stat.value}
               icon={stat.icon}
@@ -123,7 +115,7 @@ export const AdminDashboardPage = () => {
               </Typography>
             </Box>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={examScoresData}>
+              <LineChart data={exam_scores_data}>
                 <defs>
                   <linearGradient
                     id="scoreGradient"
@@ -149,7 +141,7 @@ export const AdminDashboardPage = () => {
                 <Legend />
                 <Line
                   type="monotone"
-                  dataKey="avgScore"
+                  dataKey="avg_score"
                   stroke="#4caf50"
                   strokeWidth={3}
                   dot={{ fill: "#4caf50", r: 3 }}
@@ -185,7 +177,7 @@ export const AdminDashboardPage = () => {
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
-                  data={examTypeData}
+                  data={exam_type_data as any}
                   cx="50%"
                   cy="45%"
                   labelLine={false}
@@ -197,7 +189,7 @@ export const AdminDashboardPage = () => {
                   dataKey="value"
                   cornerRadius={7}
                 >
-                  {examTypeData.map((_, index) => (
+                  {exam_type_data.map((_, index: number) => (
                     <Cell
                       key={`cell-${index}`}
                       fill={["#667eea", "#00d4ff"][index % 2]}
@@ -246,7 +238,7 @@ export const AdminDashboardPage = () => {
               </Typography>
             </Box>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={topExamsData}>
+              <BarChart data={top_exams_data}>
                 <defs>
                   <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#9c27b0" stopOpacity={0.9} />
@@ -298,7 +290,7 @@ export const AdminDashboardPage = () => {
               </Typography>
             </Box>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={studentActivityData}>
+              <LineChart data={student_activity_data}>
                 <defs>
                   <linearGradient
                     id="studentsGradient"

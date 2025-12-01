@@ -6,3 +6,4 @@ export * from "./answer.dto";
 export * from "./choice.dto";
 export * from "./attempt.dto";
 export * from "./coding-test-cases.dto";
+export * from "./dashboard.dto";

@@ -28,7 +28,7 @@ export interface ExamAttemptsPageItemDTO {
   status: AttemptStatus;
 }
 
-// DTO for the Exam Attempts Page
+// DTO for the Exam Attempts Page (admin)
 export interface ExamAttemptsPageDTO {
   exam_id: string;
   title: string;
@@ -41,6 +41,7 @@ export interface ExamAttemptsPageDTO {
 }
 
 export interface SubmissionReviewPageDTO {
+  attempt_id: string;
   student: {
     user_id: string;
     full_name?: string;
@@ -52,6 +53,49 @@ export interface SubmissionReviewPageDTO {
     max_score: number;
   };
   total_score?: number;
+  cheated: boolean;
   submitted_at?: string;
   questions: ReviewQuestionDTO[];
+}
+
+export interface MyResultsPageItemDTO {
+  attempt_id: string;
+  exam: {
+    exam_id: string;
+    title: string;
+    description?: string;
+    max_score: number;
+  };
+  submitted_at?: string;
+  percentage_score?: number;
+  total_score?: number;
+  cheated: boolean;
+  status: AttemptStatus;
+}
+
+// DTO for My Results Page (student)
+export interface MyResultsPageDTO {
+  results: MyResultsPageItemDTO[];
+}
+
+export interface LeaderboardItemDTO {
+  rank: number;
+  name?: string;
+  score?: number;
+  submitted_at?: string;
+}
+
+// DTO for Exam Result Page (student)
+export interface ExamResultPageDTO extends MyResultsPageItemDTO {
+  rank?: number;
+  total_participants?: number;
+  leaderboard: LeaderboardItemDTO[];
+}
+
+// DTO for updating essay question grades
+export interface GradeEssayDTO {
+  question_grades: {
+    question_id: string;
+    score: number;
+  };
 }
