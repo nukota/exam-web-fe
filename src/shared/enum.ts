@@ -1,3 +1,5 @@
+export type UserRole = "admin" | "student";
+
 export type ExamType = "standard" | "coding";
 
 // not in database
