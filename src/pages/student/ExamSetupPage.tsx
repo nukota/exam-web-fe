@@ -4,15 +4,13 @@ import {
   Box,
   Typography,
   Button,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
   TextField,
   Alert,
   CircularProgress,
-  Paper,
+  Container,
+  Switch,
+  FormControlLabel,
 } from "@mui/material";
-import { Camera, CameraOff } from "lucide-react";
 import { useExam } from "../../services/examsService";
 import { useWebcam } from "../../shared/providers/WebcamProvider";
 
@@ -21,7 +19,7 @@ export const StudentExamSetupPage = () => {
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const [webcamEnabled, setWebcamEnabled] = useState<"yes" | "no" | null>(null);
+  const [webcamEnabled, setWebcamEnabled] = useState<boolean | null>(null);
   const [noWebcamReason, setNoWebcamReason] = useState("");
 
   const { data: exam, isLoading } = useExam(examId || "");
@@ -43,11 +41,11 @@ export const StudentExamSetupPage = () => {
     }
   }, [stream]);
 
-  const handleWebcamChoice = async (value: "yes" | "no") => {
-    setWebcamEnabled(value);
+  const handleWebcamChoice = async (enabled: boolean) => {
+    setWebcamEnabled(enabled);
     setNoWebcamReason("");
 
-    if (value === "yes") {
+    if (enabled) {
       await startWebcam();
     } else {
       // Stop webcam if it was already running
@@ -59,7 +57,7 @@ export const StudentExamSetupPage = () => {
     if (!examId || !exam) return;
 
     // Start recording if webcam is enabled
-    if (webcamEnabled === "yes" && stream && !isRecording) {
+    if (webcamEnabled && stream && !isRecording) {
       startRecording();
     }
 
@@ -73,7 +71,7 @@ export const StudentExamSetupPage = () => {
 
   const canProceed = () => {
     if (webcamEnabled === null) return false;
-    if (webcamEnabled === "yes") {
+    if (webcamEnabled) {
       return stream !== null;
     }
     return noWebcamReason.trim().length > 0;
@@ -116,74 +114,94 @@ export const StudentExamSetupPage = () => {
     <Box
       sx={{
         minHeight: "100vh",
-        bgcolor: "background.default",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        p: 3,
+        backgroundColor: "#eee",
+        py: 4,
       }}
     >
       <Box sx={{ maxWidth: 800, width: "100%" }}>
-        <Paper elevation={3} sx={{ p: 4 }}>
-          <Typography variant="h4" fontWeight="bold" gutterBottom>
+        <Container
+          sx={{
+            background: "white",
+            borderRadius: 4,
+            width: "fit-content",
+            py: 2,
+            px: 4,
+          }}
+        >
+          <Typography variant="h5" fontWeight={700} gutterBottom>
             Exam Setup
           </Typography>
-          <Typography variant="h6" color="text.secondary" gutterBottom>
-            {exam.title}
-          </Typography>
 
-          <Box sx={{ mt: 4 }}>
-            <Typography variant="h6" gutterBottom>
-              Webcam Setup
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              For exam integrity, we recommend enabling your webcam during the
-              exam.
-            </Typography>
-
-            <RadioGroup
-              value={webcamEnabled || ""}
-              onChange={(e) =>
-                handleWebcamChoice(e.target.value as "yes" | "no")
-              }
+          {/* Exam Information Section */}
+          <Box
+            sx={{
+              mt: 2,
+              p: 2,
+              bgcolor: "#f0f0f0",
+              borderRadius: 2,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-start",
+              gap: 0.5,
+            }}
+          >
+            <Typography variant="body1">Title: {exam.title}</Typography>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
             >
+              <Typography variant="body2" color="text.secondary">
+                {exam.type === "coding" ? "Coding Exam" : "Standard Exam"}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {exam.questions?.length || 0} questions in{" "}
+                {exam.duration_minutes} minutes
+              </Typography>
+            </Box>
+          </Box>
+
+          <Box sx={{ mt: 2 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2, my: 2 }}>
+              <Typography variant="body1" fontWeight={500}>
+                Enable Webcam
+              </Typography>
               <FormControlLabel
-                value="yes"
-                control={<Radio />}
-                label={
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Camera size={20} />
-                    <Typography>Enable webcam</Typography>
-                  </Box>
+                control={
+                  <Switch
+                    checked={webcamEnabled || false}
+                    onChange={(e) => handleWebcamChoice(e.target.checked)}
+                    color="primary"
+                  />
                 }
+                label=""
               />
-              <FormControlLabel
-                value="no"
-                control={<Radio />}
-                label={
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <CameraOff size={20} />
-                    <Typography>No webcam available</Typography>
-                  </Box>
-                }
-              />
-            </RadioGroup>
+            </Box>
 
             {/* Webcam Preview */}
-            {webcamEnabled === "yes" && (
-              <Box sx={{ mt: 3 }}>
-                <Typography variant="subtitle2" gutterBottom>
-                  Webcam Preview
-                </Typography>
+            {webcamEnabled && (
+              <Box
+                sx={{
+                  height: 330,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "flex-start",
+                }}
+              >
                 <Box
                   sx={{
                     position: "relative",
-                    borderRadius: 2,
+                    borderRadius: 1,
                     overflow: "hidden",
                     bgcolor: "black",
-                    width: "100%",
-                    maxWidth: 640,
-                    aspectRatio: "4/3",
+                    width: { xs: 400, lg: 540 },
+                    aspectRatio: "16/9",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -251,26 +269,37 @@ export const StudentExamSetupPage = () => {
                   )}
                 </Box>
                 {stream && (
-                  <Alert severity="success" sx={{ mt: 2 }}>
-                    Webcam is working correctly. Recording will begin when you
+                  <Typography
+                    variant="body2"
+                    color="success.main"
+                    sx={{ mt: 1, textAlign: "center", fontWeight: 500 }}
+                  >
+                    ✓ Webcam is working correctly. Recording will begin when you
                     start the exam.
-                  </Alert>
+                  </Typography>
                 )}
               </Box>
             )}
 
             {/* No Webcam Reason */}
-            {webcamEnabled === "no" && (
-              <Box sx={{ mt: 3 }}>
+            {webcamEnabled === false && (
+              <Box sx={{ height: 330, width: { xs: 400, lg: 540 } }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 2 }}
+                >
+                  You may report the reason why you cannot use a webcam for this
+                  exam.
+                </Typography>
                 <TextField
                   fullWidth
                   multiline
-                  rows={3}
+                  rows={2}
                   label="Reason for not using webcam"
                   placeholder="Please explain why you cannot use a webcam..."
                   value={noWebcamReason}
                   onChange={(e) => setNoWebcamReason(e.target.value)}
-                  helperText="This information helps us maintain exam integrity"
                 />
               </Box>
             )}
@@ -283,19 +312,34 @@ export const StudentExamSetupPage = () => {
             )}
           </Box>
 
+          {/* Cheat Detection Warning */}
+          <Box
+            sx={{
+              mt: 4,
+              p: 1,
+              bgcolor: "#f0f0f0",
+              borderRadius: 2,
+            }}
+          >
+            <Typography variant="body2" color="#999">
+              This exam uses monitoring technologies to ensure fair examination.
+              <p> Suspicious activity may result in exam termination.</p>
+            </Typography>
+          </Box>
+
           {/* Action Buttons */}
           <Box
             sx={{
               mt: 4,
               display: "flex",
-              justifyContent: "space-between",
+              justifyContent: "flex-end",
               gap: 2,
             }}
           >
             <Button
-              variant="outlined"
+              variant="text"
+              color="inherit"
               onClick={() => navigate("/student/exams")}
-              size="large"
             >
               Cancel
             </Button>
@@ -303,13 +347,12 @@ export const StudentExamSetupPage = () => {
               variant="contained"
               onClick={handleTakeExam}
               disabled={!canProceed()}
-              size="large"
-              sx={{ minWidth: 150 }}
+              sx={{ minWidth: 150, fontWeight: 500 }}
             >
               Take Exam
             </Button>
           </Box>
-        </Paper>
+        </Container>
 
         {/* Keyframe animation for recording indicator */}
         <style>
