@@ -8,6 +8,9 @@ export const queryKeys = {
     all: ["auth"] as const,
     currentUser: ["auth", "currentUser"] as const,
   },
+  dashboard: {
+    all: ["dashboard"] as const,
+  },
   exams: {
     all: ["exams"] as const,
     list: (filters?: Record<string, unknown>) =>
@@ -33,6 +36,7 @@ export const queryKeys = {
 // Helper function to invalidate related queries
 export const getInvalidationKeys = {
   auth: () => [queryKeys.auth.all],
+  dashboard: () => [queryKeys.dashboard.all],
   exams: () => [queryKeys.exams.all],
   users: () => [queryKeys.users.all],
   submissions: () => [queryKeys.submissions.all],

@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, CircularProgress, Alert } from "@mui/material";
 import { Assignment, People, Grading, TrendingUp } from "@mui/icons-material";
 import { Layout } from "../../components/common";
 import StatCard from "../../components/admin/items/StatCard";
@@ -18,39 +18,80 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { mockDashboardData } from "../../shared/mockdata";
+import { useDashboard } from "../../services/dashboardService";
 
 export const AdminDashboardPage = () => {
+  const { data: dashboardData, isLoading, error } = useDashboard();
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "50vh",
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      </Layout>
+    );
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        <Box sx={{ p: 3 }}>
+          <Alert severity="error">
+            Failed to load dashboard data. Please try again later.
+          </Alert>
+        </Box>
+      </Layout>
+    );
+  }
+
+  if (!dashboardData) {
+    return (
+      <Layout>
+        <Box sx={{ p: 3 }}>
+          <Alert severity="info">No dashboard data available.</Alert>
+        </Box>
+      </Layout>
+    );
+  }
+
   const stats = [
     {
       title: "Total Exams",
-      value: mockDashboardData.total_exams,
+      value: dashboardData.total_exams,
       icon: <Assignment />,
     },
     {
       title: "Total Students",
-      value: mockDashboardData.total_students,
+      value: dashboardData.total_students,
       icon: <People />,
     },
     {
       title: "Pending Grading",
-      value: mockDashboardData.pending_grading,
+      value: dashboardData.pending_grading,
       icon: <Grading />,
     },
     {
       title: "Avg Score",
-      value: mockDashboardData.avg_score,
+      value: dashboardData.avg_score,
       icon: <TrendingUp />,
     },
   ];
 
-  // Use data from mockDashboardData
+  // Use data from API
   const {
     exam_scores_data,
     exam_type_data,
     top_exams_data,
     student_activity_data,
-  } = mockDashboardData;
+  } = dashboardData;
 
   return (
     <Layout>
@@ -189,7 +230,7 @@ export const AdminDashboardPage = () => {
                   dataKey="value"
                   cornerRadius={7}
                 >
-                  {exam_type_data.map((_, index: number) => (
+                  {exam_type_data.map((_entry: any, index: number) => (
                     <Cell
                       key={`cell-${index}`}
                       fill={["#667eea", "#00d4ff"][index % 2]}
