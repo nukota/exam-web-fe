@@ -1,15 +1,51 @@
-import { Box, Typography, IconButton } from "@mui/material";
+import {
+  Box,
+  Typography,
+  IconButton,
+  CircularProgress,
+  Alert,
+} from "@mui/material";
 import { ClipboardEdit } from "lucide-react";
 import type { GridColDef } from "@mui/x-data-grid";
 import { Layout, CustomDataGrid } from "../../components/common";
 import { useNavigate } from "react-router-dom";
-import { mockExamsForGrading } from "../../shared/mockdata";
+import { useGradingExams } from "../../services/examsService";
 
 export const AdminGradingPage = () => {
   const navigate = useNavigate();
+  const { data: gradingData, isLoading, error } = useGradingExams();
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "50vh",
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      </Layout>
+    );
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        <Box sx={{ p: 3 }}>
+          <Alert severity="error">
+            Failed to load grading data. Please try again later.
+          </Alert>
+        </Box>
+      </Layout>
+    );
+  }
 
   // Filter only exams with pending submissions
-  const examsWithPending = mockExamsForGrading.filter(
+  const examsWithPending = (gradingData || []).filter(
     (exam) => exam.pending_submissions > 0
   );
 

@@ -8,6 +8,7 @@ import type {
   CreateExamDTO,
   UpdateExamWithQuestionsDTO,
   Exam,
+  GradingPageDTO,
 } from "../shared/dtos/exam.dto";
 
 const getAllExams = async (): Promise<AllExamsPageDTO> => {
@@ -39,6 +40,11 @@ const updateExam = async ({
 const deleteExam = async (examId: string): Promise<void> => {
   if (!auth.currentUser) throw new Error("Not authenticated");
   return api.delete<void>(`/exams/${examId}`);
+};
+
+const getGradingExams = async (): Promise<GradingPageDTO> => {
+  if (!auth.currentUser) throw new Error("Not authenticated");
+  return api.get<GradingPageDTO>("/exams/grading");
 };
 
 // React Query Hooks
@@ -102,5 +108,14 @@ export const useDeleteExam = () => {
         queryKey: queryKeys.exams.all,
       });
     },
+  });
+};
+
+export const useGradingExams = () => {
+  return useQuery({
+    queryKey: queryKeys.exams.list({ grading: true }),
+    queryFn: getGradingExams,
+    enabled: !!auth.currentUser,
+    staleTime: 1 * 60 * 1000, // 1 minute
   });
 };
