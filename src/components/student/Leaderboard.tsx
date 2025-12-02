@@ -14,16 +14,16 @@ import { Card } from "../common";
 
 interface LeaderboardEntry {
   rank: number;
-  name: string;
-  score: number;
-  submitted_at: string;
+  name?: string;
+  score?: number;
+  submitted_at?: string;
   isCurrentUser?: boolean;
 }
 
 interface LeaderboardProps {
   entries: LeaderboardEntry[];
-  currentUserRank: number;
-  totalParticipants: number;
+  currentUserRank?: number;
+  totalParticipants?: number;
 }
 
 export const Leaderboard = ({
@@ -53,7 +53,7 @@ export const Leaderboard = ({
       >
         <Box sx={{ flex: 1, textAlign: "center" }}>
           <Typography variant="h5" color="black" fontWeight="bold">
-            #{currentUserRank}
+            #{currentUserRank ?? "-"}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Your Rank
@@ -62,7 +62,7 @@ export const Leaderboard = ({
         <Divider orientation="vertical" flexItem />
         <Box sx={{ flex: 1, textAlign: "center" }}>
           <Typography variant="h5" fontWeight="bold">
-            {totalParticipants}
+            {totalParticipants ?? "-"}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Total Students
@@ -124,7 +124,7 @@ export const Leaderboard = ({
                       variant="body2"
                       fontWeight={entry.isCurrentUser ? "bold" : "normal"}
                     >
-                      {entry.name}
+                      {entry.name || "Anonymous"}
                     </Typography>
                     {entry.rank === 1 && <Crown size={16} color="#f59e0b" />}
                   </Box>
@@ -134,7 +134,7 @@ export const Leaderboard = ({
                     variant="body2"
                     fontWeight={entry.isCurrentUser ? "bold" : "medium"}
                   >
-                    {entry.score}
+                    {entry.score ?? "-"}
                   </Typography>
                 </TableCell>
                 <TableCell
@@ -146,7 +146,9 @@ export const Leaderboard = ({
                     color="text.secondary"
                     fontWeight={entry.isCurrentUser ? "bold" : "normal"}
                   >
-                    {new Date(entry.submitted_at).toLocaleString()}
+                    {entry.submitted_at
+                      ? new Date(entry.submitted_at).toLocaleString()
+                      : "N/A"}
                   </Typography>
                 </TableCell>
               </TableRow>

@@ -1,101 +1,92 @@
 import { Box, Typography, Paper, Button, IconButton } from "@mui/material";
-import { BookOpen, Eye, SquareTerminal } from "lucide-react";
+import { Eye } from "lucide-react";
 import { Layout } from "../../components/common/Layout";
 import { CustomDataGrid } from "../../components/common";
-import { calculatePercentage } from "../../shared/utils";
 import { useNavigate } from "react-router-dom";
-import { mockResults } from "../../shared/mockdata";
+import { useMyResults } from "../../services/attemptsService";
 import type { GridColDef } from "@mui/x-data-grid";
 
 export const StudentAllResultsPage = () => {
   const navigate = useNavigate();
+  const { data: resultsData, isLoading, error } = useMyResults();
 
   const columns: GridColDef[] = [
     {
-      field: "title",
+      field: "exam.title",
       headerName: "Title",
       flex: 1,
       minWidth: 200,
       renderCell: (params) => (
         <Box sx={{ display: "flex", flexDirection: "column", gap: 0 }}>
           <Typography variant="body1" fontWeight="medium">
-            {params.row.title}
+            {params.row.exam.title}
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            {params.row.description}
+            {params.row.exam.description}
           </Typography>
         </Box>
       ),
     },
     {
-      field: "type",
-      headerName: "Type",
-      width: 100,
-      renderCell: (params) => (
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          {params.value === "coding" ? (
-            <SquareTerminal size={22} />
-          ) : (
-            <BookOpen size={22} />
-          )}
-        </Box>
-      ),
-    },
-    {
-      field: "score",
+      field: "total_score",
       headerName: "Score",
       width: 120,
       align: "center",
       headerAlign: "center",
       renderCell: (params) => (
         <Typography variant="body2" fontWeight="medium">
-          {params.value} / {params.row.maxScore}
+          {params.value} / {params.row.exam.max_score}
         </Typography>
       ),
     },
     {
-      field: "percentage",
+      field: "percentage_score",
       headerName: "Percentage",
       width: 100,
       align: "center",
       headerAlign: "center",
       renderCell: (params) => {
-        const percentage = calculatePercentage(
-          params.row.score,
-          params.row.maxScore
-        );
+        const percentage = params.value;
+        const passed = percentage >= 60; // Assuming 60% is passing
         return (
           <Typography
             variant="body2"
-            color={params.row.passed ? "success.main" : "error.main"}
+            color={passed ? "success.main" : "error.main"}
             fontWeight="medium"
           >
-            {percentage}%
+            {percentage?.toFixed(1)}%
           </Typography>
         );
       },
     },
     {
-      field: "passed",
+      field: "status",
       headerName: "Status",
       width: 110,
       align: "center",
       headerAlign: "center",
-      renderCell: (params) => (
-        <Typography
-          variant="body2"
-          color={params.value ? "success.main" : "error.main"}
-          fontWeight="medium"
-        >
-          {params.value ? "Passed" : "Failed"}
-        </Typography>
-      ),
+      renderCell: (params) => {
+        const statusColors = {
+          graded: "success.main",
+          submitted: "success.main",
+          in_progress: "info.main",
+          not_started: "text.secondary",
+          overdue: "error.main",
+          cancelled: "text.secondary",
+        };
+        return (
+          <Typography
+            variant="body2"
+            color={
+              statusColors[params.value as keyof typeof statusColors] ||
+              "text.secondary"
+            }
+            fontWeight="medium"
+          >
+            {params.value?.replace("_", " ").toUpperCase()}
+          </Typography>
+        );
+      },
     },
     {
       field: "submitted_at",
@@ -126,7 +117,9 @@ export const StudentAllResultsPage = () => {
         <IconButton
           size="small"
           disabled={params.row.status !== "graded"}
-          onClick={() => navigate(`/student/exam/${params.row.exam_id}/result`)}
+          onClick={() =>
+            navigate(`/student/exam/${params.row.exam.exam_id}/result`)
+          }
           sx={{
             color: "text.secondary",
             "&:hover": {
@@ -140,8 +133,45 @@ export const StudentAllResultsPage = () => {
     },
   ];
 
-  const totalExams = mockResults.length;
-  const passedExams = mockResults.filter((result) => result.passed).length;
+  const results = resultsData?.results || [];
+  const totalExams = results.length;
+  const passedExams = results.filter(
+    (result) => result.percentage_score && result.percentage_score >= 60
+  ).length;
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "50vh",
+          }}
+        >
+          <Typography>Loading results...</Typography>
+        </Box>
+      </Layout>
+    );
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "50vh",
+          }}
+        >
+          <Typography color="error">Failed to load results</Typography>
+        </Box>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -172,11 +202,11 @@ export const StudentAllResultsPage = () => {
           </Typography>
         </Box>
 
-        {mockResults.length > 0 ? (
+        {results.length > 0 ? (
           <CustomDataGrid
-            rows={mockResults}
+            rows={results}
             columns={columns}
-            getRowId={(row) => row.exam_id}
+            getRowId={(row) => row.attempt_id}
             pageSize={10}
             pageSizeOptions={[10, 20, 50]}
           />

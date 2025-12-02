@@ -6,88 +6,55 @@ import {
   IconButton,
 } from "@mui/material";
 import { Layout, Card } from "../../components/common";
-import { useNavigate } from "react-router-dom";
-import type { Submission } from "../../shared/dtos";
+import { useNavigate, useParams } from "react-router-dom";
 import { Leaderboard } from "../../components/student/Leaderboard";
 import { ArrowLeft } from "lucide-react";
-
-// Mock data
-const mockResult = {
-  exam_title: "Introduction to Computer Science",
-  submission: {
-    submission_id: "1",
-    exam_id: "1",
-    user_id: "student1",
-    submitted_at: "2025-11-14T10:30:00",
-    total_score: 8,
-    status: "graded",
-  } as Submission,
-  maxScore: 11,
-  rank: 5,
-  totalParticipants: 50,
-  questionResults: [
-    {
-      question: "What is the time complexity of binary search?",
-      earned: 2,
-      max: 2,
-      correct: true,
-    },
-    {
-      question: "Which of the following are programming paradigms?",
-      earned: 2,
-      max: 3,
-      correct: false,
-    },
-    { question: "What does CPU stand for?", earned: 1, max: 1, correct: true },
-    {
-      question: "Explain the concept of recursion",
-      earned: 3,
-      max: 5,
-      correct: true,
-    },
-  ],
-};
-
-const mockLeaderboard = [
-  {
-    rank: 1,
-    name: "Alice Johnson",
-    score: 11,
-    submitted_at: "2025-11-14T09:45:00",
-  },
-  {
-    rank: 2,
-    name: "Bob Smith",
-    score: 10,
-    submitted_at: "2025-11-14T10:12:00",
-  },
-  {
-    rank: 3,
-    name: "Carol White",
-    score: 9,
-    submitted_at: "2025-11-14T10:05:00",
-  },
-  {
-    rank: 4,
-    name: "David Brown",
-    score: 9,
-    submitted_at: "2025-11-14T10:20:00",
-  },
-  {
-    rank: 5,
-    name: "You",
-    score: 8,
-    submitted_at: "2025-11-14T10:30:00",
-    isCurrentUser: true,
-  },
-];
+import { useExamLeaderboard } from "../../services/attemptsService";
 
 export const StudentExamResultPage = () => {
-  // const { examId } = useParams(); // For future use to fetch exam-specific results
+  const { examId } = useParams();
   const navigate = useNavigate();
+  const {
+    data: resultData,
+    isLoading,
+    error,
+  } = useExamLeaderboard(examId || "");
 
-  const percentage =
-    (mockResult.submission.total_score / mockResult.maxScore) * 100;
+  if (isLoading) {
+    return (
+      <Layout>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "50vh",
+          }}
+        >
+          <Typography>Loading exam results...</Typography>
+        </Box>
+      </Layout>
+    );
+  }
+
+  if (error || !resultData) {
+    return (
+      <Layout>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "50vh",
+          }}
+        >
+          <Typography color="error">Failed to load exam results</Typography>
+        </Box>
+      </Layout>
+    );
+  }
+
+  const percentage = resultData.percentage_score || 0;
   const passed = percentage >= 60;
 
   return (
@@ -149,7 +116,7 @@ export const StudentExamResultPage = () => {
                   gutterBottom
                   sx={{ mb: 2 }}
                 >
-                  {mockResult.exam_title}
+                  {resultData.exam.title}
                 </Typography>
               </Box>
             </Box>
@@ -193,7 +160,7 @@ export const StudentExamResultPage = () => {
                     color={passed ? "success.main" : "error.main"}
                     fontWeight="bold"
                   >
-                    {mockResult.submission.total_score}/{mockResult.maxScore}
+                    {resultData.total_score}/{resultData.exam.max_score}
                   </Typography>
                 </Box>
               </Box>
@@ -203,9 +170,7 @@ export const StudentExamResultPage = () => {
               <Button
                 variant="contained"
                 onClick={() =>
-                  navigate(
-                    `/student/submissions/${mockResult.submission.submission_id}`
-                  )
+                  navigate(`/student/submissions/${resultData.attempt_id}`)
                 }
                 sx={{
                   minWidth: 140,
@@ -239,9 +204,9 @@ export const StudentExamResultPage = () => {
 
           {/* Leaderboard Card */}
           <Leaderboard
-            entries={mockLeaderboard}
-            currentUserRank={mockResult.rank}
-            totalParticipants={mockResult.totalParticipants}
+            entries={resultData.leaderboard}
+            currentUserRank={resultData.rank}
+            totalParticipants={resultData.total_participants}
           />
         </Box>
       </Box>

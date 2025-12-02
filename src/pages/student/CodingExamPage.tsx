@@ -10,16 +10,24 @@ import {
   DialogActions,
 } from "@mui/material";
 import { Timer, Send, Code, Check } from "@mui/icons-material";
-import { mockCodingQuestions } from "../../shared/mockdata";
 import { useExamTimer } from "../../shared/providers/ExamTimerProvider";
 import { useWebcam } from "../../shared/providers/WebcamProvider";
+import { useExamMonitor } from "../../shared/providers/ExamMonitorProvider";
+import { useExam } from "../../services/examsService";
 import { Card } from "../../components/common";
 
 export const StudentCodingExamPage = () => {
   const { examId } = useParams();
   const navigate = useNavigate();
   const { timeRemaining, startTimer, formatTime } = useExamTimer();
-  const { isRecording, stopRecording, stopWebcam } = useWebcam();
+  const { stopWebcam, isWebcamEnabled } = useWebcam();
+  const {
+    tabSwitches,
+    hasExitedFullscreen,
+    requestFullscreen,
+    resetMonitoring,
+  } = useExamMonitor();
+  const { data: exam, isLoading, error } = useExam(examId || "");
   const [completedQuestions, setCompletedQuestions] = useState<Set<string>>(
     new Set()
   );
@@ -34,14 +42,24 @@ export const StudentCodingExamPage = () => {
   `;
 
   useEffect(() => {
-    // Start timer with 90 minutes (5400 seconds)
-    startTimer(5400, handleSubmit);
-  }, []);
+    if (exam && exam.duration_minutes) {
+      // Reset monitoring counters
+      resetMonitoring();
+
+      // Request fullscreen mode
+      requestFullscreen();
+
+      // Start timer with exam duration
+      const durationInSeconds = exam.duration_minutes * 60;
+      startTimer(durationInSeconds, handleSubmit);
+    }
+  }, [exam]);
 
   // Check for completed questions whenever localStorage might change
   const checkCompletedQuestions = () => {
+    const questions = exam?.questions || [];
     const completed = new Set<string>();
-    mockCodingQuestions.forEach((question) => {
+    questions.forEach((question) => {
       // Check if any language has code saved for this question
       const languages = question.programming_languages || ["python"];
       const hasCode = languages.some((lang) => {
@@ -60,7 +78,7 @@ export const StudentCodingExamPage = () => {
 
   useEffect(() => {
     checkCompletedQuestions();
-  }, [examId]);
+  }, [examId, exam]);
 
   // Listen for storage changes to update completion status in real-time
   useEffect(() => {
@@ -72,15 +90,13 @@ export const StudentCodingExamPage = () => {
   }, []);
 
   const handleSubmit = async () => {
-    // Stop recording if active
-    if (isRecording) {
-      stopRecording();
-    }
     // Stop webcam
     stopWebcam();
 
+    const questions = exam?.questions || [];
+
     // Collect all saved code from localStorage for all questions and all languages
-    const allAnswers = mockCodingQuestions.map((question) => {
+    const allAnswers = questions.map((question) => {
       const languages = question.programming_languages || ["python"];
       const savedLanguage =
         localStorage.getItem(`language_${question.question_id}`) ||
@@ -103,7 +119,7 @@ export const StudentCodingExamPage = () => {
       // await submitCodingExam(examId, allAnswers);
 
       // Clear all code from localStorage after successful submission
-      mockCodingQuestions.forEach((question) => {
+      questions.forEach((question) => {
         const languages = question.programming_languages || ["python"];
         languages.forEach((lang) => {
           localStorage.removeItem(`code_${question.question_id}_${lang}`);
@@ -122,8 +138,39 @@ export const StudentCodingExamPage = () => {
     navigate(`/student/exam/coding/${examId}/compiler/${questionId}`);
   };
 
-  const totalPoints = mockCodingQuestions.reduce((sum, q) => sum + q.points, 0);
+  const questions = exam?.questions || [];
+  const totalPoints = questions.reduce((sum, q) => sum + q.points, 0);
   const completedCount = completedQuestions.size;
+
+  if (isLoading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+        }}
+      >
+        <Typography>Loading exam...</Typography>
+      </Box>
+    );
+  }
+
+  if (error || !exam) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+        }}
+      >
+        <Typography color="error">Failed to load exam</Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ display: "flex", height: "100vh", bgcolor: "white" }}>
@@ -142,7 +189,7 @@ export const StudentCodingExamPage = () => {
         {/* Exam Title and Timer */}
         <Box sx={{ mb: 2 }}>
           <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
-            Python Programming Challenge
+            {exam.title}
           </Typography>
           <Box
             sx={{
@@ -189,7 +236,7 @@ export const StudentCodingExamPage = () => {
               Completed:
             </Typography>
             <Typography variant="body2" fontWeight="bold">
-              {completedCount} / {mockCodingQuestions.length}
+              {completedCount} / {questions.length}
             </Typography>
           </Box>
           <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
@@ -223,24 +270,36 @@ export const StudentCodingExamPage = () => {
             <Typography variant="body2" color="text.secondary">
               Tab Switches:
             </Typography>
-            <Typography variant="body2" fontWeight="bold">
-              0
+            <Typography
+              variant="body2"
+              fontWeight="bold"
+              color={tabSwitches > 0 ? "error.main" : "inherit"}
+            >
+              {tabSwitches}
             </Typography>
           </Box>
           <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
             <Typography variant="body2" color="text.secondary">
               Face Detection:
             </Typography>
-            <Typography variant="body2" fontWeight="bold">
-              Active
+            <Typography
+              variant="body2"
+              fontWeight="bold"
+              color={isWebcamEnabled ? "success.main" : "text.secondary"}
+            >
+              {isWebcamEnabled ? "Yes" : "No"}
             </Typography>
           </Box>
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
             <Typography variant="body2" color="text.secondary">
-              Window Focus:
+              Keep Fullscreen mode:
             </Typography>
-            <Typography variant="body2" fontWeight="bold">
-              Yes
+            <Typography
+              variant="body2"
+              fontWeight="bold"
+              color={hasExitedFullscreen ? "error.main" : "success.main"}
+            >
+              {hasExitedFullscreen ? "No" : "Yes"}
             </Typography>
           </Box>
         </Box>
@@ -262,7 +321,7 @@ export const StudentCodingExamPage = () => {
               gap: 0.5,
             }}
           >
-            {mockCodingQuestions.map((question, index) => {
+            {questions.map((question, index) => {
               const isCompleted = completedQuestions.has(question.question_id);
               return (
                 <Box
@@ -337,7 +396,7 @@ export const StudentCodingExamPage = () => {
           <Typography variant="h6">Coding Problems</Typography>
         </Box>
         <Box sx={{ gap: 3, display: "flex", flexDirection: "column" }}>
-          {mockCodingQuestions.map((question, index) => (
+          {questions.map((question, index) => (
             <Card
               key={question.question_id}
               onClick={() => handleQuestionClick(question.question_id)}
@@ -392,7 +451,7 @@ export const StudentCodingExamPage = () => {
         <DialogContent>
           <Typography>
             Are you sure you want to submit your coding exam? You have completed{" "}
-            {completedCount} out of {mockCodingQuestions.length} questions.
+            {completedCount} out of {questions.length} questions.
           </Typography>
         </DialogContent>
         <DialogActions>

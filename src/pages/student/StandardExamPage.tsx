@@ -10,16 +10,24 @@ import {
   DialogActions,
 } from "@mui/material";
 import { Timer, Send } from "@mui/icons-material";
-import { mockQuestionsExam1 } from "../../shared/mockdata";
 import { Question } from "../../components/student/items/Question";
+import { useExam } from "../../services/examsService";
 import { useExamTimer } from "../../shared/providers/ExamTimerProvider";
 import { useWebcam } from "../../shared/providers/WebcamProvider";
+import { useExamMonitor } from "../../shared/providers/ExamMonitorProvider";
 
 export const StudentStandardExamPage = () => {
   const { examId } = useParams();
   const navigate = useNavigate();
   const { timeRemaining, startTimer, formatTime } = useExamTimer();
-  const { isRecording, stopRecording, stopWebcam } = useWebcam();
+  const { stopWebcam, isWebcamEnabled } = useWebcam();
+  const {
+    tabSwitches,
+    hasExitedFullscreen,
+    requestFullscreen,
+    resetMonitoring,
+  } = useExamMonitor();
+  const { data: exam, isLoading, error } = useExam(examId || "");
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [flaggedQuestions, setFlaggedQuestions] = useState<Set<string>>(
     new Set()
@@ -36,9 +44,18 @@ export const StudentStandardExamPage = () => {
   `;
 
   useEffect(() => {
-    // Start timer with 60 minutes (3600 seconds)
-    startTimer(3600, handleSubmit);
-  }, []);
+    if (exam && exam.duration_minutes) {
+      // Reset monitoring counters
+      resetMonitoring();
+
+      // Request fullscreen mode
+      requestFullscreen();
+
+      // Start timer with exam duration
+      const durationInSeconds = exam.duration_minutes * 60;
+      startTimer(durationInSeconds, handleSubmit);
+    }
+  }, [exam]);
 
   const handleAnswerChange = (questionId: string, value: any) => {
     setAnswers({ ...answers, [questionId]: value });
@@ -57,10 +74,6 @@ export const StudentStandardExamPage = () => {
   };
 
   const handleSubmit = () => {
-    // Stop recording if active
-    if (isRecording) {
-      stopRecording();
-    }
     // Stop webcam
     stopWebcam();
 
@@ -68,7 +81,6 @@ export const StudentStandardExamPage = () => {
     console.log("Submitting answers:", answers);
     navigate(`/student/exam/${examId}/result`);
   };
-
   const scrollToQuestion = (questionId: string) => {
     questionRefs.current[questionId]?.scrollIntoView({
       behavior: "smooth",
@@ -76,8 +88,39 @@ export const StudentStandardExamPage = () => {
     });
   };
 
-  const totalPoints = mockQuestionsExam1.reduce((sum, q) => sum + q.points, 0);
+  const questions = exam?.questions || [];
+  const totalPoints = questions.reduce((sum, q) => sum + q.points, 0);
   const answeredCount = Object.keys(answers).length;
+
+  if (isLoading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+        }}
+      >
+        <Typography>Loading exam...</Typography>
+      </Box>
+    );
+  }
+
+  if (error || !exam) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+        }}
+      >
+        <Typography color="error">Failed to load exam</Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ display: "flex", height: "100vh", bgcolor: "white" }}>
@@ -96,7 +139,7 @@ export const StudentStandardExamPage = () => {
         {/* Exam Title and Timer */}
         <Box sx={{ mb: 2 }}>
           <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
-            Introduction to Computer Science
+            {exam.title}
           </Typography>
           <Box
             sx={{
@@ -147,7 +190,7 @@ export const StudentStandardExamPage = () => {
               Answered:
             </Typography>
             <Typography variant="body2" fontWeight="bold">
-              {answeredCount} / {mockQuestionsExam1.length}
+              {answeredCount} / {questions.length}
             </Typography>
           </Box>
           <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
@@ -181,24 +224,36 @@ export const StudentStandardExamPage = () => {
             <Typography variant="body2" color="text.secondary">
               Tab Switches:
             </Typography>
-            <Typography variant="body2" fontWeight="bold">
-              0
+            <Typography
+              variant="body2"
+              fontWeight="bold"
+              color={tabSwitches > 0 ? "error.main" : "inherit"}
+            >
+              {tabSwitches}
             </Typography>
           </Box>
           <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
             <Typography variant="body2" color="text.secondary">
               Face Detection:
             </Typography>
-            <Typography variant="body2" fontWeight="bold">
-              Active
+            <Typography
+              variant="body2"
+              fontWeight="bold"
+              color={isWebcamEnabled ? "success.main" : "text.secondary"}
+            >
+              {isWebcamEnabled ? "Yes" : "No"}
             </Typography>
           </Box>
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
             <Typography variant="body2" color="text.secondary">
-              Window Focus:
+              Keep Fullscreen mode:
             </Typography>
-            <Typography variant="body2" fontWeight="bold">
-              Yes
+            <Typography
+              variant="body2"
+              fontWeight="bold"
+              color={hasExitedFullscreen ? "error.main" : "success.main"}
+            >
+              {hasExitedFullscreen ? "No" : "Yes"}
             </Typography>
           </Box>
         </Box>
@@ -220,7 +275,7 @@ export const StudentStandardExamPage = () => {
               gap: 0.5,
             }}
           >
-            {mockQuestionsExam1.map((question, index) => {
+            {questions.map((question, index) => {
               const isAnswered = answers[question.question_id] !== undefined;
               const isFlagged = flaggedQuestions.has(question.question_id);
               return (
@@ -299,7 +354,7 @@ export const StudentStandardExamPage = () => {
         }}
       >
         <Box sx={{ mb: 2 }} />
-        {mockQuestionsExam1.map((question, index) => (
+        {questions.map((question, index) => (
           <Question
             key={question.question_id}
             question={question}
@@ -324,7 +379,7 @@ export const StudentStandardExamPage = () => {
         <DialogContent>
           <Typography>
             Are you sure you want to submit your exam? You have answered{" "}
-            {answeredCount} out of {mockQuestionsExam1.length} questions.
+            {answeredCount} out of {questions.length} questions.
           </Typography>
         </DialogContent>
         <DialogActions>

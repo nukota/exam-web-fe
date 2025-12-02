@@ -18,6 +18,14 @@ export const queryKeys = {
     detail: (id: string) => ["exams", "detail", id] as const,
     attempts: (examId: string) => ["exams", "attempts", examId] as const,
   },
+  attempts: {
+    all: ["attempts"] as const,
+  },
+  results: {
+    all: ["results"] as const,
+    leaderboard: (examId: string) =>
+      ["results", "leaderboard", examId] as const,
+  },
   users: {
     all: ["users"] as const,
     list: (filters?: Record<string, unknown>) =>
@@ -38,6 +46,8 @@ export const getInvalidationKeys = {
   auth: () => [queryKeys.auth.all],
   dashboard: () => [queryKeys.dashboard.all],
   exams: () => [queryKeys.exams.all],
+  attempts: () => [queryKeys.attempts.all],
+  results: () => [queryKeys.results.all],
   users: () => [queryKeys.users.all],
   submissions: () => [queryKeys.submissions.all],
 };

@@ -23,14 +23,7 @@ export const StudentExamSetupPage = () => {
   const [noWebcamReason, setNoWebcamReason] = useState("");
 
   const { data: exam, isLoading } = useExam(examId || "");
-  const {
-    stream,
-    isRecording,
-    error,
-    startWebcam,
-    stopWebcam,
-    startRecording,
-  } = useWebcam();
+  const { stream, error, startWebcam, stopWebcam } = useWebcam();
 
   // Update video element when stream changes
   useEffect(() => {
@@ -55,11 +48,6 @@ export const StudentExamSetupPage = () => {
 
   const handleTakeExam = () => {
     if (!examId || !exam) return;
-
-    // Start recording if webcam is enabled
-    if (webcamEnabled && stream && !isRecording) {
-      startRecording();
-    }
 
     // Navigate to appropriate exam page
     if (exam.type === "coding") {
@@ -220,36 +208,6 @@ export const StudentExamSetupPage = () => {
                           objectFit: "cover",
                         }}
                       />
-                      {isRecording && (
-                        <Box
-                          sx={{
-                            position: "absolute",
-                            top: 10,
-                            right: 10,
-                            bgcolor: "error.main",
-                            color: "white",
-                            px: 1.5,
-                            py: 0.5,
-                            borderRadius: 1,
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 0.5,
-                          }}
-                        >
-                          <Box
-                            sx={{
-                              width: 8,
-                              height: 8,
-                              borderRadius: "50%",
-                              bgcolor: "white",
-                              animation: "pulse 1.5s infinite",
-                            }}
-                          />
-                          <Typography variant="caption" fontWeight="bold">
-                            RECORDING
-                          </Typography>
-                        </Box>
-                      )}
                     </>
                   ) : (
                     <Box
@@ -274,8 +232,7 @@ export const StudentExamSetupPage = () => {
                     color="success.main"
                     sx={{ mt: 1, textAlign: "center", fontWeight: 500 }}
                   >
-                    ✓ Webcam is working correctly. Recording will begin when you
-                    start the exam.
+                    ✓ Webcam is working correctly.
                   </Typography>
                 )}
               </Box>

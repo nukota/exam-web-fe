@@ -40,6 +40,7 @@ export interface ExamAttemptsPageDTO {
   attempts: ExamAttemptsPageItemDTO[];
 }
 
+// DTO for Submission Review Page (admin)
 export interface SubmissionReviewPageDTO {
   attempt_id: string;
   student: {
@@ -98,4 +99,18 @@ export interface GradeEssayDTO {
     question_id: string;
     score: number;
   };
+}
+
+export interface AnswerSubmissionDTO {
+  question_id: string;
+  answer_text?: string;
+  selected_choices?: string[];
+  programming_language?: string;
+}
+
+// DTO for submitting an exam
+export interface SubmitExamDTO {
+  started_at?: string;
+  cheated: boolean;
+  answers: AnswerSubmissionDTO[];
 }

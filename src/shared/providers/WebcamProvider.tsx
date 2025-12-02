@@ -7,18 +7,14 @@ import {
   useEffect,
 } from "react";
 import type { ReactNode } from "react";
+import { useLocation } from "react-router-dom";
 
 interface WebcamContextType {
   stream: MediaStream | null;
-  isRecording: boolean;
   error: string | null;
   isWebcamEnabled: boolean;
   startWebcam: () => Promise<void>;
   stopWebcam: () => void;
-  startRecording: () => void;
-  stopRecording: () => void;
-  getRecordedChunks: () => Blob[];
-  clearRecordedChunks: () => void;
 }
 
 const WebcamContext = createContext<WebcamContextType | undefined>(undefined);
@@ -37,13 +33,28 @@ interface WebcamProviderProps {
 
 export const WebcamProvider = ({ children }: WebcamProviderProps) => {
   const streamRef = useRef<MediaStream | null>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const recordedChunksRef = useRef<Blob[]>([]);
+  const location = useLocation();
 
   const [stream, setStream] = useState<MediaStream | null>(null);
-  const [isRecording, setIsRecording] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isWebcamEnabled, setIsWebcamEnabled] = useState(false);
+
+  // Check if current route allows webcam usage
+  const isWebcamAllowedRoute = useCallback((pathname: string) => {
+    // Allowed routes for webcam usage:
+    // - /student/exam/:examId/setup (exam setup page)
+    // - /student/exam/:examId (standard exam page)
+    // - /student/exam/coding/:examId (coding exam page)
+    // - /student/exam/coding/:examId/compiler/:questionId (code compiler page)
+    const allowedPatterns = [
+      /^\/student\/exam\/[^\/]+\/setup$/, // /student/exam/:examId/setup
+      /^\/student\/exam\/[^\/]+$/, // /student/exam/:examId
+      /^\/student\/exam\/coding\/[^\/]+$/, // /student/exam/coding/:examId
+      /^\/student\/exam\/coding\/[^\/]+\/compiler\/[^\/]+$/, // /student/exam/coding/:examId/compiler/:questionId
+    ];
+
+    return allowedPatterns.some((pattern) => pattern.test(pathname));
+  }, []);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -53,11 +64,8 @@ export const WebcamProvider = ({ children }: WebcamProviderProps) => {
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((track) => track.stop());
       }
-      if (mediaRecorderRef.current && isRecording) {
-        mediaRecorderRef.current.stop();
-      }
     };
-  }, [isRecording]);
+  }, []);
 
   const stopWebcam = useCallback(() => {
     console.log("WebcamProvider: stopWebcam called");
@@ -70,6 +78,16 @@ export const WebcamProvider = ({ children }: WebcamProviderProps) => {
       console.log("WebcamProvider: webcam stopped and cleaned up");
     }
   }, []);
+
+  // Auto-stop webcam when navigating away from allowed routes
+  useEffect(() => {
+    if (!isWebcamAllowedRoute(location.pathname) && isWebcamEnabled) {
+      console.log(
+        "WebcamProvider: Navigating away from allowed route, stopping webcam"
+      );
+      stopWebcam();
+    }
+  }, [location.pathname, isWebcamEnabled, isWebcamAllowedRoute, stopWebcam]);
 
   const startWebcam = useCallback(async () => {
     console.log("WebcamProvider: startWebcam called");
@@ -101,86 +119,12 @@ export const WebcamProvider = ({ children }: WebcamProviderProps) => {
     }
   }, [stopWebcam]);
 
-  const startRecording = useCallback(() => {
-    console.log("WebcamProvider: startRecording called");
-    if (!streamRef.current) {
-      console.error("WebcamProvider: No webcam stream available to record");
-      setError("No webcam stream available to record");
-      return;
-    }
-
-    try {
-      const mediaRecorder = new MediaRecorder(streamRef.current, {
-        mimeType: "video/webm;codecs=vp9",
-      });
-
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          recordedChunksRef.current.push(event.data);
-          console.log(
-            "WebcamProvider: recorded chunk added, size:",
-            event.data.size
-          );
-        }
-      };
-
-      mediaRecorder.onstart = () => {
-        console.log("WebcamProvider: recording started");
-        setIsRecording(true);
-      };
-
-      mediaRecorder.onstop = () => {
-        console.log("WebcamProvider: recording stopped");
-        setIsRecording(false);
-      };
-
-      mediaRecorderRef.current = mediaRecorder;
-      mediaRecorder.start(1000); // Collect data every second
-      console.log("WebcamProvider: MediaRecorder started");
-    } catch (err) {
-      console.error("Error starting recording:", err);
-      setError("Failed to start recording. Please try again.");
-    }
-  }, []);
-
-  const stopRecording = useCallback(() => {
-    console.log("WebcamProvider: stopRecording called");
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      console.log("WebcamProvider: MediaRecorder stopped");
-    } else {
-      console.log("WebcamProvider: No active recording to stop");
-    }
-  }, [isRecording]);
-
-  const getRecordedChunks = useCallback(() => {
-    console.log(
-      "WebcamProvider: getRecordedChunks called, chunks count:",
-      recordedChunksRef.current.length
-    );
-    return [...recordedChunksRef.current];
-  }, []);
-
-  const clearRecordedChunks = useCallback(() => {
-    console.log(
-      "WebcamProvider: clearRecordedChunks called, clearing",
-      recordedChunksRef.current.length,
-      "chunks"
-    );
-    recordedChunksRef.current = [];
-  }, []);
-
   const value: WebcamContextType = {
     stream,
-    isRecording,
     error,
     isWebcamEnabled,
     startWebcam,
     stopWebcam,
-    startRecording,
-    stopRecording,
-    getRecordedChunks,
-    clearRecordedChunks,
   };
 
   return (

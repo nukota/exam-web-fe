@@ -6,6 +6,7 @@ import type {
   GradingPageDTO,
   ExamAttemptsPageDTO,
   DashboardDTO,
+  MyResultsPageDTO,
 } from "./dtos";
 
 // Mock Users
@@ -405,38 +406,52 @@ export const mockLeaderboardData = [
   },
 ];
 
-export const mockResults = [
-  {
-    exam_id: "1",
-    title: "Introduction to Computer Science",
-    description: "Basic concepts of programming and algorithms",
-    submitted_at: "2025-11-14T10:30:00",
-    score: 8,
-    maxScore: 11,
-    status: "graded",
-    passed: true,
-  },
-  {
-    exam_id: "2",
-    title: "Python Programming Challenge",
-    description: "Hands-on coding problems in Python",
-    submitted_at: "2025-11-10T14:20:00",
-    score: 7,
-    maxScore: 10,
-    status: "graded",
-    passed: true,
-  },
-  {
-    exam_id: "3",
-    title: "Data Structures Basics",
-    description: "Fundamental data structures and their operations",
-    submitted_at: "2025-11-05T09:15:00",
-    score: 5,
-    maxScore: 10,
-    status: "submitted",
-    passed: false,
-  },
-];
+export const mockResults: MyResultsPageDTO = {
+  results: [
+    {
+      attempt_id: "attempt1",
+      exam: {
+        exam_id: "1",
+        title: "Introduction to Computer Science",
+        description: "Basic concepts of programming and algorithms",
+        max_score: 11,
+      },
+      submitted_at: "2025-11-14T10:30:00",
+      percentage_score: 72.73,
+      total_score: 8,
+      cheated: false,
+      status: "graded",
+    },
+    {
+      attempt_id: "attempt2",
+      exam: {
+        exam_id: "2",
+        title: "Python Programming Challenge",
+        description: "Hands-on coding problems in Python",
+        max_score: 10,
+      },
+      submitted_at: "2025-11-10T14:20:00",
+      percentage_score: 70,
+      total_score: 7,
+      cheated: false,
+      status: "graded",
+    },
+    {
+      attempt_id: "attempt3",
+      exam: {
+        exam_id: "3",
+        title: "Data Structures Basics",
+        description: "Fundamental data structures and their operations",
+        max_score: 10,
+      },
+      submitted_at: "2025-11-05T09:15:00",
+      percentage_score: 50,
+      total_score: 5,
+      cheated: false,
+      status: "submitted",
+    },
+  ],
+};
 
 // Mock Submission Detail with Answers
 export const mockSubmissionDetail = {
