@@ -24,7 +24,7 @@ import type { GridColDef } from "@mui/x-data-grid";
 
 export const AdminExamsPage = () => {
   const navigate = useNavigate();
-  const { showSnackbar } = useFeedback();
+  const { showSnackbar, showAlert } = useFeedback();
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const { data: exams, isLoading, error } = useExams();
@@ -32,22 +32,30 @@ export const AdminExamsPage = () => {
   const deleteExamMutation = useDeleteExam();
 
   const handleDelete = (examId: string) => {
-    if (window.confirm("Are you sure you want to delete this exam?")) {
-      deleteExamMutation.mutate(examId, {
-        onSuccess: () => {
-          showSnackbar({
-            message: "Exam deleted successfully",
-            severity: "success",
-          });
-        },
-        onError: (error: any) => {
-          showSnackbar({
-            message: error.message || "Failed to delete exam",
-            severity: "error",
-          });
-        },
-      });
-    }
+    showAlert({
+      title: "Delete Exam",
+      message:
+        "Are you sure you want to delete this exam? This action cannot be undone.",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      severity: "error",
+      onConfirm: () => {
+        deleteExamMutation.mutate(examId, {
+          onSuccess: () => {
+            showSnackbar({
+              message: "Exam deleted successfully",
+              severity: "success",
+            });
+          },
+          onError: (error: any) => {
+            showSnackbar({
+              message: error.message || "Failed to delete exam",
+              severity: "error",
+            });
+          },
+        });
+      },
+    });
   };
 
   const handleCreateExam = (examData: any) => {

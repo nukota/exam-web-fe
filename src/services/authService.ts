@@ -4,6 +4,7 @@ import { queryKeys } from "../shared/lib/queryKeys";
 import type { User } from "../shared/dtos/user.dto";
 import { auth } from "../shared/lib/firebase";
 import { signOut as firebaseSignOut } from "firebase/auth";
+import { useAuth } from "../shared/providers/AuthProvider";
 
 const getMe = async (): Promise<User> => {
   if (!auth.currentUser) throw new Error("Not authenticated");
@@ -26,10 +27,12 @@ const signOutUser = async (): Promise<void> => {
  * Automatically fetches when Firebase user is authenticated
  */
 export const useCurrentUser = (enabled: boolean = true) => {
+  const { firebaseUser } = useAuth();
+
   return useQuery({
     queryKey: queryKeys.auth.currentUser,
     queryFn: getMe,
-    enabled: enabled && !!auth.currentUser,
+    enabled: enabled && !!firebaseUser,
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
