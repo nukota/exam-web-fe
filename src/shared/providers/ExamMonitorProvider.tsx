@@ -36,6 +36,7 @@ export const ExamMonitorProvider = ({ children }: ExamMonitorProviderProps) => {
   const [hasExitedFullscreen, setHasExitedFullscreen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isMonitoring, setIsMonitoring] = useState(false);
+  const [hasEnteredFullscreen, setHasEnteredFullscreen] = useState(false);
 
   // Check if document is in fullscreen
   const checkFullscreen = useCallback(() => {
@@ -66,11 +67,13 @@ export const ExamMonitorProvider = ({ children }: ExamMonitorProviderProps) => {
     }
   }, []);
 
-  // Reset monitoring counters
+  // Reset monitoring counters and enable monitoring
   const resetMonitoring = useCallback(() => {
     setTabSwitches(0);
     setHasExitedFullscreen(false);
-    console.log("ExamMonitor: Monitoring counters reset");
+    setHasEnteredFullscreen(false);
+    setIsMonitoring(true);
+    console.log("ExamMonitor: Monitoring counters reset and enabled");
   }, []);
 
   // Monitor visibility change (tab switching/minimizing)
@@ -101,12 +104,16 @@ export const ExamMonitorProvider = ({ children }: ExamMonitorProviderProps) => {
       );
       setIsFullscreen(isCurrentlyFullscreen);
 
-      // If user exits fullscreen while monitoring, set flag
-      if (!isCurrentlyFullscreen && isMonitoring) {
+      // Track when user enters fullscreen
+      if (isCurrentlyFullscreen && isMonitoring) {
+        setHasEnteredFullscreen(true);
+        console.log("ExamMonitor: Fullscreen mode entered");
+      }
+
+      // If user exits fullscreen after having entered it while monitoring, set flag
+      if (!isCurrentlyFullscreen && isMonitoring && hasEnteredFullscreen) {
         setHasExitedFullscreen(true);
         console.log("ExamMonitor: Fullscreen exit detected");
-      } else if (isCurrentlyFullscreen) {
-        console.log("ExamMonitor: Fullscreen mode entered");
       }
     };
 
@@ -135,7 +142,7 @@ export const ExamMonitorProvider = ({ children }: ExamMonitorProviderProps) => {
         handleFullscreenChange
       );
     };
-  }, [isMonitoring, checkFullscreen]);
+  }, [isMonitoring, checkFullscreen, hasEnteredFullscreen]);
 
   // Monitor window focus/blur
   useEffect(() => {

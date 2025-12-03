@@ -95,7 +95,11 @@ export const Question = ({
         </Box>
 
         <Typography variant="body1" sx={{ textAlign: "left" }}>
-          {question.question_text || "Question text not available"}
+          <span
+            dangerouslySetInnerHTML={{
+              __html: question.question_text || "Question text not available",
+            }}
+          />
         </Typography>
       </Box>
 
@@ -143,7 +147,11 @@ export const Question = ({
                           {getChoiceLabel(idx)}
                         </Typography>
                         <Typography variant="body2">
-                          {choice.choice_text}
+                          <span
+                            dangerouslySetInnerHTML={{
+                              __html: choice.choice_text,
+                            }}
+                          />
                         </Typography>
                       </Box>
                     }
@@ -212,7 +220,11 @@ export const Question = ({
                               fontWeight: isChecked ? "bold" : "normal",
                             }}
                           >
-                            {choice.choice_text}
+                            <span
+                              dangerouslySetInnerHTML={{
+                                __html: choice.choice_text,
+                              }}
+                            />
                           </Typography>
                         </Box>
                       }

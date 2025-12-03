@@ -14,7 +14,10 @@ import { useExamTimer } from "../../shared/providers/ExamTimerProvider";
 import { useWebcam } from "../../shared/providers/WebcamProvider";
 import { useExamMonitor } from "../../shared/providers/ExamMonitorProvider";
 import { useExam } from "../../services/examsService";
+import { useSubmitExam } from "../../services/attemptsService";
+import { useFeedback } from "../../shared/providers/FeedbackProvider";
 import { Card } from "../../components/common";
+import type { AnswerSubmissionDTO } from "../../shared/dtos/attempt.dto";
 
 export const StudentCodingExamPage = () => {
   const { examId } = useParams();
@@ -28,10 +31,13 @@ export const StudentCodingExamPage = () => {
     resetMonitoring,
   } = useExamMonitor();
   const { data: exam, isLoading, error } = useExam(examId || "");
+  const submitExamMutation = useSubmitExam();
+  const { showSnackbar } = useFeedback();
   const [completedQuestions, setCompletedQuestions] = useState<Set<string>>(
     new Set()
   );
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
+  const [startTime] = useState<string>(new Date().toISOString());
 
   const shakeAnimation = `
     @keyframes shake {
@@ -90,33 +96,42 @@ export const StudentCodingExamPage = () => {
   }, []);
 
   const handleSubmit = async () => {
+    if (!examId) return;
+
     // Stop webcam
     stopWebcam();
 
     const questions = exam?.questions || [];
 
     // Collect all saved code from localStorage for all questions and all languages
-    const allAnswers = questions.map((question) => {
-      const languages = question.programming_languages || ["python"];
-      const savedLanguage =
-        localStorage.getItem(`language_${question.question_id}`) ||
-        languages[0];
-      const code =
-        localStorage.getItem(`code_${question.question_id}_${savedLanguage}`) ||
-        "";
+    const answerSubmissions: AnswerSubmissionDTO[] = questions.map(
+      (question) => {
+        const languages = question.programming_languages || ["python"];
+        const savedLanguage =
+          localStorage.getItem(`language_${question.question_id}`) ||
+          languages[0];
+        const code =
+          localStorage.getItem(
+            `code_${question.question_id}_${savedLanguage}`
+          ) || "";
 
-      return {
-        question_id: question.question_id,
-        language: savedLanguage,
-        code: code,
-      };
-    });
-
-    console.log("Submitting coding exam with all answers:", allAnswers);
+        return {
+          question_id: question.question_id,
+          answer_text: code,
+          programming_language: savedLanguage,
+        };
+      }
+    );
 
     try {
-      // TODO: Send allAnswers to backend
-      // await submitCodingExam(examId, allAnswers);
+      await submitExamMutation.mutateAsync({
+        examId,
+        submitData: {
+          started_at: startTime,
+          cheated: tabSwitches > 0 || hasExitedFullscreen,
+          answers: answerSubmissions,
+        },
+      });
 
       // Clear all code from localStorage after successful submission
       questions.forEach((question) => {
@@ -130,7 +145,10 @@ export const StudentCodingExamPage = () => {
       navigate(`/student/exam/${examId}/result`);
     } catch (error) {
       console.error("Failed to submit exam:", error);
-      // Don't clear localStorage if submission fails
+      showSnackbar({
+        message: "Failed to submit exam. Please try again.",
+        severity: "error",
+      });
     }
   };
 
@@ -420,8 +438,12 @@ export const StudentCodingExamPage = () => {
                 <Box sx={{ flex: 1, textAlign: "left" }}>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <Typography variant="h6" fontWeight="bold">
-                      {question.title || question.question_text} (
-                      {question.points} pts)
+                      <span
+                        dangerouslySetInnerHTML={{
+                          __html: question.title || `Question ${index + 1}`,
+                        }}
+                      />{" "}
+                      ({question.points} pts)
                     </Typography>
                     {completedQuestions.has(question.question_id) && (
                       <Check sx={{ color: "success.main", fontSize: 20 }} />
@@ -432,7 +454,12 @@ export const StudentCodingExamPage = () => {
                     color="text.secondary"
                     sx={{ mb: 2, mt: 1 }}
                   >
-                    {question.question_text || "Solve this coding problem"}
+                    <span
+                      dangerouslySetInnerHTML={{
+                        __html:
+                          question.question_text || "Solve this coding problem",
+                      }}
+                    />
                   </Typography>
                 </Box>
                 <Code sx={{ color: "grey.400" }} />

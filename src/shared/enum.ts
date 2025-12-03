@@ -8,6 +8,7 @@ export type ExamStatus =
   | "started"
   | "ended"
   | "graded"
+  | "submitted"
   | "released";
 
 export type QuestionType =

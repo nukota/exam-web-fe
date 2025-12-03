@@ -12,9 +12,12 @@ import {
 import { Timer, Send } from "@mui/icons-material";
 import { Question } from "../../components/student/items/Question";
 import { useExam } from "../../services/examsService";
+import { useSubmitExam } from "../../services/attemptsService";
 import { useExamTimer } from "../../shared/providers/ExamTimerProvider";
 import { useWebcam } from "../../shared/providers/WebcamProvider";
 import { useExamMonitor } from "../../shared/providers/ExamMonitorProvider";
+import { useFeedback } from "../../shared/providers/FeedbackProvider";
+import type { AnswerSubmissionDTO } from "../../shared/dtos/attempt.dto";
 
 export const StudentStandardExamPage = () => {
   const { examId } = useParams();
@@ -28,11 +31,14 @@ export const StudentStandardExamPage = () => {
     resetMonitoring,
   } = useExamMonitor();
   const { data: exam, isLoading, error } = useExam(examId || "");
+  const submitExamMutation = useSubmitExam();
+  const { showSnackbar } = useFeedback();
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [flaggedQuestions, setFlaggedQuestions] = useState<Set<string>>(
     new Set()
   );
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
+  const [startTime] = useState<string>(new Date().toISOString());
   const questionRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const shakeAnimation = `
@@ -73,13 +79,48 @@ export const StudentStandardExamPage = () => {
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (!examId) return;
+
     // Stop webcam
     stopWebcam();
 
-    // In a real app, submit answers to the backend
-    console.log("Submitting answers:", answers);
-    navigate(`/student/exam/${examId}/result`);
+    // Convert answers to AnswerSubmissionDTO format
+    const answerSubmissions: AnswerSubmissionDTO[] = Object.entries(
+      answers
+    ).map(([questionId, value]) => {
+      const answer: AnswerSubmissionDTO = {
+        question_id: questionId,
+      };
+
+      // Handle different answer types
+      if (typeof value === "string") {
+        answer.answer_text = value;
+      } else if (Array.isArray(value)) {
+        answer.selected_choices = value;
+      }
+
+      return answer;
+    });
+
+    try {
+      await submitExamMutation.mutateAsync({
+        examId,
+        submitData: {
+          started_at: startTime,
+          cheated: tabSwitches > 0 || hasExitedFullscreen,
+          answers: answerSubmissions,
+        },
+      });
+
+      navigate(`/student/exam/${examId}/result`);
+    } catch (error) {
+      console.error("Failed to submit exam:", error);
+      showSnackbar({
+        message: "Failed to submit exam. Please try again.",
+        severity: "error",
+      });
+    }
   };
   const scrollToQuestion = (questionId: string) => {
     questionRefs.current[questionId]?.scrollIntoView({
@@ -166,7 +207,7 @@ export const StudentStandardExamPage = () => {
           </Box>
         </Box>
 
-        {/* Progress and Monitoring Status */}
+        {/* Progress */}
         <Box
           sx={{
             p: 2,

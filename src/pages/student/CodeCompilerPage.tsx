@@ -3,8 +3,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Box, Typography, Tabs, Tab, IconButton, Button } from "@mui/material";
 import { Timer, ArrowBack, Save } from "@mui/icons-material";
 import { CodeEditor } from "../../components/student/CodeEditor";
-import { mockCodingQuestions } from "../../shared/mockdata";
 import { useExamTimer } from "../../shared/providers/ExamTimerProvider";
+import { useExam } from "../../services/examsService";
+import { useFeedback } from "../../shared/providers/FeedbackProvider";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -25,10 +26,12 @@ export const StudentCodeCompilerPage = () => {
   const { examId, questionId } = useParams();
   const navigate = useNavigate();
   const { timeRemaining, formatTime } = useExamTimer();
+  const { data: exam } = useExam(examId || "");
+  const { showSnackbar } = useFeedback();
   const [tabValue, setTabValue] = useState(0);
 
-  // Find the current question
-  const currentQuestion = mockCodingQuestions.find(
+  // Find the current question from the exam data
+  const currentQuestion = exam?.questions?.find(
     (q) => q.question_id === questionId
   );
 
@@ -70,7 +73,7 @@ export const StudentCodeCompilerPage = () => {
         setCode(template);
       }
     }
-  }, [language, questionId, currentQuestion]);
+  }, [language, questionId, currentQuestion, exam]);
 
   useEffect(() => {
     // Navigate back if time runs out
@@ -84,6 +87,10 @@ export const StudentCodeCompilerPage = () => {
       localStorage.setItem(`code_${questionId}_${language}`, code);
       localStorage.setItem(`language_${questionId}`, language);
       console.log("Code saved successfully!");
+      showSnackbar({
+        message: "Code saved successfully!",
+        severity: "success",
+      });
     }
   };
 
@@ -129,7 +136,7 @@ export const StudentCodeCompilerPage = () => {
               <ArrowBack />
             </IconButton>
             <Typography variant="h6" fontWeight="bold">
-              Python Programming Challenge
+              {exam!.title}
             </Typography>
           </Box>
           <Box
@@ -193,7 +200,13 @@ export const StudentCodeCompilerPage = () => {
                 Problem Statement
               </Typography>
               <Typography variant="body1" paragraph>
-                {currentQuestion.question_text || "Solve this coding problem."}
+                <span
+                  dangerouslySetInnerHTML={{
+                    __html:
+                      currentQuestion.question_text ||
+                      "Solve this coding problem.",
+                  }}
+                />
               </Typography>
 
               {currentQuestion.coding_test_cases &&
@@ -243,59 +256,61 @@ export const StudentCodeCompilerPage = () => {
                 Test Cases
               </Typography>
 
-              {currentQuestion.coding_test_cases?.map((testCase) => (
-                <Box
-                  key={testCase.test_case_id}
-                  sx={{
-                    mb: 2,
-                    bgcolor: "grey.100",
-                    borderRadius: 2,
-                    px: 3,
-                    py: 1,
-                  }}
-                >
-                  <Box sx={{ display: "flex", gap: 3 }}>
-                    <Box sx={{ flex: 1 }}>
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        fontWeight="bold"
-                      >
-                        Input:
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          fontFamily: "monospace",
-                          mt: 0.5,
-                          whiteSpace: "pre-wrap",
-                        }}
-                      >
-                        {testCase.input_data}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ flex: 1 }}>
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        fontWeight="bold"
-                      >
-                        Expected Output:
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          fontFamily: "monospace",
-                          mt: 0.5,
-                          whiteSpace: "pre-wrap",
-                        }}
-                      >
-                        {testCase.expected_output}
-                      </Typography>
+              {currentQuestion.coding_test_cases
+                ?.filter((testCase) => !testCase.is_hidden)
+                ?.map((testCase) => (
+                  <Box
+                    key={testCase.test_case_id}
+                    sx={{
+                      mb: 2,
+                      bgcolor: "grey.100",
+                      borderRadius: 2,
+                      px: 3,
+                      py: 1,
+                    }}
+                  >
+                    <Box sx={{ display: "flex", gap: 3 }}>
+                      <Box sx={{ flex: 1 }}>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          fontWeight="bold"
+                        >
+                          Input:
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontFamily: "monospace",
+                            mt: 0.5,
+                            whiteSpace: "pre-wrap",
+                          }}
+                        >
+                          {testCase.input_data}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ flex: 1 }}>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          fontWeight="bold"
+                        >
+                          Expected Output:
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontFamily: "monospace",
+                            mt: 0.5,
+                            whiteSpace: "pre-wrap",
+                          }}
+                        >
+                          {testCase.expected_output}
+                        </Typography>
+                      </Box>
                     </Box>
                   </Box>
-                </Box>
-              ))}
+                ))}
 
               <Typography variant="caption" color="text.secondary">
                 Note: Some test cases may be hidden and will only be revealed

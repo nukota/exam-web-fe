@@ -45,14 +45,12 @@ export const StudentExamListPage = () => {
     }
 
     joinExamMutation.mutate(accessCode, {
-      onSuccess: (attempt) => {
+      onSuccess: () => {
         showSnackbar({
           message: "Successfully joined the exam",
           severity: "success",
         });
         setAccessCode("");
-        // Navigate to the exam setup page
-        navigate(`/student/exam/${attempt.exam_id}/setup`);
       },
       onError: (error: any) => {
         showSnackbar({
