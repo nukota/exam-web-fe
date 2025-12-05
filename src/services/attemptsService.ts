@@ -7,6 +7,10 @@ import type {
   SubmitExamDTO,
   MyResultsPageDTO,
   ExamResultPageDTO,
+  ExamAttemptsPageDTO,
+  SubmissionReviewPageDTO,
+  GradeEssayDTO,
+  ExamLeaderboardPageDTO,
 } from "../shared/dtos/attempt.dto";
 
 const joinExam = async (accessCode: string): Promise<Attempt> => {
@@ -40,6 +44,40 @@ const getExamLeaderboard = async (
 ): Promise<ExamResultPageDTO> => {
   if (!auth.currentUser) throw new Error("Not authenticated");
   return api.get<ExamResultPageDTO>(`/attempts/leaderboard/${examId}`);
+};
+
+const getExamAttempts = async (
+  examId: string
+): Promise<ExamAttemptsPageDTO> => {
+  if (!auth.currentUser) throw new Error("Not authenticated");
+  return api.get<ExamAttemptsPageDTO>(`/attempts/exam/${examId}`);
+};
+
+const getAdminExamLeaderboard = async (
+  examId: string
+): Promise<ExamLeaderboardPageDTO> => {
+  if (!auth.currentUser) throw new Error("Not authenticated");
+  return api.get<ExamLeaderboardPageDTO>(
+    `/attempts/leaderboard/admin/${examId}`
+  );
+};
+
+const getSubmissionReview = async (
+  attemptId: string
+): Promise<SubmissionReviewPageDTO> => {
+  if (!auth.currentUser) throw new Error("Not authenticated");
+  return api.get<SubmissionReviewPageDTO>(`/attempts/review/${attemptId}`);
+};
+
+const gradeSubmission = async ({
+  attemptId,
+  gradeData,
+}: {
+  attemptId: string;
+  gradeData: GradeEssayDTO;
+}): Promise<void> => {
+  if (!auth.currentUser) throw new Error("Not authenticated");
+  return api.post<void>(`/attempts/grade/${attemptId}`, gradeData);
 };
 
 // React Query Hooks
@@ -77,12 +115,15 @@ export const useSubmitExam = () => {
   return useMutation({
     mutationFn: submitExam,
     onSuccess: () => {
-      // Invalidate attempts and results to refetch updated status
+      // Invalidate attempts, results, and exams to refetch updated status
       queryClient.invalidateQueries({
         queryKey: queryKeys.attempts.all,
       });
       queryClient.invalidateQueries({
         queryKey: queryKeys.results.all,
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.exams.all,
       });
     },
   });
@@ -100,5 +141,49 @@ export const useExamLeaderboard = (examId: string) => {
     queryKey: queryKeys.results.leaderboard(examId),
     queryFn: () => getExamLeaderboard(examId),
     enabled: !!examId,
+  });
+};
+
+export const useExamAttempts = (examId: string) => {
+  return useQuery({
+    queryKey: queryKeys.attempts.exam(examId),
+    queryFn: () => getExamAttempts(examId),
+    enabled: !!examId,
+  });
+};
+
+export const useAdminExamLeaderboard = (examId: string) => {
+  return useQuery({
+    queryKey: queryKeys.results.adminLeaderboard(examId),
+    queryFn: () => getAdminExamLeaderboard(examId),
+    enabled: !!examId,
+  });
+};
+
+export const useSubmissionReview = (attemptId: string) => {
+  return useQuery({
+    queryKey: queryKeys.submissions.detail(attemptId),
+    queryFn: () => getSubmissionReview(attemptId),
+    enabled: !!attemptId,
+  });
+};
+
+export const useGradeSubmission = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: gradeSubmission,
+    onSuccess: (_, variables) => {
+      // Invalidate submission details, attempts list, and exams for grading
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.submissions.detail(variables.attemptId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.attempts.all,
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.exams.all,
+      });
+    },
   });
 };

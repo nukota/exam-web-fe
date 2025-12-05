@@ -20,11 +20,14 @@ export const queryKeys = {
   },
   attempts: {
     all: ["attempts"] as const,
+    exam: (examId: string) => ["attempts", "exam", examId] as const,
   },
   results: {
     all: ["results"] as const,
     leaderboard: (examId: string) =>
       ["results", "leaderboard", examId] as const,
+    adminLeaderboard: (examId: string) =>
+      ["results", "adminLeaderboard", examId] as const,
   },
   users: {
     all: ["users"] as const,

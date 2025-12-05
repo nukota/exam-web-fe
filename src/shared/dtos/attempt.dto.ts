@@ -86,6 +86,27 @@ export interface LeaderboardItemDTO {
   submitted_at?: string;
 }
 
+export interface ExamLeaderboardItemDTO {
+  rank: number;
+  student: {
+    user_id: string;
+    full_name?: string;
+    email?: string;
+  };
+  score?: number;
+  submitted_at?: string;
+}
+
+// DTO for Exam Leaderboard Page (admin)
+export interface ExamLeaderboardPageDTO {
+  exam: {
+    exam_id: string;
+    title: string;
+    max_score: number;
+  };
+  leaderboard: ExamLeaderboardItemDTO[];
+}
+
 // DTO for Exam Result Page (student)
 export interface ExamResultPageDTO extends MyResultsPageItemDTO {
   rank?: number;
@@ -98,7 +119,7 @@ export interface GradeEssayDTO {
   question_grades: {
     question_id: string;
     score: number;
-  };
+  }[];
 }
 
 export interface AnswerSubmissionDTO {

@@ -113,7 +113,7 @@ export const StudentStandardExamPage = () => {
         },
       });
 
-      navigate(`/student/exam/${examId}/result`);
+      navigate(-2);
     } catch (error) {
       console.error("Failed to submit exam:", error);
       showSnackbar({
@@ -367,6 +367,7 @@ export const StudentStandardExamPage = () => {
           variant="contained"
           startIcon={<Send />}
           onClick={() => setSubmitDialogOpen(true)}
+          disabled={submitExamMutation.isPending}
           sx={{
             mt: "auto",
             width: 180,
@@ -377,7 +378,7 @@ export const StudentStandardExamPage = () => {
             color: "black",
           }}
         >
-          Submit Exam
+          {submitExamMutation.isPending ? "Submitting..." : "Submit Exam"}
         </Button>
       </Box>
 
@@ -424,9 +425,19 @@ export const StudentStandardExamPage = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setSubmitDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleSubmit} variant="contained" color="success">
-            Submit
+          <Button
+            onClick={() => setSubmitDialogOpen(false)}
+            disabled={submitExamMutation.isPending}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            variant="contained"
+            color="success"
+            disabled={submitExamMutation.isPending}
+          >
+            {submitExamMutation.isPending ? "Submitting..." : "Submit"}
           </Button>
         </DialogActions>
       </Dialog>

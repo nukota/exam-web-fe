@@ -57,6 +57,9 @@ export const useSignOut = () => {
     mutationFn: signOutUser,
     onSuccess: () => {
       queryClient.removeQueries({ queryKey: queryKeys.auth.currentUser });
+      queryClient.invalidateQueries({ queryKey: queryKeys.exams.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.attempts.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.results.all });
     },
   });
 };

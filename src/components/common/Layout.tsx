@@ -19,10 +19,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     setMobileOpen(!mobileOpen);
   };
 
-  const userRole =
-    currentUser?.role === "admin" || currentUser?.role === "teacher"
-      ? "admin"
-      : "student";
+  const userRole = currentUser?.role === "admin" ? "admin" : "student";
 
   return (
     <Box sx={{ display: "flex", height: "100vh" }}>

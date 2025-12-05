@@ -9,7 +9,7 @@ import {
   MenuItem,
   CircularProgress,
 } from "@mui/material";
-import { Layout } from "../../components/common";
+import { Card, Layout } from "../../components/common";
 import ExamItem from "../../components/student/items/ExamItem";
 import { isExamActive } from "../../shared/utils";
 import { useExams } from "../../services/examsService";
@@ -157,19 +157,28 @@ export const StudentExamListPage = () => {
           </Button>
         </Box>
 
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))",
-            gap: 3,
-          }}
-        >
-          {filteredExams.length === 0 ? (
+        {filteredExams.length === 0 ? (
+          <Card
+            sx={{
+              height: 400,
+              width: "100%",
+              alignContent: "center",
+              justifyContent: "center",
+            }}
+          >
             <Typography variant="body1" color="text.secondary">
               No exams available
             </Typography>
-          ) : (
-            filteredExams.map((exam) => (
+          </Card>
+        ) : (
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))",
+              gap: 3,
+            }}
+          >
+            {filteredExams.map((exam) => (
               <ExamItem
                 key={exam.exam_id}
                 exam={exam}
@@ -177,9 +186,9 @@ export const StudentExamListPage = () => {
                 onLeave={handleLeaveExam}
                 disabled={!isExamActive(exam)}
               />
-            ))
-          )}
-        </Box>
+            ))}
+          </Box>
+        )}
       </Box>
     </Layout>
   );

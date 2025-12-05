@@ -1,7 +1,7 @@
-import { Box, Typography, Paper, Button, IconButton } from "@mui/material";
+import { Box, Typography, Button, IconButton } from "@mui/material";
 import { Eye } from "lucide-react";
 import { Layout } from "../../components/common/Layout";
-import { CustomDataGrid } from "../../components/common";
+import { Card, CustomDataGrid } from "../../components/common";
 import { useNavigate } from "react-router-dom";
 import { useMyResults } from "../../services/attemptsService";
 import type { GridColDef } from "@mui/x-data-grid";
@@ -211,7 +211,13 @@ export const StudentAllResultsPage = () => {
             pageSizeOptions={[10, 20, 50]}
           />
         ) : (
-          <Paper elevation={2} sx={{ p: 4, mt: 3, textAlign: "center" }}>
+          <Card
+            sx={{
+              height: 400,
+              alignContent: "center",
+              justifyContent: "center",
+            }}
+          >
             <Typography variant="h6" color="text.secondary">
               No exam results yet
             </Typography>
@@ -222,7 +228,7 @@ export const StudentAllResultsPage = () => {
             >
               Take an Exam
             </Button>
-          </Paper>
+          </Card>
         )}
       </Box>
     </Layout>

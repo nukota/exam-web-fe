@@ -4,13 +4,18 @@ import { ArrowLeft, Eye, AlertTriangle, SquarePen, Trash } from "lucide-react";
 import type { GridColDef } from "@mui/x-data-grid";
 import { Layout, CustomDataGrid } from "../../components/common";
 import Card from "../../components/common/Card";
-import { mockExamAttemptsPage } from "../../shared/mockdata";
+import { useExamAttempts } from "../../services/attemptsService";
 import type { ExamAttemptsPageItemDTO } from "../../shared/dtos/attempt.dto";
 import { Flag } from "lucide-react";
 
 export const AdminExamSubmissionsPage = () => {
-  const { examId: _ } = useParams();
+  const { examId } = useParams();
   const navigate = useNavigate();
+  const {
+    data: examAttempts,
+    isLoading,
+    error,
+  } = useExamAttempts(examId || "");
 
   const {
     title,
@@ -19,11 +24,52 @@ export const AdminExamSubmissionsPage = () => {
     graded_attempts,
     flagged_attempts,
     attempts,
-  } = mockExamAttemptsPage;
+  } = examAttempts || {
+    title: "",
+    max_score: 0,
+    total_attempts: 0,
+    graded_attempts: 0,
+    flagged_attempts: 0,
+    attempts: [],
+  };
 
   const pendingCount = attempts.filter(
     (s: ExamAttemptsPageItemDTO) => s.status === "submitted"
   ).length;
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "100vh",
+          }}
+        >
+          <Typography>Loading exam attempts...</Typography>
+        </Box>
+      </Layout>
+    );
+  }
+
+  if (error || !examAttempts) {
+    return (
+      <Layout>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "100vh",
+          }}
+        >
+          <Typography color="error">Failed to load exam attempts</Typography>
+        </Box>
+      </Layout>
+    );
+  }
 
   const handleViewAttempt = (attemptId: string) => {
     navigate(`/admin/submissions/${attemptId}`);

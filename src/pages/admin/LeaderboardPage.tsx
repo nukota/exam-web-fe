@@ -2,14 +2,55 @@ import { Box, Typography, IconButton } from "@mui/material";
 import { Layout } from "../../components/common/Layout";
 import { CustomDataGrid } from "../../components/common";
 import Card from "../../components/common/Card";
-import { mockLeaderboardData } from "../../shared/mockdata";
 import type { GridColDef } from "@mui/x-data-grid";
 import { ArrowLeft, Trophy, Crown } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useAdminExamLeaderboard } from "../../services/attemptsService";
 
 export const AdminLeaderboardPage = () => {
-  // const { examId } = useParams(); // For future use to fetch exam-specific leaderboard
+  const { examId } = useParams();
   const navigate = useNavigate();
+  const {
+    data: leaderboardData,
+    isLoading,
+    error,
+  } = useAdminExamLeaderboard(examId || "");
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "100vh",
+          }}
+        >
+          <Typography>Loading leaderboard...</Typography>
+        </Box>
+      </Layout>
+    );
+  }
+
+  if (error || !leaderboardData) {
+    return (
+      <Layout>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "100vh",
+          }}
+        >
+          <Typography color="error">Failed to load leaderboard</Typography>
+        </Box>
+      </Layout>
+    );
+  }
+
+  const maxScore = leaderboardData.exam.max_score;
   const columns: GridColDef[] = [
     {
       field: "rank",
@@ -26,7 +67,7 @@ export const AdminLeaderboardPage = () => {
       ),
     },
     {
-      field: "name",
+      field: "student",
       headerName: "Student",
       flex: 1,
       minWidth: 220,
@@ -34,12 +75,12 @@ export const AdminLeaderboardPage = () => {
         <Box sx={{ display: "flex", flexDirection: "column", gap: 0 }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Typography fontWeight={params.row.rank <= 3 ? "bold" : "normal"}>
-              {params.value}
+              {params.value.full_name}
             </Typography>
             {params.row.rank === 1 && <Crown size={16} color="#f59e0b" />}
           </Box>
           <Typography variant="caption" color="text.secondary">
-            {params.row.email}
+            {params.value.email}
           </Typography>
         </Box>
       ),
@@ -53,7 +94,7 @@ export const AdminLeaderboardPage = () => {
       renderCell: (params) => (
         <Typography fontWeight="bold" color="success.main">
           {params.value !== null && params.value !== undefined
-            ? `${params.value}/${params.row.maxScore}`
+            ? `${params.value}/${maxScore}`
             : "-"}
         </Typography>
       ),
@@ -72,7 +113,7 @@ export const AdminLeaderboardPage = () => {
             </Typography>
           );
         }
-        const percentage = (params.row.score / params.row.maxScore) * 100;
+        const percentage = (params.row.score / maxScore) * 100;
         return (
           <Typography
             fontWeight="bold"
@@ -132,16 +173,16 @@ export const AdminLeaderboardPage = () => {
         <Box sx={{ px: { xs: 0, lg: "7%", xl: "20%" } }}>
           <Card sx={{ p: 3, mb: 3, bgcolor: "grey.50" }}>
             <Typography variant="h6" fontWeight="bold" gutterBottom>
-              Introduction to Computer Science
+              {leaderboardData.exam.title}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {mockLeaderboardData.length} students have submitted
+              {leaderboardData.leaderboard.length} students have submitted
             </Typography>
           </Card>
 
           <Card sx={{ p: 0, overflow: "hidden" }}>
             <CustomDataGrid
-              rows={mockLeaderboardData}
+              rows={leaderboardData.leaderboard}
               columns={columns}
               getRowId={(row) => row.rank.toString()}
               pageSize={10}

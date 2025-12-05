@@ -148,6 +148,8 @@ export const NavBar: React.FC<NavBarProps> = ({ role }) => {
           variant="body2"
           sx={{
             fontWeight: 800,
+            textAlign: "left",
+            width: "100%",
             color: "text.primary",
             fontSize: "1rem",
             whiteSpace: "nowrap",
@@ -160,6 +162,7 @@ export const NavBar: React.FC<NavBarProps> = ({ role }) => {
         <Typography
           variant="caption"
           sx={{
+            width: "100%",
             color: "text.secondary",
             fontSize: "0.875rem",
             whiteSpace: "nowrap",

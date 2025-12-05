@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { Box, Typography, TextField } from "@mui/material";
 import { CheckCircle, X, Check, Flag } from "lucide-react";
-import type { QuestionDTO as QuestionType } from "../../../shared/dtos/question.dto";
+import type { ReviewQuestionDTO } from "../../../shared/dtos/question.dto";
 import type { Answer } from "../../../shared/dtos/answer.dto";
 
 interface QuestionProps {
-  question: QuestionType;
+  question: ReviewQuestionDTO;
   answer: Answer;
   index: number;
   isFlagged?: boolean;
@@ -41,7 +41,6 @@ export const QuestionItem: React.FC<QuestionProps> = ({
       question.question_type === "single_choice" ||
       question.question_type === "multiple_choice"
     ) {
-      const selectedChoices = answer.selected_choices || [];
       return (
         <Box
           sx={{
@@ -52,10 +51,8 @@ export const QuestionItem: React.FC<QuestionProps> = ({
           }}
         >
           {question.choices?.map((choice) => {
-            const isSelected = selectedChoices.includes(choice.choice_id);
-            const isCorrect = question.correct_answer?.includes(
-              choice.choice_id
-            );
+            const isSelected = choice.is_chosen;
+            const isCorrect = choice.is_correct;
 
             return (
               <Box

@@ -49,15 +49,24 @@ export const StudentCodingExamPage = () => {
 
   useEffect(() => {
     if (exam && exam.duration_minutes) {
-      // Reset monitoring counters
-      resetMonitoring();
+      // Only initialize monitoring and fullscreen on first load
+      // Don't reset when navigating back from CodeCompilerPage
+      const hasInitialized = localStorage.getItem(`exam_${examId}_initialized`);
 
-      // Request fullscreen mode
-      requestFullscreen();
+      if (!hasInitialized) {
+        // Reset monitoring counters
+        resetMonitoring();
 
-      // Start timer with exam duration
-      const durationInSeconds = exam.duration_minutes * 60;
-      startTimer(durationInSeconds, handleSubmit);
+        // Request fullscreen mode
+        requestFullscreen();
+
+        // Start timer with exam duration
+        const durationInSeconds = exam.duration_minutes * 60;
+        startTimer(durationInSeconds, handleSubmit);
+
+        // Mark as initialized
+        localStorage.setItem(`exam_${examId}_initialized`, "true");
+      }
     }
   }, [exam]);
 
@@ -142,7 +151,10 @@ export const StudentCodingExamPage = () => {
         localStorage.removeItem(`language_${question.question_id}`);
       });
 
-      navigate(`/student/exam/${examId}/result`);
+      // Clear initialization flag
+      localStorage.removeItem(`exam_${examId}_initialized`);
+
+      navigate(-2);
     } catch (error) {
       console.error("Failed to submit exam:", error);
       showSnackbar({
@@ -375,6 +387,7 @@ export const StudentCodingExamPage = () => {
           variant="contained"
           startIcon={<Send />}
           onClick={() => setSubmitDialogOpen(true)}
+          disabled={submitExamMutation.isPending}
           sx={{
             mt: "auto",
             width: 180,
@@ -385,7 +398,7 @@ export const StudentCodingExamPage = () => {
             color: "black",
           }}
         >
-          Submit Exam
+          {submitExamMutation.isPending ? "Submitting..." : "Submit Exam"}
         </Button>
       </Box>
 
@@ -482,9 +495,19 @@ export const StudentCodingExamPage = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setSubmitDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleSubmit} variant="contained" color="success">
-            Submit
+          <Button
+            onClick={() => setSubmitDialogOpen(false)}
+            disabled={submitExamMutation.isPending}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            variant="contained"
+            color="success"
+            disabled={submitExamMutation.isPending}
+          >
+            {submitExamMutation.isPending ? "Submitting..." : "Submit"}
           </Button>
         </DialogActions>
       </Dialog>
