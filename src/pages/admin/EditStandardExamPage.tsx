@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { Box, Typography, Button, Alert } from "@mui/material";
+import { Box, Typography, Button, Alert, IconButton } from "@mui/material";
 import { Add } from "@mui/icons-material";
+import { ArrowLeft } from "lucide-react";
 import { Layout } from "../../components/common";
 import Card from "../../components/common/Card";
 import { EditableQuestion } from "../../components/admin/items/EditableQuestion";
@@ -256,15 +257,19 @@ export const AdminEditStandardExamPage = () => {
   return (
     <Layout>
       <Box>
-        <Typography
-          variant="h4"
-          component="h1"
-          fontWeight="bold"
-          gutterBottom
-          sx={{ mb: 3, textAlign: "left" }}
-        >
-          {pageTitle}
-        </Typography>
+        <Box sx={{ display: "flex", alignItems: "center", mb: 3, gap: 1 }}>
+          <IconButton onClick={() => navigate("/admin/exams")}>
+            <ArrowLeft size={32} color="black" />
+          </IconButton>
+          <Typography
+            variant="h4"
+            component="h1"
+            fontWeight="bold"
+            sx={{ mr: 1 }}
+          >
+            {pageTitle}
+          </Typography>
+        </Box>
 
         {isExamStarted && (
           <Alert severity="warning" sx={{ mb: 3 }}>

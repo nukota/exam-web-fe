@@ -207,7 +207,11 @@ export const QuestionItem: React.FC<QuestionProps> = ({
         </Box>
 
         <Typography variant="body1" sx={{ textAlign: "left" }}>
-          {question.question_text}
+          <span
+            dangerouslySetInnerHTML={{
+              __html: question.question_text || "Question text not available",
+            }}
+          />
         </Typography>
       </Box>
 

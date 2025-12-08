@@ -154,6 +154,13 @@ export const StudentCodingExamPage = () => {
       // Clear initialization flag
       localStorage.removeItem(`exam_${examId}_initialized`);
 
+      // Exit fullscreen mode
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(console.error);
+      } else if ((document as any).webkitFullscreenElement) {
+        (document as any).webkitExitFullscreen();
+      }
+
       navigate(-2);
     } catch (error) {
       console.error("Failed to submit exam:", error);
