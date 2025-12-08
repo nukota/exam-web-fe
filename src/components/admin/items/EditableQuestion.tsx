@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Box,
   Typography,
@@ -48,6 +49,11 @@ export const EditableQuestion = ({
   onRemoveChoice,
   onChoiceChange,
 }: EditableQuestionProps) => {
+  const [pointsInput, setPointsInput] = React.useState<string>(String(question.points || 1));
+
+  React.useEffect(() => {
+    setPointsInput(String(question.points || 1));
+  }, [question.points]);
   return (
     <Box sx={{ mb: 6 }}>
       <Box
@@ -117,14 +123,16 @@ export const EditableQuestion = ({
             size="small"
             label="Points"
             type="number"
-            value={question.points}
-            onChange={(e) =>
-              onQuestionChange(
-                questionIndex,
-                "points",
-                parseFloat(e.target.value)
-              )
-            }
+            value={pointsInput}
+            onChange={(e) => {
+              const value = e.target.value;
+              setPointsInput(value);
+              const parsed = parseFloat(value);
+              if (!isNaN(parsed) && parsed > 0) {
+                onQuestionChange(questionIndex, "points", parsed);
+              }
+            }}
+            error={!pointsInput || parseFloat(pointsInput) <= 0}
             sx={{ width: 150 }}
           />
         </Box>

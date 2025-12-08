@@ -93,11 +93,26 @@ export const StudentStandardExamPage = () => {
         question_id: questionId,
       };
 
-      // Handle different answer types
-      if (typeof value === "string") {
-        answer.answer_text = value;
-      } else if (Array.isArray(value)) {
+      // Find the question to determine its type
+      const question = questions.find((q) => q.question_id === questionId);
+
+      // Handle different answer types based on question type
+      if (
+        question?.question_type === "single_choice" &&
+        typeof value === "string"
+      ) {
+        answer.selected_choices = [value];
+      } else if (
+        question?.question_type === "multiple_choice" &&
+        Array.isArray(value)
+      ) {
         answer.selected_choices = value;
+      } else if (
+        (question?.question_type === "short_answer" ||
+          question?.question_type === "essay") &&
+        typeof value === "string"
+      ) {
+        answer.answer_text = value;
       }
 
       return answer;

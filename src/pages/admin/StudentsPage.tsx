@@ -89,7 +89,7 @@ export const AdminStudentsPage = () => {
     {
       field: "school_name",
       headerName: "School",
-      flex: 0.3,
+      flex: 0.75,
       minWidth: 150,
       renderCell: (params) => (
         <Typography variant="body2">{params.value || "N/A"}</Typography>

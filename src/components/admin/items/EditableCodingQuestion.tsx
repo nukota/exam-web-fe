@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Box,
   Typography,
@@ -51,6 +52,12 @@ export const EditableCodingQuestion: React.FC<EditableCodingQuestionProps> = ({
   onMoveDown,
   onRemove,
 }) => {
+  const [pointsInput, setPointsInput] = React.useState<string>(String(question.points || 10));
+
+  React.useEffect(() => {
+    setPointsInput(String(question.points || 10));
+  }, [question.points]);
+
   return (
     <Box sx={{ mb: 4 }}>
       {/* Question Header */}
@@ -95,8 +102,16 @@ export const EditableCodingQuestion: React.FC<EditableCodingQuestionProps> = ({
           size="small"
           label="Points"
           type="number"
-          value={question.points || 10}
-          onChange={(e) => onQuestionChange("points", parseInt(e.target.value))}
+          value={pointsInput}
+          onChange={(e) => {
+            const value = e.target.value;
+            setPointsInput(value);
+            const parsed = parseInt(value);
+            if (!isNaN(parsed) && parsed > 0) {
+              onQuestionChange("points", parsed);
+            }
+          }}
+          error={!pointsInput || parseInt(pointsInput) <= 0}
           sx={{ width: 100 }}
         />
       </Box>

@@ -42,6 +42,11 @@ const deleteExam = async (examId: string): Promise<void> => {
   return api.delete<void>(`/exams/${examId}`);
 };
 
+const releaseExamResults = async (examId: string): Promise<void> => {
+  if (!auth.currentUser) throw new Error("Not authenticated");
+  return api.patch<void>(`/exams/${examId}/release-results`);
+};
+
 const getGradingExams = async (): Promise<GradingPageDTO> => {
   if (!auth.currentUser) throw new Error("Not authenticated");
   return api.get<GradingPageDTO>("/exams/grading");
@@ -104,6 +109,20 @@ export const useDeleteExam = () => {
     mutationFn: deleteExam,
     onSuccess: () => {
       // Invalidate exams list
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.exams.all,
+      });
+    },
+  });
+};
+
+export const useReleaseExamResults = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: releaseExamResults,
+    onSuccess: () => {
+      // Invalidate exams list to refetch updated status
       queryClient.invalidateQueries({
         queryKey: queryKeys.exams.all,
       });

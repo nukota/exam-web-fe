@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Box,
   Typography,
@@ -29,6 +30,11 @@ export const ExamInfoSection = ({
 }: ExamInfoSectionProps) => {
   const { showSnackbar } = useFeedback();
   const showQuestionMap = exam.type !== "coding" && questions.length > 0;
+  const [durationInput, setDurationInput] = React.useState<string>(String(exam.duration_minutes || 60));
+
+  React.useEffect(() => {
+    setDurationInput(String(exam.duration_minutes || 60));
+  }, [exam.duration_minutes]);
 
   const handleCopyAccessCode = async () => {
     if (exam.access_code) {
@@ -104,13 +110,19 @@ export const ExamInfoSection = ({
             fullWidth
             label="Duration (minutes)"
             type="number"
-            value={exam.duration_minutes || 60}
-            onChange={(e) =>
-              onExamChange({
-                ...exam,
-                duration_minutes: parseInt(e.target.value),
-              })
-            }
+            value={durationInput}
+            onChange={(e) => {
+              const value = e.target.value;
+              setDurationInput(value);
+              const parsed = parseInt(value);
+              if (!isNaN(parsed) && parsed > 0) {
+                onExamChange({
+                  ...exam,
+                  duration_minutes: parsed,
+                });
+              }
+            }}
+            error={!durationInput || parseInt(durationInput) <= 0}
           />
           <TextField
             size="small"

@@ -3,7 +3,7 @@ import { Layout } from "../../components/common/Layout";
 import { CustomDataGrid } from "../../components/common";
 import Card from "../../components/common/Card";
 import type { GridColDef } from "@mui/x-data-grid";
-import { ArrowLeft, Trophy, Crown } from "lucide-react";
+import { ArrowLeft, Trophy, Crown, Eye } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAdminExamLeaderboard } from "../../services/attemptsService";
 
@@ -92,9 +92,11 @@ export const AdminLeaderboardPage = () => {
       align: "center",
       headerAlign: "center",
       renderCell: (params) => (
-        <Typography fontWeight="bold" color="success.main">
-          {params.value !== null && params.value !== undefined
-            ? `${params.value}/${maxScore}`
+        <Typography fontWeight="bold">
+          {params.row.status === "graded" || params.row.status === "submitted"
+            ? params.value !== null && params.value !== undefined
+              ? `${params.value}/${maxScore}`
+              : "-"
             : "-"}
         </Typography>
       ),
@@ -106,6 +108,16 @@ export const AdminLeaderboardPage = () => {
       align: "center",
       headerAlign: "center",
       renderCell: (params) => {
+        if (
+          params.row.status !== "graded" &&
+          params.row.status !== "submitted"
+        ) {
+          return (
+            <Typography fontWeight="bold" color="text.secondary">
+              -
+            </Typography>
+          );
+        }
         if (params.row.score === null || params.row.score === undefined) {
           return (
             <Typography fontWeight="bold" color="text.secondary">
@@ -149,6 +161,48 @@ export const AdminLeaderboardPage = () => {
           hour12: true,
         });
       },
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      width: 120,
+      align: "center",
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Typography
+          variant="body2"
+          sx={{
+            textTransform: "capitalize",
+            color:
+              params.value === "submitted"
+                ? "success.main"
+                : params.value === "in_progress"
+                ? "warning.main"
+                : "text.secondary",
+          }}
+        >
+          {params.value.replace(/_/g, " ")}
+        </Typography>
+      ),
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 100,
+      sortable: false,
+      align: "center",
+      headerAlign: "center",
+      renderCell: (params) => (
+        <IconButton
+          size="small"
+          onClick={() =>
+            navigate(`/admin/submissions/${params.row.attempt_id}`)
+          }
+          title="View Submission Details"
+        >
+          <Eye size={20} />
+        </IconButton>
+      ),
     },
   ];
 

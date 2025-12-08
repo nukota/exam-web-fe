@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { Box, Typography, Button, Divider } from "@mui/material";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { Box, Typography, Button, Divider, Alert } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import { Layout } from "../../components/common";
 import Card from "../../components/common/Card";
@@ -24,7 +24,9 @@ const AVAILABLE_LANGUAGES: ProgrammingLanguage[] = [
 export const AdminEditCodingExamPage = () => {
   const { examId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { showSnackbar } = useFeedback();
+  const isExamStarted = location.state?.isExamStarted || false;
   const [exam, setExam] = useState<Partial<Exam>>({});
   const [questions, setQuestions] = useState<UpdateQuestionDTO[]>([]);
   const [hasEndTime, setHasEndTime] = useState<boolean>(true);
@@ -310,6 +312,8 @@ export const AdminEditCodingExamPage = () => {
     );
   }
 
+  const pageTitle = isExamStarted ? "Coding Exam Details" : "Edit Coding Exam";
+
   return (
     <Layout>
       <Box>
@@ -320,8 +324,14 @@ export const AdminEditCodingExamPage = () => {
           gutterBottom
           sx={{ mb: 3, textAlign: "left" }}
         >
-          Edit Coding Exam
+          {pageTitle}
         </Typography>
+
+        {isExamStarted && (
+          <Alert severity="warning" sx={{ mb: 3 }}>
+            You cannot edit this exam as it has already started.
+          </Alert>
+        )}
 
         <Box sx={{ display: "flex", gap: 3, alignItems: "flex-start" }}>
           {/* Left Section - Exam Info */}
@@ -403,6 +413,7 @@ export const AdminEditCodingExamPage = () => {
           <Button
             variant="contained"
             onClick={handleSubmit}
+            disabled={isExamStarted}
             sx={{
               px: 2,
               fontWeight: "bold",

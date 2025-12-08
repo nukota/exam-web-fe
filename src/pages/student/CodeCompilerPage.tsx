@@ -353,6 +353,7 @@ export const StudentCodeCompilerPage = () => {
           onChange={(value) => setCode(value || "")}
           language={language}
           onLanguageChange={setLanguage}
+          availableLanguages={currentQuestion.programming_languages}
         />
       </Box>
     </Box>

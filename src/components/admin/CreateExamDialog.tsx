@@ -34,9 +34,10 @@ export const CreateExamDialog: React.FC<CreateExamDialogProps> = ({
     start_at: "",
     end_at: "",
   });
+  const [durationInput, setDurationInput] = useState<string>("60");
 
   const handleSubmit = () => {
-    if (!exam.title) {
+    if (!exam.title || !durationInput || parseInt(durationInput) <= 0) {
       return;
     }
     onSubmit(exam);
@@ -48,6 +49,7 @@ export const CreateExamDialog: React.FC<CreateExamDialogProps> = ({
       start_at: "",
       end_at: "",
     });
+    setDurationInput("60");
   };
 
   const handleClose = () => {
@@ -59,6 +61,7 @@ export const CreateExamDialog: React.FC<CreateExamDialogProps> = ({
       start_at: "",
       end_at: "",
     });
+    setDurationInput("60");
     onClose();
   };
 
@@ -105,13 +108,18 @@ export const CreateExamDialog: React.FC<CreateExamDialogProps> = ({
               fullWidth
               label="Duration (minutes)"
               type="number"
-              value={exam.duration_minutes}
-              onChange={(e) =>
-                setExam({
-                  ...exam,
-                  duration_minutes: parseInt(e.target.value) || 60,
-                })
-              }
+              value={durationInput}
+              onChange={(e) => {
+                const value = e.target.value;
+                setDurationInput(value);
+                const parsed = parseInt(value);
+                if (!isNaN(parsed) && parsed > 0) {
+                  setExam({
+                    ...exam,
+                    duration_minutes: parsed,
+                  });
+                }
+              }}
             />
           </Box>
           <Box sx={{ display: "flex", gap: 2 }}>
@@ -143,7 +151,7 @@ export const CreateExamDialog: React.FC<CreateExamDialogProps> = ({
         <Button
           onClick={handleSubmit}
           variant="contained"
-          disabled={!exam.title}
+          disabled={!exam.title || !durationInput || parseInt(durationInput) <= 0}
           sx={{ fontWeight: "bold" }}
         >
           Create Exam

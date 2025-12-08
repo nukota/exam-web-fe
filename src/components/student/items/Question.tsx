@@ -107,7 +107,7 @@ export const Question = ({
       {question.question_type === "single_choice" && (
         <Box>
           <RadioGroup
-            value={answer || ""}
+            value={(answer as Array<string>) || []}
             onChange={(e) =>
               onAnswerChange(question.question_id, e.target.value)
             }

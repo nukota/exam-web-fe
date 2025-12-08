@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { Box, Typography, Button } from "@mui/material";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { Box, Typography, Button, Alert } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import { Layout } from "../../components/common";
 import Card from "../../components/common/Card";
@@ -16,7 +16,9 @@ const generateTempId = () => `temp_${crypto.randomUUID()}`;
 export const AdminEditStandardExamPage = () => {
   const { examId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { showSnackbar } = useFeedback();
+  const isExamStarted = location.state?.isExamStarted || false;
   const [exam, setExam] = useState<Partial<Exam>>({});
   const [questions, setQuestions] = useState<UpdateQuestionDTO[]>([]);
   const [hasEndTime, setHasEndTime] = useState<boolean>(true);
@@ -247,6 +249,10 @@ export const AdminEditStandardExamPage = () => {
     );
   }
 
+  const pageTitle = isExamStarted
+    ? "Standard Exam Details"
+    : "Edit Standard Exam";
+
   return (
     <Layout>
       <Box>
@@ -257,8 +263,14 @@ export const AdminEditStandardExamPage = () => {
           gutterBottom
           sx={{ mb: 3, textAlign: "left" }}
         >
-          Edit Exam
+          {pageTitle}
         </Typography>
+
+        {isExamStarted && (
+          <Alert severity="warning" sx={{ mb: 3 }}>
+            You cannot edit this exam as it has already started.
+          </Alert>
+        )}
 
         <Box sx={{ display: "flex", gap: 3, alignItems: "flex-start" }}>
           {/* Left Section - Exam Info */}
@@ -352,6 +364,7 @@ export const AdminEditStandardExamPage = () => {
           <Button
             variant="contained"
             onClick={handleSubmit}
+            disabled={isExamStarted}
             sx={{
               px: 2,
               fontWeight: "bold",

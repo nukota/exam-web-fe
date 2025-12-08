@@ -26,6 +26,13 @@ export const QuestionItem: React.FC<QuestionProps> = ({
   const [score, setScore] = useState<number>(answer.score || 0);
 
   const handleScoreChange = (value: string) => {
+    if (value === "") {
+      setScore(0);
+      if (onScoreChange) {
+        onScoreChange(question.question_id, 0);
+      }
+      return;
+    }
     const numValue = parseFloat(value);
     if (!isNaN(numValue) && numValue >= 0 && numValue <= question.points) {
       // Round to nearest 0.25
@@ -225,13 +232,14 @@ export const QuestionItem: React.FC<QuestionProps> = ({
           <TextField
             size="small"
             type="number"
-            value={score}
+            value={score === 0 ? "" : score}
             onChange={(e) => handleScoreChange(e.target.value)}
             inputProps={{
               min: 0,
               max: question.points,
               step: 0.25,
             }}
+            placeholder="0"
           />
           <Typography variant="body2" color="text.secondary">
             / {question.points} points

@@ -87,6 +87,7 @@ export interface LeaderboardItemDTO {
 }
 
 export interface ExamLeaderboardItemDTO {
+  attempt_id: string;
   rank: number;
   student: {
     user_id: string;
@@ -94,6 +95,7 @@ export interface ExamLeaderboardItemDTO {
     email?: string;
   };
   score?: number;
+  status: AttemptStatus;
   submitted_at?: string;
 }
 

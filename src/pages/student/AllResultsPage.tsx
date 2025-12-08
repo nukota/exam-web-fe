@@ -35,7 +35,9 @@ export const StudentAllResultsPage = () => {
       headerAlign: "center",
       renderCell: (params) => (
         <Typography variant="body2" fontWeight="medium">
-          {params.value} / {params.row.exam.max_score}
+          {params.row.status !== "graded"
+            ? "-"
+            : `${params.value} / ${params.row.exam.max_score}`}
         </Typography>
       ),
     },
@@ -54,7 +56,9 @@ export const StudentAllResultsPage = () => {
             color={passed ? "success.main" : "error.main"}
             fontWeight="medium"
           >
-            {percentage?.toFixed(1)}%
+            {params.row.status !== "graded"
+              ? "-"
+              : `${percentage?.toFixed(1)}%`}
           </Typography>
         );
       },
@@ -62,7 +66,7 @@ export const StudentAllResultsPage = () => {
     {
       field: "status",
       headerName: "Status",
-      width: 110,
+      width: 150,
       align: "center",
       headerAlign: "center",
       renderCell: (params) => {
@@ -83,7 +87,7 @@ export const StudentAllResultsPage = () => {
             }
             fontWeight="medium"
           >
-            {params.value?.replace("_", " ").toUpperCase()}
+            {params.value?.replace("_", " ")}
           </Typography>
         );
       },

@@ -19,10 +19,11 @@ interface CodeEditorProps {
   language?: string;
   onLanguageChange?: (language: string) => void;
   readOnly?: boolean;
+  availableLanguages?: string[];
 }
 
 const SUPPORTED_LANGUAGES = [
-  { value: "cpp", label: "C++" },
+  { value: "c++", label: "C++" },
   { value: "python", label: "Python" },
   { value: "javascript", label: "JavaScript" },
   { value: "java", label: "Java" },
@@ -34,10 +35,18 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   language = "python",
   onLanguageChange,
   readOnly = false,
+  availableLanguages,
 }) => {
   const [consoleOutput, setConsoleOutput] = useState<string>("");
   const [consoleInput, setConsoleInput] = useState<string>("");
   const [isRunning, setIsRunning] = useState(false);
+
+  // Filter SUPPORTED_LANGUAGES based on availableLanguages if provided
+  const languageOptions = availableLanguages
+    ? SUPPORTED_LANGUAGES.filter((lang) =>
+        availableLanguages.includes(lang.value)
+      )
+    : SUPPORTED_LANGUAGES;
 
   const handleRunCode = async () => {
     setIsRunning(true);
@@ -81,7 +90,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
                   onChange={(e) => onLanguageChange(e.target.value)}
                   disabled={readOnly}
                 >
-                  {SUPPORTED_LANGUAGES.map((lang) => (
+                  {languageOptions.map((lang) => (
                     <MenuItem key={lang.value} value={lang.value}>
                       {lang.label}
                     </MenuItem>

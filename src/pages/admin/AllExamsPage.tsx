@@ -9,6 +9,7 @@ import {
   BarChart3,
   Edit,
   Trash2,
+  Send,
 } from "lucide-react";
 import { Layout } from "../../components/common";
 import { CustomDataGrid } from "../../components/common";
@@ -18,6 +19,7 @@ import {
   useExams,
   useCreateExam,
   useDeleteExam,
+  useReleaseExamResults,
 } from "../../services/examsService";
 import { formatExamDateRange } from "../../shared/utils/utils";
 import type { GridColDef } from "@mui/x-data-grid";
@@ -30,6 +32,7 @@ export const AdminExamsPage = () => {
   const { data: exams, isLoading, error } = useExams();
   const createExamMutation = useCreateExam();
   const deleteExamMutation = useDeleteExam();
+  const releaseResultsMutation = useReleaseExamResults();
 
   const handleDelete = (examId: string) => {
     showAlert({
@@ -50,6 +53,33 @@ export const AdminExamsPage = () => {
           onError: (error: any) => {
             showSnackbar({
               message: error.message || "Failed to delete exam",
+              severity: "error",
+            });
+          },
+        });
+      },
+    });
+  };
+
+  const handleReleaseResults = (examId: string) => {
+    showAlert({
+      title: "Release Results",
+      message:
+        "Are you sure you want to release the results for this exam? This action cannot be undone.",
+      confirmText: "Release",
+      cancelText: "Cancel",
+      severity: "warning",
+      onConfirm: () => {
+        releaseResultsMutation.mutate(examId, {
+          onSuccess: () => {
+            showSnackbar({
+              message: "Results released successfully",
+              severity: "success",
+            });
+          },
+          onError: (error: any) => {
+            showSnackbar({
+              message: error.message || "Failed to release results",
               severity: "error",
             });
           },
@@ -190,11 +220,16 @@ export const AdminExamsPage = () => {
               navigate(`/admin/exams/${params.row.exam_id}/leaderboard`)
             }
             title="View Leaderboard"
-            disabled={
-              params.row.status !== "graded" && params.row.status !== "released"
-            }
           >
             <BarChart3 size={20} />
+          </IconButton>
+          <IconButton
+            size="small"
+            onClick={() => handleReleaseResults(params.row.exam_id)}
+            title="Release Results"
+            disabled={params.row.status !== "graded"}
+          >
+            <Send size={20} />
           </IconButton>
           <IconButton
             size="small"
@@ -203,10 +238,11 @@ export const AdminExamsPage = () => {
                 params.row.type === "coding"
                   ? `/admin/exams/${params.row.exam_id}/edit-coding`
                   : `/admin/exams/${params.row.exam_id}/edit-standard`;
-              navigate(editPath);
+              navigate(editPath, {
+                state: { isExamStarted: params.row.status !== "not started" },
+              });
             }}
             title="Edit Exam"
-            disabled={params.row.status !== "not started"}
           >
             <Edit size={20} />
           </IconButton>
