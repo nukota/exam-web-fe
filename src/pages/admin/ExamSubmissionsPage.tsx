@@ -4,18 +4,27 @@ import { ArrowLeft, Eye, AlertTriangle, SquarePen, Trash } from "lucide-react";
 import type { GridColDef } from "@mui/x-data-grid";
 import { Layout, CustomDataGrid } from "../../components/common";
 import Card from "../../components/common/Card";
-import { useExamAttempts } from "../../services/attemptsService";
+import {
+  useExamAttempts,
+  useDeleteAttempt,
+  useCancelResult,
+} from "../../services/attemptsService";
 import type { ExamAttemptsPageItemDTO } from "../../shared/dtos/attempt.dto";
 import { Flag } from "lucide-react";
+import { useFeedback } from "../../shared/providers/FeedbackProvider";
 
 export const AdminExamSubmissionsPage = () => {
   const { examId } = useParams();
   const navigate = useNavigate();
+  const { showAlert, showSnackbar } = useFeedback();
   const {
     data: examAttempts,
     isLoading,
     error,
   } = useExamAttempts(examId || "");
+
+  const deleteAttemptMutation = useDeleteAttempt();
+  const cancelResultMutation = useCancelResult();
 
   const {
     title,
@@ -80,15 +89,54 @@ export const AdminExamSubmissionsPage = () => {
   };
 
   const handleCancelAttempt = (attemptId: string) => {
-    // TODO: Call backend API to cancel/invalidate the attempt
-    console.log("Cancelling attempt:", attemptId);
-    // In a real app, this would make an API call and refresh the data
+    showAlert({
+      title: "Cancel Result",
+      message: "Are you sure you want to cancel this result?",
+      confirmText: "Cancel Result",
+      cancelText: "Keep Result",
+      severity: "warning",
+      onConfirm: async () => {
+        try {
+          await cancelResultMutation.mutateAsync(attemptId);
+          showSnackbar({
+            message: "Result cancelled successfully",
+            severity: "success",
+          });
+        } catch (error) {
+          console.error("Failed to cancel result:", error);
+          showSnackbar({
+            message: "Failed to cancel result. Please try again.",
+            severity: "error",
+          });
+        }
+      },
+    });
   };
 
   const handleDeleteAttempt = (attemptId: string) => {
-    // TODO: Call backend API to delete the attempt
-    console.log("Deleting attempt:", attemptId);
-    // In a real app, this would make an API call and refresh the data
+    showAlert({
+      title: "Delete Attempt",
+      message:
+        "Are you sure you want to delete this attempt? This action cannot be undone.",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      severity: "error",
+      onConfirm: async () => {
+        try {
+          await deleteAttemptMutation.mutateAsync(attemptId);
+          showSnackbar({
+            message: "Attempt deleted successfully",
+            severity: "success",
+          });
+        } catch (error) {
+          console.error("Failed to delete attempt:", error);
+          showSnackbar({
+            message: "Failed to delete attempt. Please try again.",
+            severity: "error",
+          });
+        }
+      },
+    });
   };
 
   const columns: GridColDef[] = [
@@ -175,15 +223,21 @@ export const AdminExamSubmissionsPage = () => {
       renderCell: (params) =>
         params.value ? (
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Flag size={20} color="#f44336" />
+            <Flag
+              size={20}
+              color={params.row.status === "cancelled" ? "#999" : "#f44336"}
+            />
             <Button
               size="small"
               variant="text"
               color="error"
+              disabled={params.row.status === "cancelled"}
               onClick={() => handleCancelAttempt(params.row.attempt_id)}
               sx={{ textTransform: "none", fontSize: "0.875rem" }}
             >
-              Cancel result
+              {params.row.status === "cancelled"
+                ? "Cancelled"
+                : "Cancel result"}
             </Button>
           </Box>
         ) : null,

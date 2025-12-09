@@ -46,5 +46,6 @@ export interface ReviewQuestionDTO extends Question {
   choices?: ReviewChoiceDTO[];
   is_flagged?: boolean;
   answered_correctly?: boolean;
+  programming_language?: ProgrammingLanguage;
   // Only Standard type questions are reviewed, no Coding type questions
 }

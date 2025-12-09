@@ -80,6 +80,16 @@ const gradeSubmission = async ({
   return api.post<void>(`/attempts/grade/${attemptId}`, gradeData);
 };
 
+const deleteAttempt = async (attemptId: string): Promise<void> => {
+  if (!auth.currentUser) throw new Error("Not authenticated");
+  return api.delete<void>(`/attempts/${attemptId}`);
+};
+
+const cancelResult = async (attemptId: string): Promise<void> => {
+  if (!auth.currentUser) throw new Error("Not authenticated");
+  return api.post<void>(`/attempts/cancel-result/${attemptId}`, {});
+};
+
 // React Query Hooks
 export const useJoinExam = () => {
   const queryClient = useQueryClient();
@@ -183,6 +193,40 @@ export const useGradeSubmission = () => {
       });
       queryClient.invalidateQueries({
         queryKey: queryKeys.exams.all,
+      });
+    },
+  });
+};
+
+export const useDeleteAttempt = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteAttempt,
+    onSuccess: () => {
+      // Invalidate attempts and results to refetch updated data
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.attempts.all,
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.results.all,
+      });
+    },
+  });
+};
+
+export const useCancelResult = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: cancelResult,
+    onSuccess: () => {
+      // Invalidate attempts and results to refetch updated data
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.attempts.all,
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.results.all,
       });
     },
   });

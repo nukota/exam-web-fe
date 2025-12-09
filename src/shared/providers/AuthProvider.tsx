@@ -29,8 +29,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   useEffect(() => {
     console.log("🔐 Setting up Firebase auth state listener");
 
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       console.log("🔐 Auth state changed:", user ? user.email : "No user");
+
+      if (user) {
+        try {
+          const idToken = await user.getIdToken();
+          console.log("🔐 User ID Token:", idToken);
+        } catch (error) {
+          console.error("🔐 Error getting ID token:", error);
+        }
+      }
+
       setFirebaseUser(user);
       setLoading(false);
     });

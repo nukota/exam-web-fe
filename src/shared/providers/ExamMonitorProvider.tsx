@@ -61,9 +61,8 @@ export const ExamMonitorProvider = ({ children }: ExamMonitorProviderProps) => {
         await (elem as any).msRequestFullscreen();
       }
       // Don't set state here - let the fullscreenchange event handler do it
-      console.log("ExamMonitor: Fullscreen requested");
     } catch (error) {
-      console.error("ExamMonitor: Failed to enter fullscreen:", error);
+      // Error handled silently
     }
   }, []);
 
@@ -73,18 +72,13 @@ export const ExamMonitorProvider = ({ children }: ExamMonitorProviderProps) => {
     setHasExitedFullscreen(false);
     setHasEnteredFullscreen(false);
     setIsMonitoring(true);
-    console.log("ExamMonitor: Monitoring counters reset and enabled");
   }, []);
 
   // Monitor visibility change (tab switching/minimizing)
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden && isMonitoring) {
-        setTabSwitches((prev) => {
-          const newCount = prev + 1;
-          console.log("ExamMonitor: Tab switch detected, count:", newCount);
-          return newCount;
-        });
+        setTabSwitches((prev) => prev + 1);
       }
     };
 
@@ -98,29 +92,22 @@ export const ExamMonitorProvider = ({ children }: ExamMonitorProviderProps) => {
   useEffect(() => {
     const handleFullscreenChange = () => {
       const isCurrentlyFullscreen = checkFullscreen();
-      console.log(
-        "ExamMonitor: Fullscreen change event, isFullscreen:",
-        isCurrentlyFullscreen
-      );
       setIsFullscreen(isCurrentlyFullscreen);
 
       // Track when user enters fullscreen
       if (isCurrentlyFullscreen && isMonitoring) {
         setHasEnteredFullscreen(true);
-        console.log("ExamMonitor: Fullscreen mode entered");
       }
 
       // If user exits fullscreen after having entered it while monitoring, set flag
       if (!isCurrentlyFullscreen && isMonitoring && hasEnteredFullscreen) {
         setHasExitedFullscreen(true);
-        console.log("ExamMonitor: Fullscreen exit detected");
       }
     };
 
     // Check initial fullscreen state
     const initialFullscreen = checkFullscreen();
     setIsFullscreen(initialFullscreen);
-    console.log("ExamMonitor: Initial fullscreen state:", initialFullscreen);
 
     document.addEventListener("fullscreenchange", handleFullscreenChange);
     document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
@@ -144,40 +131,11 @@ export const ExamMonitorProvider = ({ children }: ExamMonitorProviderProps) => {
     };
   }, [isMonitoring, checkFullscreen, hasEnteredFullscreen]);
 
-  // Monitor window focus/blur
-  useEffect(() => {
-    const handleBlur = () => {
-      if (isMonitoring) {
-        console.log("ExamMonitor: Window focus lost");
-      }
-    };
-
-    const handleFocus = () => {
-      if (isMonitoring) {
-        console.log("ExamMonitor: Window focus regained");
-      }
-    };
-
-    window.addEventListener("blur", handleBlur);
-    window.addEventListener("focus", handleFocus);
-
-    return () => {
-      window.removeEventListener("blur", handleBlur);
-      window.removeEventListener("focus", handleFocus);
-    };
-  }, [isMonitoring]);
-
   // Enable monitoring when on exam pages
   useEffect(() => {
     const pathname = window.location.pathname;
     const isExamPage = /^\/student\/exam\//.test(pathname);
     setIsMonitoring(isExamPage);
-
-    if (isExamPage) {
-      console.log("ExamMonitor: Monitoring enabled");
-    } else {
-      console.log("ExamMonitor: Monitoring disabled");
-    }
   }, []);
 
   const value: ExamMonitorContextType = {

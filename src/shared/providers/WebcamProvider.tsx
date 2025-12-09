@@ -58,9 +58,7 @@ export const WebcamProvider = ({ children }: WebcamProviderProps) => {
 
   // Cleanup on unmount
   useEffect(() => {
-    console.log("WebcamProvider: cleanup useEffect triggered");
     return () => {
-      console.log("WebcamProvider: unmounting, cleaning up");
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((track) => track.stop());
       }
@@ -68,35 +66,28 @@ export const WebcamProvider = ({ children }: WebcamProviderProps) => {
   }, []);
 
   const stopWebcam = useCallback(() => {
-    console.log("WebcamProvider: stopWebcam called");
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
       setStream(null);
       setIsWebcamEnabled(false);
       sessionStorage.removeItem("examWebcamEnabled");
-      console.log("WebcamProvider: webcam stopped and cleaned up");
     }
   }, []);
 
   // Auto-stop webcam when navigating away from allowed routes
   useEffect(() => {
     if (!isWebcamAllowedRoute(location.pathname) && isWebcamEnabled) {
-      console.log(
-        "WebcamProvider: Navigating away from allowed route, stopping webcam"
-      );
       stopWebcam();
     }
   }, [location.pathname, isWebcamEnabled, isWebcamAllowedRoute, stopWebcam]);
 
   const startWebcam = useCallback(async () => {
-    console.log("WebcamProvider: startWebcam called");
     try {
       setError(null);
 
       // Stop any existing stream first
       if (streamRef.current) {
-        console.log("WebcamProvider: stopping existing stream");
         stopWebcam();
       }
 
@@ -109,7 +100,6 @@ export const WebcamProvider = ({ children }: WebcamProviderProps) => {
       setStream(mediaStream);
       setIsWebcamEnabled(true);
       sessionStorage.setItem("examWebcamEnabled", "true");
-      console.log("WebcamProvider: webcam started successfully");
     } catch (err: any) {
       console.error("Error accessing webcam:", err);
       setError(

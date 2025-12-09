@@ -35,7 +35,7 @@ export const StudentAllResultsPage = () => {
       headerAlign: "center",
       renderCell: (params) => (
         <Typography variant="body2" fontWeight="medium">
-          {params.row.status !== "graded"
+          {params.row.status !== "graded" || params.value === undefined
             ? "-"
             : `${params.value} / ${params.row.exam.max_score}`}
         </Typography>
@@ -56,7 +56,7 @@ export const StudentAllResultsPage = () => {
             color={passed ? "success.main" : "error.main"}
             fontWeight="medium"
           >
-            {params.row.status !== "graded"
+            {params.row.status !== "graded" || percentage === undefined
               ? "-"
               : `${percentage?.toFixed(1)}%`}
           </Typography>
@@ -120,7 +120,10 @@ export const StudentAllResultsPage = () => {
       renderCell: (params) => (
         <IconButton
           size="small"
-          disabled={params.row.status !== "graded"}
+          disabled={
+            params.row.status !== "graded" ||
+            params.row.total_score === undefined
+          }
           onClick={() =>
             navigate(`/student/exam/${params.row.exam.exam_id}/result`)
           }

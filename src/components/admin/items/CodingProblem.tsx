@@ -113,8 +113,9 @@ export const CodingProblem: React.FC<CodingProblemProps> = ({
           fontWeight="bold"
           sx={{ textAlign: "left", mb: 1 }}
         >
-          Submitted Code:
+          Submitted Code: {question.programming_language?.toLocaleUpperCase()}
         </Typography>
+
         <Box
           sx={{
             p: 2,

@@ -1,4 +1,4 @@
-import type { ExamLeaderboardPageDTO } from "./dtos";
+// import type { ExamLeaderboardPageDTO } from "./dtos";
 
 // // Mock Users
 // export const mockUsers: User[] = [
@@ -354,65 +354,65 @@ import type { ExamLeaderboardPageDTO } from "./dtos";
 // ];
 
 // Mock Leaderboard Data
-export const mockLeaderboardData: ExamLeaderboardPageDTO = {
-  exam: {
-    exam_id: "1",
-    title: "Introduction to Computer Science",
-    max_score: 11,
-  },
-  leaderboard: [
-    {
-      rank: 1,
-      student: {
-        user_id: "student1",
-        full_name: "Alice Johnson",
-        email: "alice@example.com",
-      },
-      score: 11,
-      submitted_at: "2025-11-14T09:45:00",
-    },
-    {
-      rank: 2,
-      student: {
-        user_id: "student2",
-        full_name: "Bob Smith",
-        email: "bob@example.com",
-      },
-      score: 10,
-      submitted_at: "2025-11-14T10:12:00",
-    },
-    {
-      rank: 3,
-      student: {
-        user_id: "student3",
-        full_name: "Carol White",
-        email: "carol@example.com",
-      },
-      score: 9,
-      submitted_at: "2025-11-14T10:05:00",
-    },
-    {
-      rank: 4,
-      student: {
-        user_id: "student4",
-        full_name: "David Brown",
-        email: "david@example.com",
-      },
-      score: 9,
-      submitted_at: "2025-11-14T10:20:00",
-    },
-    {
-      rank: 5,
-      student: {
-        user_id: "student5",
-        full_name: "Eve Davis",
-        email: "eve@example.com",
-      },
-      score: 8,
-      submitted_at: "2025-11-14T10:30:00",
-    },
-  ],
-};
+// export const mockLeaderboardData: ExamLeaderboardPageDTO = {
+//   exam: {
+//     exam_id: "1",
+//     title: "Introduction to Computer Science",
+//     max_score: 11,
+//   },
+//   leaderboard: [
+//     {
+//       rank: 1,
+//       student: {
+//         user_id: "student1",
+//         full_name: "Alice Johnson",
+//         email: "alice@example.com",
+//       },
+//       score: 11,
+//       submitted_at: "2025-11-14T09:45:00",
+//     },
+//     {
+//       rank: 2,
+//       student: {
+//         user_id: "student2",
+//         full_name: "Bob Smith",
+//         email: "bob@example.com",
+//       },
+//       score: 10,
+//       submitted_at: "2025-11-14T10:12:00",
+//     },
+//     {
+//       rank: 3,
+//       student: {
+//         user_id: "student3",
+//         full_name: "Carol White",
+//         email: "carol@example.com",
+//       },
+//       score: 9,
+//       submitted_at: "2025-11-14T10:05:00",
+//     },
+//     {
+//       rank: 4,
+//       student: {
+//         user_id: "student4",
+//         full_name: "David Brown",
+//         email: "david@example.com",
+//       },
+//       score: 9,
+//       submitted_at: "2025-11-14T10:20:00",
+//     },
+//     {
+//       rank: 5,
+//       student: {
+//         user_id: "student5",
+//         full_name: "Eve Davis",
+//         email: "eve@example.com",
+//       },
+//       score: 8,
+//       submitted_at: "2025-11-14T10:30:00",
+//     },
+//   ],
+// };
 
 // export const mockResults: MyResultsPageDTO = {
 //   results: [
