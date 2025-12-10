@@ -69,8 +69,8 @@ export const AdminLeaderboardPage = () => {
     {
       field: "student",
       headerName: "Student",
-      flex: 1,
-      minWidth: 220,
+      flex: 0.8,
+      minWidth: 200,
       renderCell: (params) => (
         <Box sx={{ display: "flex", flexDirection: "column", gap: 0 }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -89,10 +89,12 @@ export const AdminLeaderboardPage = () => {
       field: "score",
       headerName: "Score",
       width: 120,
-      align: "center",
       headerAlign: "center",
       renderCell: (params) => (
-        <Typography fontWeight="bold">
+        <Typography
+          fontWeight="bold"
+          sx={{ textAlign: "right", width: "100%" }}
+        >
           {params.row.status === "graded" || params.row.status === "submitted"
             ? params.value !== null && params.value !== undefined
               ? `${params.value}/${maxScore}`
@@ -105,7 +107,6 @@ export const AdminLeaderboardPage = () => {
       field: "percentage",
       headerName: "Percentage",
       width: 120,
-      align: "center",
       headerAlign: "center",
       renderCell: (params) => {
         if (
@@ -113,14 +114,22 @@ export const AdminLeaderboardPage = () => {
           params.row.status !== "submitted"
         ) {
           return (
-            <Typography fontWeight="bold" color="text.secondary">
+            <Typography
+              fontWeight="bold"
+              sx={{ textAlign: "right", width: "100%" }}
+              color="text.secondary"
+            >
               -
             </Typography>
           );
         }
         if (params.row.score === null || params.row.score === undefined) {
           return (
-            <Typography fontWeight="bold" color="text.secondary">
+            <Typography
+              fontWeight="bold"
+              sx={{ textAlign: "right", width: "100%" }}
+              color="text.secondary"
+            >
               -
             </Typography>
           );
@@ -129,6 +138,7 @@ export const AdminLeaderboardPage = () => {
         return (
           <Typography
             fontWeight="bold"
+            sx={{ textAlign: "right", width: "100%" }}
             color={
               percentage >= 80
                 ? "#4caf50"

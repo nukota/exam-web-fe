@@ -112,13 +112,16 @@ export const AdminGradingPage = () => {
     {
       field: "graded_submissions",
       headerName: "Graded Submissions",
-      width: 220,
+      width: 200,
       headerAlign: "center",
       renderCell: (params) => {
         const graded =
           params.row.total_submissions - params.row.pending_submissions;
         return (
-          <Typography variant="body2">
+          <Typography
+            variant="body2"
+            sx={{ textAlign: "right", width: "100%" }}
+          >
             {graded}/{params.row.total_submissions}
           </Typography>
         );

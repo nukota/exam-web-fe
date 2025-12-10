@@ -108,15 +108,39 @@ export const AdminStudentsPage = () => {
       field: "dob",
       headerName: "Date of Birth",
       flex: 0.5,
-      valueFormatter: (value) =>
-        value ? new Date(value).toLocaleDateString() : "N/A",
+      headerAlign: "center",
+      renderCell: (params) => {
+        const formattedDate = params.value
+          ? new Date(params.value).toLocaleDateString()
+          : "N/A";
+        return (
+          <Typography
+            variant="body2"
+            sx={{ textAlign: "right", width: "100%" }}
+          >
+            {formattedDate}
+          </Typography>
+        );
+      },
     },
     {
       field: "created_at",
       headerName: "Joined Date",
       flex: 0.5,
-      valueFormatter: (value) =>
-        value ? new Date(value).toLocaleDateString() : "N/A",
+      headerAlign: "center",
+      renderCell: (params) => {
+        const formattedDate = params.value
+          ? new Date(params.value).toLocaleDateString()
+          : "N/A";
+        return (
+          <Typography
+            variant="body2"
+            sx={{ textAlign: "right", width: "100%" }}
+          >
+            {formattedDate}
+          </Typography>
+        );
+      },
     },
     {
       field: "actions",

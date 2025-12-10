@@ -179,7 +179,7 @@ export const AdminExamSubmissionsPage = () => {
       headerName: "Score",
       width: 120,
       renderCell: (params) => (
-        <Typography variant="body2">
+        <Typography variant="body2" sx={{ textAlign: "right", width: "100%" }}>
           {params.row.status === "graded"
             ? `${params.row.total_score} / ${max_score}`
             : "-"}
@@ -201,7 +201,11 @@ export const AdminExamSubmissionsPage = () => {
             ? "warning.main"
             : "error.main";
         return (
-          <Typography variant="body2" color={color}>
+          <Typography
+            variant="body2"
+            sx={{ textAlign: "right", width: "100%" }}
+            color={color}
+          >
             {percentage ? `${percentage.toFixed(1)}%` : "-"}
           </Typography>
         );

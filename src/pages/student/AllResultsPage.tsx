@@ -34,7 +34,11 @@ export const StudentAllResultsPage = () => {
       align: "center",
       headerAlign: "center",
       renderCell: (params) => (
-        <Typography variant="body2" fontWeight="medium">
+        <Typography
+          variant="body2"
+          fontWeight="medium"
+          sx={{ textAlign: "right", width: "100%" }}
+        >
           {params.row.status !== "graded" || params.value === undefined
             ? "-"
             : `${params.value} / ${params.row.exam.max_score}`}
@@ -54,6 +58,7 @@ export const StudentAllResultsPage = () => {
           <Typography
             variant="body2"
             color={passed ? "success.main" : "error.main"}
+            sx={{ textAlign: "right", width: "100%" }}
             fontWeight="medium"
           >
             {params.row.status !== "graded" || percentage === undefined
@@ -67,7 +72,6 @@ export const StudentAllResultsPage = () => {
       field: "status",
       headerName: "Status",
       width: 150,
-      align: "center",
       headerAlign: "center",
       renderCell: (params) => {
         const statusColors = {
@@ -97,10 +101,19 @@ export const StudentAllResultsPage = () => {
       headerName: "Submitted At",
       flex: 0.6,
       minWidth: 180,
-      valueFormatter: (value) => {
-        if (!value) return "N/A";
-        const date = new Date(value);
-        return date.toLocaleString("en-US", {
+      headerAlign: "right",
+      renderCell: (params) => {
+        if (!params.value)
+          return (
+            <Typography
+              variant="body2"
+              sx={{ textAlign: "right", width: "100%" }}
+            >
+              N/A
+            </Typography>
+          );
+        const date = new Date(params.value);
+        const formattedDate = date.toLocaleString("en-US", {
           month: "short",
           day: "numeric",
           year: "numeric",
@@ -108,13 +121,20 @@ export const StudentAllResultsPage = () => {
           minute: "2-digit",
           hour12: true,
         });
+        return (
+          <Typography
+            variant="body2"
+            sx={{ textAlign: "right", width: "100%" }}
+          >
+            {formattedDate}
+          </Typography>
+        );
       },
     },
     {
       field: "actions",
       headerName: "Actions",
       width: 120,
-      align: "center",
       headerAlign: "center",
       sortable: false,
       renderCell: (params) => (

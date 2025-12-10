@@ -164,20 +164,27 @@ export const AdminExamsPage = () => {
         </Box>
       ),
     },
-
     {
       field: "question_amount",
       headerName: "Questions",
       width: 100,
-      valueFormatter: (value) => {
-        value;
-      },
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ textAlign: "right", width: "100%" }}>
+          {params.value}
+        </Typography>
+      ),
     },
     {
       field: "duration_minutes",
       headerName: "Duration",
       width: 100,
-      valueFormatter: (value) => `${value} min`,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ textAlign: "right", width: "100%" }}>
+          {params.value} min
+        </Typography>
+      ),
     },
     {
       field: "date",
