@@ -67,11 +67,9 @@ export const WebcamProvider = ({ children }: WebcamProviderProps) => {
   }, []);
 
   const stopWebcam = useCallback(() => {
-    console.log("Stopping webcam, streamRef:", !!streamRef.current);
     // Stop tracks from streamRef
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => {
-        console.log("Stopping track:", track.kind, track.readyState);
         track.stop();
       });
       streamRef.current = null;
@@ -90,25 +88,14 @@ export const WebcamProvider = ({ children }: WebcamProviderProps) => {
     });
     setIsWebcamEnabled(false);
     sessionStorage.removeItem("examWebcamEnabled");
-    console.log("Webcam stopped successfully");
   }, []);
 
   // Auto-stop webcam when navigating away from allowed routes
   useEffect(() => {
-    console.log("Route changed to:", location.pathname);
-    console.log("Is allowed route:", isWebcamAllowedRoute(location.pathname));
-    console.log(
-      "Stream exists:",
-      !!streamRef.current,
-      "isWebcamEnabled:",
-      isWebcamEnabled
-    );
-
     if (
       !isWebcamAllowedRoute(location.pathname) &&
       (streamRef.current || isWebcamEnabled)
     ) {
-      console.log("Auto-stopping webcam due to route change");
       stopWebcam();
     }
   }, [location.pathname, isWebcamAllowedRoute, stopWebcam, isWebcamEnabled]);

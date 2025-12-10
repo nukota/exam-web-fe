@@ -49,13 +49,6 @@ export const StudentStandardExamPage = () => {
     }
   `;
 
-  // Cleanup webcam on unmount
-  useEffect(() => {
-    return () => {
-      stopWebcam();
-    };
-  }, [stopWebcam]);
-
   useEffect(() => {
     if (exam && exam.duration_minutes) {
       // Reset monitoring counters
@@ -91,6 +84,7 @@ export const StudentStandardExamPage = () => {
 
     // Stop webcam
     stopWebcam();
+    console.log("Webcam stopped for exam submission.");
 
     // Convert answers to AnswerSubmissionDTO format
     const answerSubmissions: AnswerSubmissionDTO[] = Object.entries(

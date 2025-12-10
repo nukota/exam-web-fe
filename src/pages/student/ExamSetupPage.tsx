@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Box,
@@ -7,6 +7,8 @@ import {
   Alert,
   CircularProgress,
   Container,
+  Switch,
+  FormControlLabel,
 } from "@mui/material";
 import { useExam } from "../../services/examsService";
 import { useWebcam } from "../../shared/providers/WebcamProvider";
@@ -16,8 +18,10 @@ export const StudentExamSetupPage = () => {
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  const [webcamEnabled, setWebcamEnabled] = useState(false);
+
   const { data: exam, isLoading } = useExam(examId || "");
-  const { stream, error, startWebcam } = useWebcam();
+  const { stream, error, startWebcam, stopWebcam } = useWebcam();
 
   // Update video element when stream changes
   useEffect(() => {
@@ -28,10 +32,15 @@ export const StudentExamSetupPage = () => {
     }
   }, [stream]);
 
-  // Auto-start webcam on mount
-  useEffect(() => {
-    startWebcam();
-  }, [startWebcam]);
+  const handleWebcamToggle = async (enabled: boolean) => {
+    setWebcamEnabled(enabled);
+
+    if (enabled) {
+      await startWebcam();
+    } else {
+      stopWebcam();
+    }
+  };
 
   const handleTakeExam = () => {
     if (!examId || !exam) return;
@@ -45,7 +54,7 @@ export const StudentExamSetupPage = () => {
   };
 
   const canProceed = () => {
-    return stream !== null;
+    return webcamEnabled && stream !== null;
   };
 
   if (isLoading) {
@@ -138,12 +147,24 @@ export const StudentExamSetupPage = () => {
           </Box>
 
           <Box sx={{ mt: 2 }}>
-            <Typography variant="body1" fontWeight={500} sx={{ mb: 2 }}>
-              Webcam Preview
-            </Typography>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2, my: 2 }}>
+              <Typography variant="body1" fontWeight={500}>
+                Enable Webcam
+              </Typography>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={webcamEnabled}
+                    onChange={(e) => handleWebcamToggle(e.target.checked)}
+                    color="primary"
+                  />
+                }
+                label=""
+              />
+            </Box>
 
             {/* Webcam Preview */}
-            {
+            {webcamEnabled && (
               <Box
                 sx={{
                   height: 330,
@@ -207,7 +228,7 @@ export const StudentExamSetupPage = () => {
                   </Typography>
                 )}
               </Box>
-            }
+            )}
 
             {/* Error Message */}
             {error && (
