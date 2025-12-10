@@ -49,6 +49,13 @@ export const StudentStandardExamPage = () => {
     }
   `;
 
+  // Cleanup webcam on unmount
+  useEffect(() => {
+    return () => {
+      stopWebcam();
+    };
+  }, [stopWebcam]);
+
   useEffect(() => {
     if (exam && exam.duration_minutes) {
       // Reset monitoring counters

@@ -15,11 +15,13 @@ import { useCurrentUser } from "../../services/authService";
 import { useUpdateProfile } from "../../services/usersService";
 import { useNavigate } from "react-router-dom";
 import Card from "../../components/common/Card";
+import { useFeedback } from "../../shared/providers/FeedbackProvider";
 
 export const AdminProfilePage = () => {
   const { data: currentUser } = useCurrentUser();
   const navigate = useNavigate();
   const updateProfile = useUpdateProfile();
+  const { showSnackbar } = useFeedback();
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState({
     school_name: currentUser?.school_name || "",
@@ -34,6 +36,16 @@ export const AdminProfilePage = () => {
     updateProfile.mutate(updateData, {
       onSuccess: () => {
         setIsEditing(false);
+        showSnackbar({
+          message: "Profile updated successfully",
+          severity: "success",
+        });
+      },
+      onError: (error: any) => {
+        showSnackbar({
+          message: error.message || "Failed to update profile",
+          severity: "error",
+        });
       },
     });
   };

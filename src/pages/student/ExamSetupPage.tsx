@@ -1,15 +1,12 @@
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Box,
   Typography,
   Button,
-  TextField,
   Alert,
   CircularProgress,
   Container,
-  Switch,
-  FormControlLabel,
 } from "@mui/material";
 import { useExam } from "../../services/examsService";
 import { useWebcam } from "../../shared/providers/WebcamProvider";
@@ -19,11 +16,8 @@ export const StudentExamSetupPage = () => {
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const [webcamEnabled, setWebcamEnabled] = useState<boolean | null>(null);
-  const [noWebcamReason, setNoWebcamReason] = useState("");
-
   const { data: exam, isLoading } = useExam(examId || "");
-  const { stream, error, startWebcam, stopWebcam } = useWebcam();
+  const { stream, error, startWebcam } = useWebcam();
 
   // Update video element when stream changes
   useEffect(() => {
@@ -34,17 +28,10 @@ export const StudentExamSetupPage = () => {
     }
   }, [stream]);
 
-  const handleWebcamChoice = async (enabled: boolean) => {
-    setWebcamEnabled(enabled);
-    setNoWebcamReason("");
-
-    if (enabled) {
-      await startWebcam();
-    } else {
-      // Stop webcam if it was already running
-      stopWebcam();
-    }
-  };
+  // Auto-start webcam on mount
+  useEffect(() => {
+    startWebcam();
+  }, [startWebcam]);
 
   const handleTakeExam = () => {
     if (!examId || !exam) return;
@@ -58,11 +45,7 @@ export const StudentExamSetupPage = () => {
   };
 
   const canProceed = () => {
-    if (webcamEnabled === null) return false;
-    if (webcamEnabled) {
-      return stream !== null;
-    }
-    return noWebcamReason.trim().length > 0;
+    return stream !== null;
   };
 
   if (isLoading) {
@@ -155,24 +138,12 @@ export const StudentExamSetupPage = () => {
           </Box>
 
           <Box sx={{ mt: 2 }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2, my: 2 }}>
-              <Typography variant="body1" fontWeight={500}>
-                Enable Webcam
-              </Typography>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={webcamEnabled || false}
-                    onChange={(e) => handleWebcamChoice(e.target.checked)}
-                    color="primary"
-                  />
-                }
-                label=""
-              />
-            </Box>
+            <Typography variant="body1" fontWeight={500} sx={{ mb: 2 }}>
+              Webcam Preview
+            </Typography>
 
             {/* Webcam Preview */}
-            {webcamEnabled && (
+            {
               <Box
                 sx={{
                   height: 330,
@@ -236,30 +207,7 @@ export const StudentExamSetupPage = () => {
                   </Typography>
                 )}
               </Box>
-            )}
-
-            {/* No Webcam Reason */}
-            {webcamEnabled === false && (
-              <Box sx={{ height: 330, width: { xs: 400, lg: 540 } }}>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ mb: 2 }}
-                >
-                  You may report the reason why you cannot use a webcam for this
-                  exam.
-                </Typography>
-                <TextField
-                  fullWidth
-                  multiline
-                  rows={2}
-                  label="Reason for not using webcam"
-                  placeholder="Please explain why you cannot use a webcam..."
-                  value={noWebcamReason}
-                  onChange={(e) => setNoWebcamReason(e.target.value)}
-                />
-              </Box>
-            )}
+            }
 
             {/* Error Message */}
             {error && (

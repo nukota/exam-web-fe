@@ -47,6 +47,13 @@ export const StudentCodingExamPage = () => {
     }
   `;
 
+  // Cleanup webcam on unmount
+  useEffect(() => {
+    return () => {
+      stopWebcam();
+    };
+  }, [stopWebcam]);
+
   useEffect(() => {
     if (exam && exam.duration_minutes) {
       // Only initialize monitoring and fullscreen on first load

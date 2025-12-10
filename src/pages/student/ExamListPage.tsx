@@ -15,6 +15,7 @@ import { isExamActive } from "../../shared/utils";
 import { useExams } from "../../services/examsService";
 import { useJoinExam, useLeaveExam } from "../../services/attemptsService";
 import { useFeedback } from "../../shared/providers/FeedbackProvider";
+import { useCurrentUser } from "../../services/authService";
 
 export const StudentExamListPage = () => {
   const [accessCode, setAccessCode] = useState("");
@@ -22,9 +23,20 @@ export const StudentExamListPage = () => {
   const navigate = useNavigate();
   const { showSnackbar } = useFeedback();
 
+  const { data: currentUser } = useCurrentUser();
   const { data: exams, isLoading, error } = useExams();
   const joinExamMutation = useJoinExam();
   const leaveExamMutation = useLeaveExam();
+
+  const isProfileComplete = (user: typeof currentUser) => {
+    if (!user) return false;
+    return !!(
+      user.full_name &&
+      user.dob &&
+      user.class_name &&
+      user.school_name
+    );
+  };
 
   const handleStartExam = (examId: string, _examType: string) => {
     // Always navigate to setup page first
@@ -39,6 +51,14 @@ export const StudentExamListPage = () => {
     if (!accessCode.trim()) {
       showSnackbar({
         message: "Please enter an exam code",
+        severity: "warning",
+      });
+      return;
+    }
+
+    if (!isProfileComplete(currentUser)) {
+      showSnackbar({
+        message: "Please update your profile first",
         severity: "warning",
       });
       return;

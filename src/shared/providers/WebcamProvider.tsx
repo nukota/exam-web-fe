@@ -61,26 +61,57 @@ export const WebcamProvider = ({ children }: WebcamProviderProps) => {
     return () => {
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
       }
     };
   }, []);
 
   const stopWebcam = useCallback(() => {
+    console.log("Stopping webcam, streamRef:", !!streamRef.current);
+    // Stop tracks from streamRef
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current.getTracks().forEach((track) => {
+        console.log("Stopping track:", track.kind, track.readyState);
+        track.stop();
+      });
       streamRef.current = null;
-      setStream(null);
-      setIsWebcamEnabled(false);
-      sessionStorage.removeItem("examWebcamEnabled");
     }
+    // Always reset state to ensure UI is in sync
+    setStream((currentStream) => {
+      // Also stop tracks from state if different from ref (edge case)
+      if (currentStream) {
+        currentStream.getTracks().forEach((track) => {
+          if (track.readyState === "live") {
+            track.stop();
+          }
+        });
+      }
+      return null;
+    });
+    setIsWebcamEnabled(false);
+    sessionStorage.removeItem("examWebcamEnabled");
+    console.log("Webcam stopped successfully");
   }, []);
 
   // Auto-stop webcam when navigating away from allowed routes
   useEffect(() => {
-    if (!isWebcamAllowedRoute(location.pathname) && isWebcamEnabled) {
+    console.log("Route changed to:", location.pathname);
+    console.log("Is allowed route:", isWebcamAllowedRoute(location.pathname));
+    console.log(
+      "Stream exists:",
+      !!streamRef.current,
+      "isWebcamEnabled:",
+      isWebcamEnabled
+    );
+
+    if (
+      !isWebcamAllowedRoute(location.pathname) &&
+      (streamRef.current || isWebcamEnabled)
+    ) {
+      console.log("Auto-stopping webcam due to route change");
       stopWebcam();
     }
-  }, [location.pathname, isWebcamEnabled, isWebcamAllowedRoute, stopWebcam]);
+  }, [location.pathname, isWebcamAllowedRoute, stopWebcam, isWebcamEnabled]);
 
   const startWebcam = useCallback(async () => {
     try {
